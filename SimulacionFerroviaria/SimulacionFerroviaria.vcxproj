@@ -84,6 +84,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CameraController.h" />
+    <ClInclude Include="CigiNetworkManager.h" />
+    <ClInclude Include="ControlEventProcessor.h" />
     <ClInclude Include="DataEventProcessor.h" />
     <ClInclude Include="DataPacket.h" />
     <ClInclude Include="GraphicManager.h" />
@@ -93,6 +95,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CameraController.cpp" />
+    <ClCompile Include="CigiNetworkManager.cpp" />
+    <ClCompile Include="ControlEventProcessor.cpp" />
     <ClCompile Include="DataEventProcessor.cpp" />
     <ClCompile Include="DataPacket.cpp" />
     <ClCompile Include="GraphicManager.cpp" />

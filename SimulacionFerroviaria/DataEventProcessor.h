@@ -4,7 +4,7 @@
 #include "CigiEntityCtrlV3_3.h"
 #include <osg\MatrixTransform>
 
-class DataEventProcessor : CigiBaseEventProcessor
+class DataEventProcessor : public CigiBaseEventProcessor
 {
 public:
 	DataEventProcessor();
