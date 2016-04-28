@@ -2,17 +2,17 @@
 #include "DataEventProcessor.h"
 #include <iostream>
 
-DataEventProcessor::DataEventProcessor()
+DataEventProcessor::DataEventProcessor(SceneData* data) : TPckt(nullptr), data(data)
 {
-	transform = new osg::MatrixTransform();
-	transform->setMatrix(osg::Matrix::identity());
 }
 
 void DataEventProcessor::OnPacketReceived(CigiBasePacket *Packet)
 {
 	CigiEntityCtrlV3_3 *InPckt = (CigiEntityCtrlV3_3 *)Packet;
 	setOriginPacket(InPckt);
-	//transform->setMatrix(osg::Matrix::translate(InPckt->GetXoff(), InPckt->GetYoff(), InPckt->GetZoff()));
+
+	data->setData(InPckt->GetXoff(), InPckt->GetYoff(), InPckt->GetZoff());
+
 	std::cout << "===>EntityCtrl <===" << std::endl;
 	std::cout << "EntityID ==> " << InPckt->GetEntityID() << std::endl;
 	std::cout << "EntityState ==> " << InPckt->GetEntityState() << std::endl;

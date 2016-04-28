@@ -8,13 +8,15 @@
 #include "DataPacket.h"
 #include <vector>
 #include "CigiNetworkManager.h"
+#include "SceneData.h"
 
 //using boost::asio::ip::udp;
 
 int _tmain(int argc, _TCHAR* argv[])
 {
 	//NetworkManager netmng;
-	//GraphicManager graphmng;
+	SceneData data;
+	GraphicManager graphmng(&data);
 
 	//std::cout << "Esperando entrada de datos..." << std::endl;
 	//auto data = netmng.readSimulationData("127.0.0.1", "8888", 500);
@@ -25,8 +27,10 @@ int _tmain(int argc, _TCHAR* argv[])
 	//}
 	//return graphmng.runScene();
 
-	CigiNetworkManager mng;
-	mng.run();
+	CigiNetworkManager mng(&data);
+	mng.startThread();
+	graphmng.runScene();
+	mng.cancel();
 	return 0;
 }
 

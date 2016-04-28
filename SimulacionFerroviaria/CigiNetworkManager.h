@@ -6,19 +6,25 @@
 #include <boost\array.hpp>
 #include <CigiIGSession.h>
 #include <CigiSOFV3_2.h>
+#include <OpenThreads\Thread>
 #include <memory>
 #include "DataEventProcessor.h"
 #include "ControlEventProcessor.h"
+#include "SceneData.h"
 
 using boost::asio::ip::udp;
 
-class CigiNetworkManager
+class CigiNetworkManager : public OpenThreads::Thread
 {
 public:
-	CigiNetworkManager();
-	void run();
+	CigiNetworkManager(SceneData* data);
+	virtual int cancel();
+	virtual void run();
 	virtual ~CigiNetworkManager();
 private:
+	SceneData* data;
+	//OpenThreads::Mutex mutex;
+	bool done;
 	int inBufferSize;
 	int outBufferSize;
 	boost::array<unsigned char, RECV_BUFFER_SIZE> inBuffer;

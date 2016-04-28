@@ -6,8 +6,9 @@
 #include <osgDB\ReadFile>
 #include <osgGA\TrackballManipulator>
 #include <iostream>
+#include "UpdateTransformCallback.h"
 
-GraphicManager::GraphicManager() : _path(nullptr), _sceneRoot(nullptr), _cameraCtrl(nullptr)
+GraphicManager::GraphicManager(SceneData* data) : _data(data), _path(nullptr), _sceneRoot(nullptr), _cameraCtrl(nullptr)
 {
 	_path = new osg::AnimationPath();
 }
@@ -39,11 +40,14 @@ void GraphicManager::createScene(){
 		osg::Vec4(1.0f, 1.0f, 0.5f, 1.0f));
 	osg::ref_ptr<osg::MatrixTransform> scene = new osg::MatrixTransform;
 	scene->addChild(model.get());
-	osg::ref_ptr<osg::AnimationPathCallback> apcb = new	osg::AnimationPathCallback;
-	apcb->setAnimationPath(_path);
-	scene->setUpdateCallback(apcb.get());
+	//osg::ref_ptr<osg::AnimationPathCallback> apcb = new	osg::AnimationPathCallback;
+	//apcb->setAnimationPath(_path);
+	//scene->setUpdateCallback(apcb.get());
+	//osg::ref_ptr<UpdateTransformCallback> updcb = new UpdateTransformCallback(_data);
+	scene->setUpdateCallback(new UpdateTransformCallback(_data));
 
-	osg::Vec3 center = osg::Vec3(0.0f, 0.0f, 0.0f);
+
+	osg::Vec3 center = osg::Vec3(38.0f, -90.0f, 1000.0f);
 	double radius = model->getBound().radius();
 
 	osg::ref_ptr<osg::Camera> mainCamera = createCamera(center - (-osg::Z_AXIS * radius * 15.0), center, osg::Y_AXIS, scene.get());
