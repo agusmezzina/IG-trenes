@@ -27,10 +27,10 @@ int _tmain(int argc, _TCHAR* argv[])
 	//}
 	//return graphmng.runScene();
 
-	CigiNetworkManager mng(&data);
-	mng.startThread();
+	//CigiNetworkManager mng(&data);
+	//mng.startThread();
 	graphmng.runScene();
-	mng.cancel();
+	//mng.cancel();
 	return 0;
 }
 

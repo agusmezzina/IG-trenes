@@ -5,10 +5,11 @@
 #include <osg\Switch>
 #include <osgDB\ReadFile>
 #include <osgGA\TrackballManipulator>
+#include <osgViewer\ViewerEventHandlers>
 #include <iostream>
 #include "UpdateTransformCallback.h"
 
-GraphicManager::GraphicManager(SceneData* data) : _data(data), _path(nullptr), _sceneRoot(nullptr), _cameraCtrl(nullptr)
+GraphicManager::GraphicManager(SceneData* data) : _data(data), netMgr(data), _path(nullptr), _sceneRoot(nullptr), _cameraCtrl(nullptr)
 {
 	_path = new osg::AnimationPath();
 }
@@ -47,7 +48,7 @@ void GraphicManager::createScene(){
 	scene->setUpdateCallback(new UpdateTransformCallback(_data));
 
 
-	osg::Vec3 center = osg::Vec3(38.0f, -90.0f, 1000.0f);
+	osg::Vec3 center = osg::Vec3(38.0f, -91.0f, 1000.0f);
 	double radius = model->getBound().radius();
 
 	osg::ref_ptr<osg::Camera> mainCamera = createCamera(center - (-osg::Z_AXIS * radius * 15.0), center, osg::Y_AXIS, scene.get());
@@ -65,19 +66,26 @@ void GraphicManager::createScene(){
 
 int GraphicManager::runViewer(){
 	osgViewer::Viewer viewer;
-	viewer.addEventHandler(_cameraCtrl.get());
+	//viewer.addEventHandler(_cameraCtrl.get());
 	viewer.setSceneData(_sceneRoot.get());
-
+	viewer.addEventHandler(new osgViewer::StatsHandler);
+	netMgr.startThread();
 	while (!viewer.done())
 	{
+		netMgr.sendSOF();
+		//netMgr.recvPacket();
 		viewer.frame();
 	}
+	netMgr.cancel();
 	return 0;
 }
 
 int GraphicManager::runScene(){
 	createScene();
-	return runViewer();
+	//netMgr.startThread();
+	int result = runViewer();
+	//netMgr.cancel();
+	return result;
 }
 
 GraphicManager::~GraphicManager()

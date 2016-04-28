@@ -4,11 +4,13 @@
 #include "CameraController.h"
 #include <osgViewer/Viewer>
 #include "SceneData.h"
+#include "CigiNetworkManager.h"
 
 class GraphicManager
 {
 private:
 	SceneData* _data;
+	CigiNetworkManager netMgr;
 	osg::ref_ptr<osg::Node> _sceneRoot;
 	osg::ref_ptr<osg::AnimationPath> _path;
 	osg::ref_ptr<CameraController> _cameraCtrl;

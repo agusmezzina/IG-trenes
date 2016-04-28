@@ -20,24 +20,34 @@ public:
 	CigiNetworkManager(SceneData* data);
 	virtual int cancel();
 	virtual void run();
+	void sendSOF();
+	void recvPacket();
 	virtual ~CigiNetworkManager();
 private:
+	void handle_receive(const boost::system::error_code& error, std::size_t size);
+	void handle_send(const boost::system::error_code& error, std::size_t size);
+
 	SceneData* data;
-	//OpenThreads::Mutex mutex;
+
 	bool done;
+
 	int inBufferSize;
 	int outBufferSize;
 	boost::array<unsigned char, RECV_BUFFER_SIZE> inBuffer;
-	//unsigned char inBuffer[RECV_BUFFER_SIZE];
 	unsigned char* outBuffer;
+
 	boost::asio::io_service io_service;
+	udp::endpoint receiver_endpoint;
 	udp::endpoint remote_endpoint;
 	std::unique_ptr<udp::socket> socket;
+
 	std::unique_ptr<CigiIGSession> cigiSession;
 	CigiOutgoingMsg* outMsg;
 	CigiIncomingMsg* inMsg;
 	std::unique_ptr<DataEventProcessor> dataProcessor;
 	std::unique_ptr<ControlEventProcessor> controlProcessor;
 	std::unique_ptr<CigiSOFV3_2> startOfFrame;
+
+	bool send = true;
 };
 

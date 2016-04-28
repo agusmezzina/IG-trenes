@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "CigiNetworkManager.h"
 #include <iostream>
+#include <boost\bind.hpp>
 
 CigiNetworkManager::CigiNetworkManager(SceneData* data) : data(data), inBufferSize(0), outBufferSize(0)
 {
@@ -9,6 +10,7 @@ CigiNetworkManager::CigiNetworkManager(SceneData* data) : data(data), inBufferSi
 	dataProcessor = std::make_unique<DataEventProcessor>(data);
 	controlProcessor = std::make_unique<ControlEventProcessor>();
 	startOfFrame = std::make_unique<CigiSOFV3_2>();
+
 	CigiOutgoingMsg &Omsg = cigiSession->GetOutgoingMsgMgr();
 	CigiIncomingMsg &Imsg = cigiSession->GetIncomingMsgMgr();
 	outMsg = &Omsg;
@@ -31,6 +33,63 @@ CigiNetworkManager::CigiNetworkManager(SceneData* data) : data(data), inBufferSi
 	startOfFrame->SetEarthRefModel(CigiBaseSOF::WGS84);
 	startOfFrame->SetTimeStamp(0);
 	startOfFrame->SetFrameCntr(0);
+
+	//start_receive();
+	udp::resolver resolver(io_service);
+	udp::resolver::query query(udp::v4(), "127.0.0.1", "8001");
+	receiver_endpoint = *resolver.resolve(query);
+}
+
+void CigiNetworkManager::sendSOF()
+{
+	if (!send)
+		return;
+	outMsg->BeginMsg();
+	boost::system::error_code ignored_error;
+	*outMsg << *startOfFrame;
+	outMsg->PackageMsg(&outBuffer, outBufferSize);
+	outMsg->UpdateSOF(outBuffer);
+
+	//int sent = socket->send_to(boost::asio::buffer(outBuffer, outBufferSize), receiver_endpoint, 0, ignored_error);
+	//outMsg->FreeMsg();
+
+	socket->async_send_to(boost::asio::buffer(outBuffer, outBufferSize),
+		receiver_endpoint,
+		boost::bind(&CigiNetworkManager::handle_send,
+		this,
+		boost::asio::placeholders::error,
+		boost::asio::placeholders::bytes_transferred));
+
+	send = false;
+}
+
+void CigiNetworkManager::recvPacket()
+{
+	socket->async_receive_from(boost::asio::buffer(inBuffer),
+		remote_endpoint,
+		boost::bind(&CigiNetworkManager::handle_receive,
+		this,
+		boost::asio::placeholders::error,
+		boost::asio::placeholders::bytes_transferred));
+}
+
+void CigiNetworkManager::handle_receive(const boost::system::error_code& error, std::size_t size)
+{
+	if (error && error != boost::asio::error::message_size)
+		throw boost::system::system_error(error);
+
+	if (size > 0)
+	{
+		inMsg->ProcessIncomingMsg(inBuffer.c_array(), size);
+	}
+
+	send = true;
+}
+
+void CigiNetworkManager::handle_send(const boost::system::error_code& error, std::size_t size)
+{
+	outMsg->FreeMsg();
+	recvPacket();
 }
 
 int CigiNetworkManager::cancel(){
@@ -41,37 +100,11 @@ int CigiNetworkManager::cancel(){
 
 void CigiNetworkManager::run(){
 	done = false;
-	do
+	while (!done)
 	{
-		try{
-			outMsg->BeginMsg();
-
-			//--------------------------------------IN------------------------------------------------------
-			boost::system::error_code error;
-			std::cout << "Esperando..." << std::endl;
-			inBufferSize = socket->receive_from(boost::asio::buffer(inBuffer), remote_endpoint, 0, error);
-
-			if (error && error != boost::asio::error::message_size)
-				throw boost::system::system_error(error);
-
-			if (inBufferSize > 0)
-			{
-				inMsg->ProcessIncomingMsg(inBuffer.c_array(), inBufferSize);
-			}
-
-			//--------------------------------------OUT-----------------------------------------------------
-			boost::system::error_code ignored_error;
-			*outMsg << *startOfFrame;
-			outMsg->PackageMsg(&outBuffer, outBufferSize);
-			outMsg->UpdateSOF(outBuffer);
-			int sent = socket->send_to(boost::asio::buffer(outBuffer, outBufferSize), remote_endpoint, 0, ignored_error);
-			//int sentBytes = network.send(pCigiOutBuf, CigiOutSz);
-			outMsg->FreeMsg();
-		}
-		catch (std::exception& e){
-			std::cerr << e.what() << std::endl;
-		}
-	} while (!done);
+		io_service.run();
+		io_service.reset();
+	}
 }
 
 CigiNetworkManager::~CigiNetworkManager()
