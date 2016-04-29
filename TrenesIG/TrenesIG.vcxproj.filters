@@ -56,9 +56,6 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>Archivos de código fuente</Filter>
     </ClCompile>
-    <ClCompile Include="SimulacionFerroviaria.cpp">
-      <Filter>Archivos de código fuente</Filter>
-    </ClCompile>
     <ClCompile Include="CameraController.cpp">
       <Filter>Archivos de código fuente</Filter>
     </ClCompile>
@@ -84,6 +81,9 @@
       <Filter>Archivos de código fuente</Filter>
     </ClCompile>
     <ClCompile Include="SceneData.cpp">
+      <Filter>Archivos de código fuente</Filter>
+    </ClCompile>
+    <ClCompile Include="TrenesIG.cpp">
       <Filter>Archivos de código fuente</Filter>
     </ClCompile>
   </ItemGroup>

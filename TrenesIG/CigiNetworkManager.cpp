@@ -109,4 +109,5 @@ void CigiNetworkManager::run(){
 
 CigiNetworkManager::~CigiNetworkManager()
 {
+	socket->close();
 }
