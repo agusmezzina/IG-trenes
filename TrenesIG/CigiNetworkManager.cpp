@@ -18,7 +18,7 @@ CigiNetworkManager::CigiNetworkManager(SceneData* data) : data(data), inBufferSi
 
 	cigiSession->SetCigiVersion(3, 3);
 	cigiSession->SetSynchronous(true);
-
+	
 	inMsg->SetReaderCigiVersion(3, 3);
 	inMsg->UsingIteration(false);
 

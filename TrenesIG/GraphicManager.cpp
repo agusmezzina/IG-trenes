@@ -48,7 +48,8 @@ void GraphicManager::createScene(){
 	scene->setUpdateCallback(new UpdateTransformCallback(_data));
 
 
-	osg::Vec3 center = osg::Vec3(38.0f, -91.0f, 1000.0f);
+	//osg::Vec3 center = osg::Vec3(38.0f, -91.0f, 1000.0f);
+	osg::Vec3 center = osg::Vec3(0.0f, 0.0f, 0.0f);
 	double radius = model->getBound().radius();
 
 	osg::ref_ptr<osg::Camera> mainCamera = createCamera(center - (-osg::Z_AXIS * radius * 15.0), center, osg::Y_AXIS, scene.get());
