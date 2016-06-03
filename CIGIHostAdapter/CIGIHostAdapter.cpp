@@ -2,11 +2,14 @@
 //
 
 #include "stdafx.h"
-#include "UDPServer.h"
+#include "CigiHost.h"
+#include "SceneData.h"
 
 int _tmain(int argc, _TCHAR* argv[])
 {
-	UDPServer server;
+	//UDPServer server;
+	SceneData data;
+	CigiHost server(&data);
 	server.run();
 	return 0;
 }

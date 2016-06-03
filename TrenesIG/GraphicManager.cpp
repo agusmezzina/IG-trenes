@@ -6,6 +6,7 @@
 #include <osgDB\ReadFile>
 #include <osgGA\TrackballManipulator>
 #include <osgViewer\ViewerEventHandlers>
+#include <osgViewer\config\SingleWindow>
 #include <iostream>
 #include "UpdateTransformCallback.h"
 
@@ -70,11 +71,11 @@ int GraphicManager::runViewer(){
 	//viewer.addEventHandler(_cameraCtrl.get());
 	viewer.setSceneData(_sceneRoot.get());
 	viewer.addEventHandler(new osgViewer::StatsHandler);
+	viewer.apply(new osgViewer::SingleWindow(10, 10, 800, 600));
 	netMgr.startThread();
 	while (!viewer.done())
 	{
 		netMgr.sendSOF();
-		//netMgr.recvPacket();
 		viewer.frame();
 	}
 	netMgr.cancel();

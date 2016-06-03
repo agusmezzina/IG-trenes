@@ -1,5 +1,4 @@
 #pragma once
-#define PORT 8888
 #define RECV_BUFFER_SIZE 32768
 #define SEND_BUFFER_SIZE 32768
 #include <boost\asio.hpp>
