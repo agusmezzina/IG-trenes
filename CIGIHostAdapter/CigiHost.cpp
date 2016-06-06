@@ -1,12 +1,12 @@
-#include "UDPServer.h"
+#include "CigiHost.h"
 #include <iostream>
-#include <boost\algorithm\string.hpp>
-#define PORT_MODEL 8887
-#define PORT_IG "8888"
 #define BUFFER_SIZE 32768
 
-UDPServer::UDPServer()
+using boost::asio::ip::udp;
+
+CigiHost::CigiHost(SimulationState* ss)
 {
+	this->state = ss;
 	cigiSession = std::make_unique<CigiHostSession>(1, BUFFER_SIZE, 2, BUFFER_SIZE);
 	ctrlProcessor = std::make_unique<IGControlProcessor>();
 
@@ -16,7 +16,7 @@ UDPServer::UDPServer()
 	inMsg = &Imsg;
 
 	cigiSession->SetCigiVersion(3, 3);
-	cigiSession->SetSynchronous(false);
+	cigiSession->SetSynchronous(true);
 
 	inMsg->SetReaderCigiVersion(3, 3);
 	inMsg->UsingIteration(false);
@@ -34,74 +34,56 @@ UDPServer::UDPServer()
 	ownship.SetEntityState(CigiBaseEntityCtrl::Active);
 }
 
-void UDPServer::run()
+void CigiHost::runCigi()
 {
 	try
 	{
 		unsigned char* outBuffer;
 		int outBufferSize = 0;
 		boost::asio::io_service io_service;
-		udp::socket socketModel(io_service, udp::endpoint(udp::v4(), PORT_MODEL));
 
-		udp::resolver resolver(io_service);
-		udp::resolver::query query(udp::v4(), "127.0.0.1", PORT_IG);
+		/*udp::resolver resolver(io_service);
+		udp::resolver::query query(udp::v4(), "127.0.0.1", "8888");
 		udp::endpoint ig_endpoint = *resolver.resolve(query);
 		udp::socket socketIG(io_service);
-		socketIG.open(udp::v4());
+		socketIG.open(udp::v4());*/
+		udp::socket socketIG(io_service, udp::endpoint(udp::v4(), 8001));
+		udp::endpoint remote_endpoint;
 
 		outMsg->BeginMsg();
 		for (;;)
 		{
 			boost::array<unsigned char, BUFFER_SIZE> recv_buf;
-			udp::endpoint remote_endpoint;
 			boost::system::error_code error;
+			boost::system::error_code ignored_error;
 
-			std::cout << "Esperando datos." << std::endl;
-
-			std::size_t len = socketModel.receive_from(boost::asio::buffer(recv_buf),
+			std::size_t len = socketIG.receive_from(boost::asio::buffer(recv_buf),
 				remote_endpoint,
 				0,
 				error);
 			if (error && error != boost::asio::error::message_size)
 				throw boost::system::system_error(error);
 
-			/*std::string msg(recv_buf.c_array(), len);
-			std::cout << msg << std::endl;*/
-			boost::system::error_code ignored_error;
-			
 			inMsg->ProcessIncomingMsg(recv_buf.c_array(), len);
+
+			double x, y, z = 0;
+			state->getData(x, y, z);
+			ownship.SetLon(y);
+
 			// load the IG Control
 			*outMsg << igControl;
-			//Update position
-			std::string msg(reinterpret_cast<char*>(recv_buf.c_array()), len);
-			std::cout << msg << std::endl;
-			if (msg.back() == '\f'){
-				msg.pop_back();
-				std::vector<std::string> fields;
-				boost::split(fields, msg, boost::is_any_of(";"));
-				if (fields.size() == 4)
-					ownship.SetLon(std::stod(fields[1]));
-			}
-
 			*outMsg << ownship;
 			outMsg->PackageMsg(&outBuffer, outBufferSize);
 
 			outMsg->UpdateIGCtrl(outBuffer, recv_buf.c_array());
 
 			socketIG.send_to(boost::asio::buffer(outBuffer, outBufferSize),
-				ig_endpoint,
+				remote_endpoint,
 				0,
 				ignored_error);
 
 			outMsg->FreeMsg();
-			/*std::string message = "2.5";
-			boost::system::error_code ignored_error;
-			socketModel.send_to(boost::asio::buffer(message),
-				remote_endpoint,
-				0,
-				ignored_error);*/
 		}
-		socketIG.close();
 	}
 	catch (std::exception& e)
 	{
@@ -109,7 +91,6 @@ void UDPServer::run()
 	}
 }
 
-
-UDPServer::~UDPServer()
+CigiHost::~CigiHost()
 {
 }

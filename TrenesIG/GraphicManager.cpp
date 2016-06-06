@@ -6,6 +6,7 @@
 #include <osgDB\ReadFile>
 #include <osgGA\TrackballManipulator>
 #include <osgViewer\ViewerEventHandlers>
+#include <osgViewer\config\SingleWindow>
 #include <iostream>
 #include "UpdateTransformCallback.h"
 
@@ -39,6 +40,7 @@ void GraphicManager::createScene(){
 		osg::Vec3(0.0f, -0.5f, 0.0f),
 		0.1f,
 		osg::Vec4(1.0f, 1.0f, 0.5f, 1.0f));
+	//osg::ref_ptr<osg::Node> model = osgDB::readNodeFile("cessna.osg");
 	osg::ref_ptr<osg::MatrixTransform> scene = new osg::MatrixTransform;
 	scene->addChild(model.get());
 	//osg::ref_ptr<osg::AnimationPathCallback> apcb = new	osg::AnimationPathCallback;
@@ -48,12 +50,12 @@ void GraphicManager::createScene(){
 	scene->setUpdateCallback(new UpdateTransformCallback(_data));
 
 
-	//osg::Vec3 center = osg::Vec3(38.0f, -91.0f, 1000.0f);
+	//osg::Vec3 center = osg::Vec3(38.0f, -91.0f, 500.0f);
 	osg::Vec3 center = osg::Vec3(0.0f, 0.0f, 0.0f);
 	double radius = model->getBound().radius();
 
-	osg::ref_ptr<osg::Camera> mainCamera = createCamera(center - (-osg::Z_AXIS * radius * 15.0), center, osg::Y_AXIS, scene.get());
-	osg::ref_ptr<osg::Camera> camera1 = createCamera(center - (osg::Y_AXIS * radius * 15.0), center, osg::Z_AXIS, scene.get());
+	osg::ref_ptr<osg::Camera> camera1 = createCamera(center - (-osg::Z_AXIS * radius * 15.0), center, osg::Y_AXIS, scene.get());
+	osg::ref_ptr<osg::Camera> mainCamera = createCamera(center - (osg::Y_AXIS * radius * 15.0), center, osg::Z_AXIS, scene.get());
 	osg::ref_ptr<osg::Camera> camera2 = createCamera(center - (osg::X_AXIS * radius * 15.0), center, osg::Z_AXIS, scene.get());
 
 	osg::ref_ptr<osg::Switch> cameras = new osg::Switch;
@@ -67,9 +69,10 @@ void GraphicManager::createScene(){
 
 int GraphicManager::runViewer(){
 	osgViewer::Viewer viewer;
-	//viewer.addEventHandler(_cameraCtrl.get());
+	viewer.addEventHandler(_cameraCtrl.get());
 	viewer.setSceneData(_sceneRoot.get());
 	viewer.addEventHandler(new osgViewer::StatsHandler);
+	viewer.apply(new osgViewer::SingleWindow(10, 10, 800, 600));
 	netMgr.startThread();
 	while (!viewer.done())
 	{

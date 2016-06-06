@@ -1,7 +1,7 @@
 // SimulacionFerroviaria.cpp: define el punto de entrada de la aplicación de consola.
 //
 
-#include "stdafx.h"
+//#include "stdafx.h"
 #include <iostream>
 #include "NetworkManager.h"
 #include "GraphicManager.h"
@@ -12,7 +12,7 @@
 
 //using boost::asio::ip::udp;
 
-int _tmain(int argc, _TCHAR* argv[])
+int main(int argc, char* argv[])
 {
 	//NetworkManager netmng;
 	SceneData data;
