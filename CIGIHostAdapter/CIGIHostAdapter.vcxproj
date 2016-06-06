@@ -84,7 +84,8 @@
   <ItemGroup>
     <ClInclude Include="CigiHost.h" />
     <ClInclude Include="IGControlProcessor.h" />
-    <ClInclude Include="SimulationState.h" />
+    <ClInclude Include="ModelUpdater.h" />
+    <ClInclude Include="SceneData.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="UDPServer.h" />
@@ -93,7 +94,8 @@
     <ClCompile Include="CigiHost.cpp" />
     <ClCompile Include="CIGIHostAdapter.cpp" />
     <ClCompile Include="IGControlProcessor.cpp" />
-    <ClCompile Include="SimulationState.cpp" />
+    <ClCompile Include="ModelUpdater.cpp" />
+    <ClCompile Include="SceneData.cpp" />
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="UDPServer.cpp" />
   </ItemGroup>

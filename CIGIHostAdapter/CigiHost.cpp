@@ -1,12 +1,14 @@
 #include "CigiHost.h"
+#include <boost\array.hpp>
+#include <boost\asio.hpp>
 #include <iostream>
 #define BUFFER_SIZE 32768
 
 using boost::asio::ip::udp;
 
-CigiHost::CigiHost(SimulationState* ss)
+CigiHost::CigiHost(SceneData* data)
 {
-	this->state = ss;
+	this->data = data;
 	cigiSession = std::make_unique<CigiHostSession>(1, BUFFER_SIZE, 2, BUFFER_SIZE);
 	ctrlProcessor = std::make_unique<IGControlProcessor>();
 
@@ -34,30 +36,29 @@ CigiHost::CigiHost(SimulationState* ss)
 	ownship.SetEntityState(CigiBaseEntityCtrl::Active);
 }
 
-void CigiHost::runCigi()
+void CigiHost::run()
 {
 	try
 	{
 		unsigned char* outBuffer;
 		int outBufferSize = 0;
-		boost::asio::io_service io_service;
 
-		/*udp::resolver resolver(io_service);
+		boost::asio::io_service io_service;
+		udp::socket socket(io_service, udp::endpoint(udp::v4(), 8001));
+
+		udp::resolver resolver(io_service);
 		udp::resolver::query query(udp::v4(), "127.0.0.1", "8888");
-		udp::endpoint ig_endpoint = *resolver.resolve(query);
-		udp::socket socketIG(io_service);
-		socketIG.open(udp::v4());*/
-		udp::socket socketIG(io_service, udp::endpoint(udp::v4(), 8001));
-		udp::endpoint remote_endpoint;
+		udp::endpoint receiver_endpoint = *resolver.resolve(query);
 
 		outMsg->BeginMsg();
 		for (;;)
 		{
 			boost::array<unsigned char, BUFFER_SIZE> recv_buf;
+			udp::endpoint remote_endpoint;
 			boost::system::error_code error;
 			boost::system::error_code ignored_error;
 
-			std::size_t len = socketIG.receive_from(boost::asio::buffer(recv_buf),
+			std::size_t len = socket.receive_from(boost::asio::buffer(recv_buf),
 				remote_endpoint,
 				0,
 				error);
@@ -66,24 +67,25 @@ void CigiHost::runCigi()
 
 			inMsg->ProcessIncomingMsg(recv_buf.c_array(), len);
 
-			double x, y, z = 0;
-			state->getData(x, y, z);
-			ownship.SetLon(y);
-
 			// load the IG Control
 			*outMsg << igControl;
+			//Update position
+			double x, y, z = 0;
+			data->getData(x, y, z);
+			ownship.SetLon(y);
 			*outMsg << ownship;
 			outMsg->PackageMsg(&outBuffer, outBufferSize);
 
 			outMsg->UpdateIGCtrl(outBuffer, recv_buf.c_array());
 
-			socketIG.send_to(boost::asio::buffer(outBuffer, outBufferSize),
-				remote_endpoint,
+			socket.send_to(boost::asio::buffer(outBuffer, outBufferSize),
+				receiver_endpoint,
 				0,
 				ignored_error);
 
 			outMsg->FreeMsg();
 		}
+		socket.close();
 	}
 	catch (std::exception& e)
 	{

@@ -4,9 +4,8 @@
 #include <boost\bind.hpp>
 
 CigiNetworkManager::CigiNetworkManager(SceneData* data) : data(data), inBufferSize(0), outBufferSize(0)
-{	
-	//socketIG.open(udp::v4());
-	socket = nullptr;	
+{
+	socket = std::make_unique<udp::socket>(io_service, udp::endpoint(udp::v4(), 8888));
 	cigiSession = std::make_unique<CigiIGSession>(1, RECV_BUFFER_SIZE, 2, SEND_BUFFER_SIZE);
 	dataProcessor = std::make_unique<DataEventProcessor>(data);
 	controlProcessor = std::make_unique<ControlEventProcessor>();
@@ -36,14 +35,13 @@ CigiNetworkManager::CigiNetworkManager(SceneData* data) : data(data), inBufferSi
 	startOfFrame->SetFrameCntr(0);
 
 	//start_receive();
-	/*udp::resolver resolver(io_service);
+	udp::resolver resolver(io_service);
 	udp::resolver::query query(udp::v4(), "127.0.0.1", "8001");
-	receiver_endpoint = *resolver.resolve(query);*/
+	receiver_endpoint = *resolver.resolve(query);
 }
 
 void CigiNetworkManager::sendSOF()
 {
-	//std::cout << "Enviado SOF" << std::endl;
 	if (!send)
 		return;
 	outMsg->BeginMsg();
@@ -56,8 +54,7 @@ void CigiNetworkManager::sendSOF()
 	//outMsg->FreeMsg();
 
 	socket->async_send_to(boost::asio::buffer(outBuffer, outBufferSize),
-		//receiver_endpoint,
-		remote_endpoint,
+		receiver_endpoint,
 		boost::bind(&CigiNetworkManager::handle_send,
 		this,
 		boost::asio::placeholders::error,
@@ -103,12 +100,6 @@ int CigiNetworkManager::cancel(){
 
 void CigiNetworkManager::run(){
 	done = false;
-	udp::resolver resolver(io_service);
-	udp::resolver::query query(udp::v4(), "127.0.0.1", "8001");
-	remote_endpoint = *resolver.resolve(query);
-	//udp::socket socket(io_service);
-	socket = std::make_unique<udp::socket>(io_service);
-	socket->open(udp::v4());
 	while (!done)
 	{
 		io_service.run();

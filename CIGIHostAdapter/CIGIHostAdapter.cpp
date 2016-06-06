@@ -2,21 +2,24 @@
 //
 
 #include "stdafx.h"
-//#include "UDPServer.h"
 #include "CigiHost.h"
-#include "SimulationState.h"
-#include <iostream>
+#include "ModelUpdater.h"
+#include "SceneData.h"
+#include <thread>
 
 int _tmain(int argc, _TCHAR* argv[])
 {
-	SimulationState ss;
-	CigiHost ch(&ss);
 	//UDPServer server;
-	//server.run();
-	ch.runCigi();
-	char q;
-	std::cout << "Listo" << std::endl;
-	std::cin >> q;
+	SceneData data;
+	CigiHost server(&data);
+	ModelUpdater model(&data);
+	
+	std::thread cigiThread(&CigiHost::run, &server);
+	std::thread modelThread(&ModelUpdater::run, &model);
+
+	cigiThread.join();
+	modelThread.join();
+
 	return 0;
 }
 

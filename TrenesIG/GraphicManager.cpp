@@ -77,7 +77,6 @@ int GraphicManager::runViewer(){
 	while (!viewer.done())
 	{
 		netMgr.sendSOF();
-		//netMgr.recvPacket();
 		viewer.frame();
 	}
 	netMgr.cancel();
