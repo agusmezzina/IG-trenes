@@ -24,19 +24,19 @@
     <ClInclude Include="targetver.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
-    <ClInclude Include="CameraController.h">
+    <ClInclude Include="UDPServer.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
-    <ClInclude Include="DataPacket.h">
+    <ClInclude Include="IGControlProcessor.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
-    <ClInclude Include="GraphicManager.h">
+    <ClInclude Include="CigiHost.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
-    <ClInclude Include="NetworkManager.h">
+    <ClInclude Include="SceneData.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
-    <ClInclude Include="DataEventProcessor.h">
+    <ClInclude Include="ModelUpdater.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
   </ItemGroup>
@@ -44,22 +44,22 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>Archivos de código fuente</Filter>
     </ClCompile>
-    <ClCompile Include="SimulacionFerroviaria.cpp">
+    <ClCompile Include="CIGIHostAdapter.cpp">
       <Filter>Archivos de código fuente</Filter>
     </ClCompile>
-    <ClCompile Include="CameraController.cpp">
+    <ClCompile Include="UDPServer.cpp">
       <Filter>Archivos de código fuente</Filter>
     </ClCompile>
-    <ClCompile Include="DataPacket.cpp">
+    <ClCompile Include="IGControlProcessor.cpp">
       <Filter>Archivos de código fuente</Filter>
     </ClCompile>
-    <ClCompile Include="GraphicManager.cpp">
+    <ClCompile Include="CigiHost.cpp">
       <Filter>Archivos de código fuente</Filter>
     </ClCompile>
-    <ClCompile Include="NetworkManager.cpp">
+    <ClCompile Include="SceneData.cpp">
       <Filter>Archivos de código fuente</Filter>
     </ClCompile>
-    <ClCompile Include="DataEventProcessor.cpp">
+    <ClCompile Include="ModelUpdater.cpp">
       <Filter>Archivos de código fuente</Filter>
     </ClCompile>
   </ItemGroup>

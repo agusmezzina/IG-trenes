@@ -11,9 +11,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{57EB97C4-9A4D-4714-A8EC-90392CAE3340}</ProjectGuid>
+    <ProjectGuid>{AC7D6A4D-EF43-41C8-8A63-2EF0B3316B51}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>SimulacionFerroviaria</RootNamespace>
+    <RootNamespace>CIGIHostAdapter</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -47,30 +47,29 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(OSG_SOURCE)\include;$(OSG_ROOT)\include;$(BOOST_ROOT);C:\Users\AM\Documents\Tesis\Software\ccl\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+      <AdditionalIncludeDirectories>$(BOOST_ROOT)\include\boost-1_61;$(CCL_SOURCE)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(OSG_ROOT)\lib;$(BOOST_ROOT)\stage\lib;$(CCL_ROOT)\lib\debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>osgd.lib;osgDBd.lib;osgViewerd.lib;osgGAd.lib;cigicl_debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(BOOST_ROOT)\lib;$(CCL_ROOT)\lib\debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>cigicl_debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -83,25 +82,22 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="CameraController.h" />
-    <ClInclude Include="DataEventProcessor.h" />
-    <ClInclude Include="DataPacket.h" />
-    <ClInclude Include="GraphicManager.h" />
-    <ClInclude Include="NetworkManager.h" />
+    <ClInclude Include="CigiHost.h" />
+    <ClInclude Include="IGControlProcessor.h" />
+    <ClInclude Include="ModelUpdater.h" />
+    <ClInclude Include="SceneData.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="UDPServer.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="CameraController.cpp" />
-    <ClCompile Include="DataEventProcessor.cpp" />
-    <ClCompile Include="DataPacket.cpp" />
-    <ClCompile Include="GraphicManager.cpp" />
-    <ClCompile Include="NetworkManager.cpp" />
-    <ClCompile Include="SimulacionFerroviaria.cpp" />
-    <ClCompile Include="stdafx.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
-    </ClCompile>
+    <ClCompile Include="CigiHost.cpp" />
+    <ClCompile Include="CIGIHostAdapter.cpp" />
+    <ClCompile Include="IGControlProcessor.cpp" />
+    <ClCompile Include="ModelUpdater.cpp" />
+    <ClCompile Include="SceneData.cpp" />
+    <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="UDPServer.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

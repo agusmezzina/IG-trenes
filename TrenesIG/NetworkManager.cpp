@@ -1,4 +1,4 @@
-#include "stdafx.h"
+//#include "stdafx.h"
 #include "NetworkManager.h"
 #include <boost\array.hpp>
 #include <boost\asio.hpp>

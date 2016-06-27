@@ -3,10 +3,14 @@
 #include <osgViewer/CompositeViewer>
 #include "CameraController.h"
 #include <osgViewer/Viewer>
+#include "SceneData.h"
+#include "CigiNetworkManager.h"
 
 class GraphicManager
 {
 private:
+	SceneData* _data;
+	CigiNetworkManager netMgr;
 	osg::ref_ptr<osg::Node> _sceneRoot;
 	osg::ref_ptr<osg::AnimationPath> _path;
 	osg::ref_ptr<CameraController> _cameraCtrl;
@@ -14,10 +18,9 @@ private:
 	osg::ref_ptr<osg::Camera> createCamera(const osg::Vec3& eye, const osg::Vec3& center, const osg::Vec3& up, osg::Node* scene);
 	void createScene();
 	int runViewer();
-
 public:
 	void addKeyFrame(double x, double y, double z, double t);
-	GraphicManager();
+	GraphicManager(SceneData* data);
 	int runScene();
 	~GraphicManager();
 };
