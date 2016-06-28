@@ -13,7 +13,7 @@ void DataEventProcessor::OnPacketReceived(CigiBasePacket *Packet)
 
 	data->setData(InPckt->GetXoff(), InPckt->GetYoff(), InPckt->GetZoff());
 
-	std::cout << "===>EntityCtrl <===" << std::endl;
+	/*std::cout << "===>EntityCtrl <===" << std::endl;
 	std::cout << "EntityID ==> " << InPckt->GetEntityID() << std::endl;
 	std::cout << "EntityState ==> " << InPckt->GetEntityState() << std::endl;
 	std::cout << "AttachState ==> " << InPckt->GetAttachState() << std::endl;
@@ -35,7 +35,7 @@ void DataEventProcessor::OnPacketReceived(CigiBasePacket *Packet)
 	std::cout << "Yaw ==> " << InPckt->GetYaw() << std::endl;
 	std::cout << "Xoff ==> " << InPckt->GetXoff() << std::endl;
 	std::cout << "Yoff ==> " << InPckt->GetYoff() << std::endl;
-	std::cout << "Zoff ==> " << InPckt->GetZoff() << std::endl;
+	std::cout << "Zoff ==> " << InPckt->GetZoff() << std::endl;*/
 
 }
 

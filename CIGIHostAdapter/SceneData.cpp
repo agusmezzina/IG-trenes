@@ -1,24 +1,30 @@
 #include "SceneData.h"
+#include <iostream>
 
-
-SceneData::SceneData() : x(0), y(0.5), z(0)
-{
+SceneData::SceneData()
+{	
+	simulationData.push(EntityState(0, 0.5, 0));
 }
 
-void SceneData::getData(double& x, double& y, double& z) const
+EntityState SceneData::getCurrent()
 {
-	std::lock_guard<std::mutex> lock(m);
-	x = this->x;
-	y = this->y;
-	z = this->z;
+	std::lock_guard<std::mutex> g(m);
+	return simulationData.front();
 }
 
-void SceneData::setData(double x, double y, double z)
+void SceneData::addNew(EntityState state)
 {
-	std::lock_guard<std::mutex> lock(m);
-	this->x = x;
-	this->y = y;
-	this->z = z;
+	std::lock_guard<std::mutex> g(m);
+	simulationData.push(state);
+}
+
+void SceneData::updateCurrent()
+{
+	std::lock_guard<std::mutex> g(m);
+	if (simulationData.size() >= 2)
+		simulationData.pop();
+
+	//std::cout << simulationData.size() << std::endl;
 }
 
 SceneData::~SceneData()

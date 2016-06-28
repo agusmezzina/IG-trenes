@@ -71,7 +71,7 @@ void CigiHost::run()
 			*outMsg << igControl;
 			//Update position
 			double x, y, z = 0;
-			data->getData(x, y, z);
+			data->getCurrent().getState(x, y, z);
 			ownship.SetLon(y);
 			*outMsg << ownship;
 			outMsg->PackageMsg(&outBuffer, outBufferSize);

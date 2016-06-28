@@ -11,7 +11,7 @@ void IGControlProcessor::OnPacketReceived(CigiBasePacket *Packet)
 	setOriginPacket(InPckt);
 
 	// We are actually not processing any information in the SOF
-	std::cout << "Recibido" << std::endl;
+	//std::cout << "Recibido" << std::endl;
 }
 
 

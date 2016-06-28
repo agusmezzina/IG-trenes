@@ -1,4 +1,5 @@
 #include "ModelUpdater.h"
+#include "EntityState.h"
 #include <boost\array.hpp>
 #include <boost\asio.hpp>
 #include <boost\algorithm\string.hpp>
@@ -16,7 +17,7 @@ void ModelUpdater::run()
 	boost::asio::io_service io_service;
 	udp::socket socket(io_service, udp::endpoint(udp::v4(), 8887));
 
-	for (;;)
+	while (true)
 	{
 		boost::array<unsigned char, 32768> recv_buf;
 		udp::endpoint remote_endpoint;
@@ -41,11 +42,12 @@ void ModelUpdater::run()
 				y = std::stod(fields[1]);
 				z = std::stod(fields[2]);
 			}
-			data->setData(x, y, z);
+			EntityState state(x, y, z);
+			data->addNew(state);
 		}
-		std::cout << x << std::endl;
-		std::cout << y << std::endl;
-		std::cout << z << std::endl;
+		//std::cout << x << std::endl;
+		//std::cout << y << std::endl;
+		//std::cout << z << std::endl;
 	}
 	socket.close();
 }
