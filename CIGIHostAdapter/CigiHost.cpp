@@ -6,7 +6,7 @@
 
 using boost::asio::ip::udp;
 
-CigiHost::CigiHost(SceneData* data)
+CigiHost::CigiHost(World* data)
 {
 	this->data = data;
 	cigiSession = std::make_unique<CigiHostSession>(1, BUFFER_SIZE, 2, BUFFER_SIZE);
@@ -71,7 +71,9 @@ void CigiHost::run()
 			*outMsg << igControl;
 			//Update position
 			double x, y, z = 0;
-			data->getCurrent().getState(x, y, z);
+			//data->getCurrent().getState(x, y, z);
+			auto entity = data->getEntity(1);
+			entity.getPositionState(x, y, z);
 			ownship.SetLon(y);
 			*outMsg << ownship;
 			outMsg->PackageMsg(&outBuffer, outBufferSize);

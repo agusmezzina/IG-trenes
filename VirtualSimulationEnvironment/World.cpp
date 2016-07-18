@@ -5,7 +5,15 @@
 void World::addEntity(Entity e)
 {
 	std::lock_guard<std::mutex> g(m);
-	entities.push_back(e);
+	entities.push_front(e);
+}
+
+const Entity World::getEntity(int id) const
+{
+	std::lock_guard<std::mutex> g(m);
+	auto it = std::find_if(std::begin(entities), std::end(entities),
+		[&](Entity const& e) { return e.getID() == id; });
+	return *it;
 }
 
 void World::updateEntityPosition(int id, double x, double y, double z)
@@ -43,20 +51,22 @@ void World::firstOrderPredictUpdate(
 	}
 }
 
-void World::instantCorrect(World* reference, double threshold)
-{
-	std::lock_guard<std::mutex> g(m);
-	for (auto entity : entities)
-	{
-		if (1) //threshold violated
-		{
-			//correct entity state
-		}
-	}
-}
+//void World::instantCorrect(World* reference, double threshold)
+//{
+//	std::lock_guard<std::mutex> g(m);
+//	for (auto entity : entities)
+//	{
+//		if (1) //threshold violated
+//		{
+//			//correct entity state
+//		}
+//	}
+//}
 
 World::World()
 {
+	Entity ownship(0);
+	entities.push_back(ownship);
 }
 
 

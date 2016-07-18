@@ -6,16 +6,20 @@
 #include "CigiHost.h"
 #include "ModelUpdater.h"
 #include "SceneData.h"
+#include "World.h"
+#include "DataPacket.h"
 #include <thread>
 #include <queue>
 
 int _tmain(int argc, _TCHAR* argv[])
 {
 	//UDPServer server;
-	SceneData data;
-	CigiHost server(&data);
+	//SceneData data;
+	std::queue<DataPacket> data;
+	World worldData;
+	CigiHost server(&worldData);
 	ModelUpdater model(&data);
-	SimulationTimer timer(&data);
+	SimulationTimer timer(&data, &worldData);
 
 	std::thread cigiThread(&CigiHost::run, &server);
 	std::thread modelThread(&ModelUpdater::run, &model);

@@ -5,11 +5,12 @@
 #include <memory>
 #include "IGControlProcessor.h"
 #include "SceneData.h"
+#include "World.h"
 
 class CigiHost
 {
 public:
-	CigiHost(SceneData* data);
+	CigiHost(World* data);
 	void run();
 	virtual ~CigiHost();
 private:
@@ -19,6 +20,6 @@ private:
 	CigiIncomingMsg* inMsg;
 	CigiIGCtrlV3_2 igControl;
 	CigiEntityCtrlV3_3 ownship;
-	SceneData* data;
+	World* data;
 };
 
