@@ -1,29 +1,21 @@
 #include "stdafx.h"
 #include "Entity.h"
 
-void Entity::getPositionState(double& x, double& y, double& z) const
+void Entity::getState(double& x, double& y, double& z, double& vx, double& vy, double& vz) const
 {
 	x = this->x;
 	y = this->y;
 	z = this->z;
-}
-
-void Entity::setPositionState(double x, double y, double z)
-{
-	this->x = x;
-	this->y = y;
-	this->z = z;
-}
-
-void Entity::getVelocityState(double& vx, double& vy, double& vz) const
-{
 	vx = this->vx;
 	vy = this->vy;
 	vz = this->vz;
 }
 
-void Entity::setVelocityState(double x, double y, double z)
+void Entity::setState(double x, double y, double z, double vx, double vy, double vz)
 {
+	this->x = x;
+	this->y = y;
+	this->z = z;
 	this->vx = vx;
 	this->vy = vy;
 	this->vz = vz;

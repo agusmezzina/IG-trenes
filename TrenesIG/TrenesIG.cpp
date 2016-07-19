@@ -10,6 +10,7 @@
 #include "CigiNetworkManager.h"
 #include "SceneData.h"
 #include "World.h"
+#include "DeadReckoning.h"
 
 //using boost::asio::ip::udp;
 
@@ -18,7 +19,9 @@ int main(int argc, char* argv[])
 	//NetworkManager netmng;
 	//SceneData data;
 	World data;
-	GraphicManager graphmng(&data);
+	World ghost;
+	DeadReckoning dr(&data, &ghost);
+	GraphicManager graphmng(&data, &ghost);
 
 	//std::cout << "Esperando entrada de datos..." << std::endl;
 	//auto data = netmng.readSimulationData("127.0.0.1", "8888", 500);

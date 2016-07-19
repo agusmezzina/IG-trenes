@@ -70,10 +70,10 @@ void CigiHost::run()
 			// load the IG Control
 			*outMsg << igControl;
 			//Update position
-			double x, y, z = 0;
+			double x{ 0 }, y{ 0 }, z{ 0 }, vx{ 0 }, vy{ 0 }, vz{ 0 };
 			//data->getCurrent().getState(x, y, z);
 			auto entity = data->getEntity(1);
-			entity.getPositionState(x, y, z);
+			entity.getState(x, y, z, vx, vy, vz);
 			std::cout << y << std::endl;
 			ownship.SetLon(y);
 			*outMsg << ownship;

@@ -7,7 +7,7 @@ public:
 	void updateGhost(double deltaT);
 	void correctGhost();
 	bool isThresholdViolated(int entityID);
-	DeadReckoning();
+	DeadReckoning(World* model, World* ghost);
 	virtual ~DeadReckoning();
 private:
 	double rThreshold;

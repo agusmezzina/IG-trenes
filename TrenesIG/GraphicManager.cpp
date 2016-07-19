@@ -8,11 +8,13 @@
 #include <osgViewer\ViewerEventHandlers>
 #include <osgViewer\config\SingleWindow>
 #include <iostream>
+#include <chrono>
 #include "UpdateTransformCallback.h"
 
-GraphicManager::GraphicManager(World* data) : _data(data), netMgr(data), _path(nullptr), _sceneRoot(nullptr), _cameraCtrl(nullptr)
+GraphicManager::GraphicManager(World* data, World* ghost) : _data(data), _ghost(ghost), netMgr(ghost), _path(nullptr), _sceneRoot(nullptr), _cameraCtrl(nullptr)
 {
 	_path = new osg::AnimationPath();
+	dr = std::make_unique<DeadReckoning>(data, ghost);
 }
 
 void GraphicManager::addKeyFrame(double x, double y, double z, double t){
@@ -47,7 +49,7 @@ void GraphicManager::createScene(){
 	//apcb->setAnimationPath(_path);
 	//scene->setUpdateCallback(apcb.get());
 	//osg::ref_ptr<UpdateTransformCallback> updcb = new UpdateTransformCallback(_data);
-	scene->setUpdateCallback(new UpdateTransformCallback(_data));
+	scene->setUpdateCallback(new UpdateTransformCallback(_ghost));
 
 
 	//osg::Vec3 center = osg::Vec3(38.0f, -91.0f, 500.0f);
@@ -74,8 +76,12 @@ int GraphicManager::runViewer(){
 	viewer.addEventHandler(new osgViewer::StatsHandler);
 	viewer.apply(new osgViewer::SingleWindow(10, 10, 800, 600));
 	netMgr.startThread();
+	auto t1 = std::chrono::high_resolution_clock::now();
 	while (!viewer.done())
 	{
+		auto t2 = std::chrono::high_resolution_clock::now();
+		std::chrono::duration<double> deltaT = t2 - t1;
+		dr->updateGhost(deltaT.count());
 		netMgr.sendSOF();
 		viewer.frame();
 	}

@@ -11,14 +11,17 @@ SimulationTimer::SimulationTimer(std::queue<DataPacket>* rawData, World* worldDa
 
 void SimulationTimer::run()
 {
+	int count = 0;
 	while (true)
 	{
 		std::this_thread::sleep_for(std::chrono::milliseconds(10));
+		count++;
 		if (!rawData->empty())
 		{
 			auto data = rawData->front();
 			//std::cout << data.getY() << std::endl;
-			worldData->updateEntityPosition(data.getID(), data.getX(), data.getY(), data.getZ());
+			if ((count % 40) == 0)
+				worldData->updateEntityState(data.getID(), data.getX(), data.getY(), data.getZ(), 0, 0, 0);
 			rawData->pop();
 		}
 	}
