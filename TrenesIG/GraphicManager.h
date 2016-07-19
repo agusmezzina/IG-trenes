@@ -5,11 +5,13 @@
 #include <osgViewer/Viewer>
 #include "SceneData.h"
 #include "CigiNetworkManager.h"
+#include "World.h"
 
 class GraphicManager
 {
 private:
-	SceneData* _data;
+	//SceneData* _data;
+	World* _data;
 	CigiNetworkManager netMgr;
 	osg::ref_ptr<osg::Node> _sceneRoot;
 	osg::ref_ptr<osg::AnimationPath> _path;
@@ -20,7 +22,7 @@ private:
 	int runViewer();
 public:
 	void addKeyFrame(double x, double y, double z, double t);
-	GraphicManager(SceneData* data);
+	GraphicManager(World* data);
 	int runScene();
 	~GraphicManager();
 };

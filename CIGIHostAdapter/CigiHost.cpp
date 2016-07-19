@@ -31,7 +31,7 @@ CigiHost::CigiHost(World* data)
 
 	// initialize the Ownship
 	//  the other parameters are set by CigiEntityCtrlV3_3
-	ownship.SetEntityID(0);
+	ownship.SetEntityID(1);
 	ownship.SetEntityType(0);
 	ownship.SetEntityState(CigiBaseEntityCtrl::Active);
 }
@@ -74,6 +74,7 @@ void CigiHost::run()
 			//data->getCurrent().getState(x, y, z);
 			auto entity = data->getEntity(1);
 			entity.getPositionState(x, y, z);
+			std::cout << y << std::endl;
 			ownship.SetLon(y);
 			*outMsg << ownship;
 			outMsg->PackageMsg(&outBuffer, outBufferSize);

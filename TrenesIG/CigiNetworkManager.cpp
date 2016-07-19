@@ -3,7 +3,7 @@
 #include <iostream>
 #include <boost\bind.hpp>
 
-CigiNetworkManager::CigiNetworkManager(SceneData* data) : data(data), inBufferSize(0), outBufferSize(0)
+CigiNetworkManager::CigiNetworkManager(World* data) : data(data), inBufferSize(0), outBufferSize(0)
 {
 	socket = std::make_unique<udp::socket>(io_service, udp::endpoint(udp::v4(), 8888));
 	cigiSession = std::make_unique<CigiIGSession>(1, RECV_BUFFER_SIZE, 2, SEND_BUFFER_SIZE);

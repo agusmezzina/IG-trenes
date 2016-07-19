@@ -2,7 +2,7 @@
 #include "DataEventProcessor.h"
 #include <iostream>
 
-DataEventProcessor::DataEventProcessor(SceneData* data) : TPckt(nullptr), data(data)
+DataEventProcessor::DataEventProcessor(World* data) : TPckt(nullptr), data(data)
 {
 }
 
@@ -11,7 +11,7 @@ void DataEventProcessor::OnPacketReceived(CigiBasePacket *Packet)
 	CigiEntityCtrlV3_3 *InPckt = (CigiEntityCtrlV3_3 *)Packet;
 	setOriginPacket(InPckt);
 
-	data->setData(InPckt->GetXoff(), InPckt->GetYoff(), InPckt->GetZoff());
+	data->updateEntityPosition(InPckt->GetEntityID(), InPckt->GetXoff(), InPckt->GetYoff(), InPckt->GetZoff());
 
 	/*std::cout << "===>EntityCtrl <===" << std::endl;
 	std::cout << "EntityID ==> " << InPckt->GetEntityID() << std::endl;

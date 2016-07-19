@@ -31,14 +31,14 @@ void ModelUpdater::run()
 			throw boost::system::system_error(error);
 
 		int id = 0;
-		double x, y, z, t = 0;
+		double x = 0, y = 0, z = 0, t = 0;
 
 		std::string msg(reinterpret_cast<char*>(recv_buf.c_array()), len);
 		if (msg.back() == '\f'){
 			msg.pop_back();
 			std::vector<std::string> fields;
 			boost::split(fields, msg, boost::is_any_of(";"));
-			if (fields.size() == 4)
+			if (fields.size() == 5)
 			{
 				id = std::stoi(fields[0]);
 				x = std::stod(fields[1]);

@@ -9,13 +9,15 @@
 #include <vector>
 #include "CigiNetworkManager.h"
 #include "SceneData.h"
+#include "World.h"
 
 //using boost::asio::ip::udp;
 
 int main(int argc, char* argv[])
 {
 	//NetworkManager netmng;
-	SceneData data;
+	//SceneData data;
+	World data;
 	GraphicManager graphmng(&data);
 
 	//std::cout << "Esperando entrada de datos..." << std::endl;

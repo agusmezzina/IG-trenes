@@ -2,18 +2,18 @@
 
 #include "CigiBaseEventProcessor.h"
 #include "CigiEntityCtrlV3_3.h"
-#include "SceneData.h"
+#include "World.h"
 #include <osg\MatrixTransform>
 
 class DataEventProcessor : public CigiBaseEventProcessor
 {
 public:
-	DataEventProcessor(SceneData* data);
+	DataEventProcessor(World* data);
 	virtual ~DataEventProcessor();
 	virtual void OnPacketReceived(CigiBasePacket *Packet);
 	void setOriginPacket(CigiEntityCtrlV3_3 *TPcktIn) { TPckt = TPcktIn; }
 
 protected:
 	CigiEntityCtrlV3_3 *TPckt;
-	SceneData* data;
+	World* data;
 };

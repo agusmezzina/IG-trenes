@@ -9,14 +9,14 @@
 #include <memory>
 #include "DataEventProcessor.h"
 #include "ControlEventProcessor.h"
-#include "SceneData.h"
+#include "World.h"
 
 using boost::asio::ip::udp;
 
 class CigiNetworkManager : public OpenThreads::Thread
 {
 public:
-	CigiNetworkManager(SceneData* data);
+	CigiNetworkManager(World* data);
 	virtual int cancel();
 	virtual void run();
 	void sendSOF();
@@ -26,7 +26,7 @@ private:
 	void handle_receive(const boost::system::error_code& error, std::size_t size);
 	void handle_send(const boost::system::error_code& error, std::size_t size);
 
-	SceneData* data;
+	World* data;
 
 	bool done;
 

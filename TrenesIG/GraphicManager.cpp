@@ -10,7 +10,7 @@
 #include <iostream>
 #include "UpdateTransformCallback.h"
 
-GraphicManager::GraphicManager(SceneData* data) : _data(data), netMgr(data), _path(nullptr), _sceneRoot(nullptr), _cameraCtrl(nullptr)
+GraphicManager::GraphicManager(World* data) : _data(data), netMgr(data), _path(nullptr), _sceneRoot(nullptr), _cameraCtrl(nullptr)
 {
 	_path = new osg::AnimationPath();
 }

@@ -65,7 +65,7 @@ void World::firstOrderPredictUpdate(
 
 World::World()
 {
-	Entity ownship(0);
+	Entity ownship(1);
 	entities.push_back(ownship);
 }
 
