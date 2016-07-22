@@ -30,23 +30,26 @@ void ModelUpdater::run()
 		if (error && error != boost::asio::error::message_size)
 			throw boost::system::system_error(error);
 
-		int id = 0;
-		double x = 0, y = 0, z = 0, t = 0;
+		int id{ 0 };
+		float x{ 0 }, y{ 0 }, z{ 0 }, vx{ 0 }, vy{ 0 }, vz{ 0 }, t{ 0 };
 
 		std::string msg(reinterpret_cast<char*>(recv_buf.c_array()), len);
 		if (msg.back() == '\f'){
 			msg.pop_back();
 			std::vector<std::string> fields;
 			boost::split(fields, msg, boost::is_any_of(";"));
-			if (fields.size() == 5)
+			if (fields.size() == 8)
 			{
 				id = std::stoi(fields[0]);
 				x = std::stod(fields[1]);
 				y = std::stod(fields[2]);
 				z = std::stod(fields[3]);
-				t = std::stod(fields[4]);
+				vx = std::stod(fields[4]);
+				vy = std::stod(fields[5]);
+				vz = std::stod(fields[6]);
+				t = std::stod(fields[1]);
 			}
-			DataPacket state(id, x, y, z, t);
+			DataPacket state(id, x, y, z, vx, vy, vz, t);
 			data->push(state);
 		}
 		//std::cout << x << std::endl;

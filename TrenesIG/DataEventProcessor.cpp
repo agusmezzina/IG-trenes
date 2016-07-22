@@ -11,7 +11,7 @@ void DataEventProcessor::OnPacketReceived(CigiBasePacket *Packet)
 	CigiEntityCtrlV3_3 *InPckt = (CigiEntityCtrlV3_3 *)Packet;
 	setOriginPacket(InPckt);
 
-	data->updateEntityState(InPckt->GetEntityID(), InPckt->GetXoff(), InPckt->GetYoff(), InPckt->GetZoff(), 0, 0, 0);
+	data->updateEntityPosition(InPckt->GetEntityID(), osg::Vec3f(InPckt->GetXoff(), InPckt->GetYoff(), InPckt->GetZoff()));
 
 	/*std::cout << "===>EntityCtrl <===" << std::endl;
 	std::cout << "EntityID ==> " << InPckt->GetEntityID() << std::endl;

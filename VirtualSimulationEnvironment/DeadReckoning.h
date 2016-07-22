@@ -4,7 +4,7 @@
 class DeadReckoning
 {
 public:
-	void updateGhost(double deltaT);
+	void updateGhost(float deltaT);
 	void correctGhost();
 	bool isThresholdViolated(int entityID);
 	DeadReckoning(World* model, World* ghost);

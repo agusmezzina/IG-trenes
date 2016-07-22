@@ -9,6 +9,7 @@ CigiNetworkManager::CigiNetworkManager(World* data) : data(data), inBufferSize(0
 	cigiSession = std::make_unique<CigiIGSession>(1, RECV_BUFFER_SIZE, 2, SEND_BUFFER_SIZE);
 	dataProcessor = std::make_unique<DataEventProcessor>(data);
 	controlProcessor = std::make_unique<ControlEventProcessor>();
+	rateProcessor = std::make_unique<RateEventProcessor>(data);
 	startOfFrame = std::make_unique<CigiSOFV3_2>();
 
 	CigiOutgoingMsg &Omsg = cigiSession->GetOutgoingMsgMgr();
@@ -17,14 +18,15 @@ CigiNetworkManager::CigiNetworkManager(World* data) : data(data), inBufferSize(0
 	inMsg = &Imsg;
 
 	cigiSession->SetCigiVersion(3, 3);
-	cigiSession->SetSynchronous(true);
+	cigiSession->SetSynchronous(false);
 	
 	inMsg->SetReaderCigiVersion(3, 3);
 	inMsg->UsingIteration(false);
 
 	//Agregar handlers
 	inMsg->RegisterEventProcessor(CIGI_IG_CTRL_PACKET_ID_V3_2, controlProcessor.get());
-	inMsg->RegisterEventProcessor(CIGI_ENTITY_CTRL_PACKET_ID_V3, dataProcessor.get());
+	inMsg->RegisterEventProcessor(CIGI_ENTITY_CTRL_PACKET_ID_V3_3, dataProcessor.get());
+	inMsg->RegisterEventProcessor(CIGI_RATE_CTRL_PACKET_ID_V3_2, rateProcessor.get());
 
 	startOfFrame->SetDatabaseID(1);
 	startOfFrame->SetIGStatus(0);
@@ -34,34 +36,35 @@ CigiNetworkManager::CigiNetworkManager(World* data) : data(data), inBufferSize(0
 	startOfFrame->SetTimeStamp(0);
 	startOfFrame->SetFrameCntr(0);
 
+	recvPacket();
 	//start_receive();
-	udp::resolver resolver(io_service);
+	/*udp::resolver resolver(io_service);
 	udp::resolver::query query(udp::v4(), "127.0.0.1", "8001");
-	receiver_endpoint = *resolver.resolve(query);
+	receiver_endpoint = *resolver.resolve(query);*/
 }
 
-void CigiNetworkManager::sendSOF()
-{
-	if (!send)
-		return;
-	outMsg->BeginMsg();
-	boost::system::error_code ignored_error;
-	*outMsg << *startOfFrame;
-	outMsg->PackageMsg(&outBuffer, outBufferSize);
-	outMsg->UpdateSOF(outBuffer);
-
-	//int sent = socket->send_to(boost::asio::buffer(outBuffer, outBufferSize), receiver_endpoint, 0, ignored_error);
-	//outMsg->FreeMsg();
-
-	socket->async_send_to(boost::asio::buffer(outBuffer, outBufferSize),
-		receiver_endpoint,
-		boost::bind(&CigiNetworkManager::handle_send,
-		this,
-		boost::asio::placeholders::error,
-		boost::asio::placeholders::bytes_transferred));
-
-	send = false;
-}
+//void CigiNetworkManager::sendSOF()
+//{
+//	if (!send)
+//		return;
+//	outMsg->BeginMsg();
+//	boost::system::error_code ignored_error;
+//	*outMsg << *startOfFrame;
+//	outMsg->PackageMsg(&outBuffer, outBufferSize);
+//	outMsg->UpdateSOF(outBuffer);
+//
+//	//int sent = socket->send_to(boost::asio::buffer(outBuffer, outBufferSize), receiver_endpoint, 0, ignored_error);
+//	//outMsg->FreeMsg();
+//
+//	socket->async_send_to(boost::asio::buffer(outBuffer, outBufferSize),
+//		receiver_endpoint,
+//		boost::bind(&CigiNetworkManager::handle_send,
+//		this,
+//		boost::asio::placeholders::error,
+//		boost::asio::placeholders::bytes_transferred));
+//
+//	send = false;
+//}
 
 void CigiNetworkManager::recvPacket()
 {
@@ -83,14 +86,15 @@ void CigiNetworkManager::handle_receive(const boost::system::error_code& error, 
 		inMsg->ProcessIncomingMsg(inBuffer.c_array(), size);
 	}
 
-	send = true;
-}
-
-void CigiNetworkManager::handle_send(const boost::system::error_code& error, std::size_t size)
-{
-	outMsg->FreeMsg();
+	//send = true;
 	recvPacket();
 }
+
+//void CigiNetworkManager::handle_send(const boost::system::error_code& error, std::size_t size)
+//{
+//	outMsg->FreeMsg();
+//	recvPacket();
+//}
 
 int CigiNetworkManager::cancel(){
 	done = true;

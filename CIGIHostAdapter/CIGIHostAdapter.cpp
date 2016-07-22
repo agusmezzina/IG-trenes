@@ -17,17 +17,18 @@ int _tmain(int argc, _TCHAR* argv[])
 	//SceneData data;
 	std::queue<DataPacket> data;
 	World worldData;
-	CigiHost server(&worldData);
+	World ghostData;
+	CigiHost server(&worldData, &ghostData, &data);
 	ModelUpdater model(&data);
-	SimulationTimer timer(&data, &worldData);
+	//SimulationTimer timer(&data, &worldData);
 
 	std::thread cigiThread(&CigiHost::run, &server);
 	std::thread modelThread(&ModelUpdater::run, &model);
-	std::thread timerThread(&SimulationTimer::run, &timer);
+	//std::thread timerThread(&SimulationTimer::run, &timer);
 
 	cigiThread.join();
 	modelThread.join();
-	timerThread.join();
+	//timerThread.join();
 
 	return 0;
 }

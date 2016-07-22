@@ -2,13 +2,17 @@
 #include <boost\array.hpp>
 #include <boost\asio.hpp>
 #include <iostream>
+#include <future>
+#include <chrono>
 #define BUFFER_SIZE 32768
 
 using boost::asio::ip::udp;
 
-CigiHost::CigiHost(World* data)
+CigiHost::CigiHost(World* data, World* ghost, std::queue<DataPacket>* rawData)
 {
 	this->data = data;
+	this->ghost = ghost;
+	this->rawData = rawData;
 	cigiSession = std::make_unique<CigiHostSession>(1, BUFFER_SIZE, 2, BUFFER_SIZE);
 	ctrlProcessor = std::make_unique<IGControlProcessor>();
 
@@ -18,7 +22,7 @@ CigiHost::CigiHost(World* data)
 	inMsg = &Imsg;
 
 	cigiSession->SetCigiVersion(3, 3);
-	cigiSession->SetSynchronous(true);
+	cigiSession->SetSynchronous(false);
 
 	inMsg->SetReaderCigiVersion(3, 3);
 	inMsg->UsingIteration(false);
@@ -34,10 +38,14 @@ CigiHost::CigiHost(World* data)
 	ownship.SetEntityID(1);
 	ownship.SetEntityType(0);
 	ownship.SetEntityState(CigiBaseEntityCtrl::Active);
+
+	rateData.SetEntityID(1);
 }
 
 void CigiHost::run()
 {
+	bool dr = true;
+
 	try
 	{
 		unsigned char* outBuffer;
@@ -50,43 +58,59 @@ void CigiHost::run()
 		udp::resolver::query query(udp::v4(), "127.0.0.1", "8888");
 		udp::endpoint receiver_endpoint = *resolver.resolve(query);
 
+		boost::system::error_code ignored_error;
+
 		outMsg->BeginMsg();
+		auto prevTime = std::chrono::high_resolution_clock::now();
+
 		for (;;)
 		{
-			boost::array<unsigned char, BUFFER_SIZE> recv_buf;
-			udp::endpoint remote_endpoint;
-			boost::system::error_code error;
-			boost::system::error_code ignored_error;
+			std::this_thread::sleep_for(std::chrono::milliseconds(10));
+			auto actualTime = std::chrono::high_resolution_clock::now();
+			std::chrono::duration<float> deltaT = actualTime - prevTime;
+			prevTime = actualTime;
+			if (!rawData->empty())
+			{
+				auto lastData = rawData->front();
+				data->updateEntityPosition(lastData.getID(), osg::Vec3f(lastData.getX(), lastData.getY(), lastData.getZ()));
+				data->updateEntityVelocity(lastData.getID(), osg::Vec3f(lastData.getVx(), lastData.getVy(), lastData.getVz()));
+				rawData->pop();
+			}
 
-			std::size_t len = socket.receive_from(boost::asio::buffer(recv_buf),
-				remote_endpoint,
-				0,
-				error);
-			if (error && error != boost::asio::error::message_size)
-				throw boost::system::system_error(error);
+			auto ghEnt = ghost->getEntity(1);
+			auto pg = ghEnt.getPosition();
+			auto vg = ghEnt.getVelocity();
 
-			inMsg->ProcessIncomingMsg(recv_buf.c_array(), len);
+			ghost->updateEntityPosition(ghEnt.getID(), osg::Vec3f(pg.x(), pg.y() + vg.y() * deltaT.count(), pg.z()));
 
-			// load the IG Control
-			*outMsg << igControl;
-			//Update position
-			double x{ 0 }, y{ 0 }, z{ 0 }, vx{ 0 }, vy{ 0 }, vz{ 0 };
-			//data->getCurrent().getState(x, y, z);
 			auto entity = data->getEntity(1);
-			entity.getState(x, y, z, vx, vy, vz);
-			std::cout << y << std::endl;
-			ownship.SetLon(y);
-			*outMsg << ownship;
-			outMsg->PackageMsg(&outBuffer, outBufferSize);
+			auto p = entity.getPosition();
+			auto v = entity.getVelocity();
 
-			outMsg->UpdateIGCtrl(outBuffer, recv_buf.c_array());
+			if ((!dr) || ((dr) && ((rawData->empty()) || (sqrt(pow(p.x() - pg.x(), 2) + pow(p.y() - pg.y(), 2) + pow(p.z() - pg.z(), 2)) > 0.1f)))) //Threshold violated
+			{
+				ghost->updateEntityPosition(1, p);
+				ghost->updateEntityVelocity(1, v);
 
-			socket.send_to(boost::asio::buffer(outBuffer, outBufferSize),
-				receiver_endpoint,
-				0,
-				ignored_error);
+				// load the IG Control
+				*outMsg << igControl;
+				//Update position
+				
+				ownship.SetLon(p.y());
+				rateData.SetYRate(v.y());
+				*outMsg << ownship;
+				*outMsg << rateData;
+				outMsg->PackageMsg(&outBuffer, outBufferSize);
 
-			outMsg->FreeMsg();
+				//outMsg->UpdateIGCtrl(outBuffer, recv_buf.c_array());
+
+				socket.send_to(boost::asio::buffer(outBuffer, outBufferSize),
+					receiver_endpoint,
+					0,
+					ignored_error);
+
+				outMsg->FreeMsg();
+			}
 		}
 		socket.close();
 	}

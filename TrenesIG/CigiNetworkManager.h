@@ -9,6 +9,7 @@
 #include <memory>
 #include "DataEventProcessor.h"
 #include "ControlEventProcessor.h"
+#include "RateEventProcessor.h"
 #include "World.h"
 
 using boost::asio::ip::udp;
@@ -45,6 +46,7 @@ private:
 	CigiIncomingMsg* inMsg;
 	std::unique_ptr<DataEventProcessor> dataProcessor;
 	std::unique_ptr<ControlEventProcessor> controlProcessor;
+	std::unique_ptr<RateEventProcessor> rateProcessor;
 	std::unique_ptr<CigiSOFV3_2> startOfFrame;
 
 	bool send = true;

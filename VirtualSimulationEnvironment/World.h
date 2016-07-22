@@ -9,9 +9,10 @@ class World
 public:
 	void addEntity(Entity e);
 	const Entity getEntity(int id) const;
-	void updateEntityState(int id, double x, double y, double z, double vx, double vy, double vz);
+	void updateEntityPosition(int id, osg::Vec3f position);
+	void updateEntityVelocity(int id, osg::Vec3f velocity);
 	void firstOrderPredictUpdate(
-		const std::function<double (double p, double v)>& predictionFunction);
+		const std::function<float (float p, float v)>& predictionFunction);
 	//void instantCorrect(World* reference, double threshold);
 	World();
 	virtual ~World();

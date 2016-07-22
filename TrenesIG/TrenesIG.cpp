@@ -20,6 +20,7 @@ int main(int argc, char* argv[])
 	//SceneData data;
 	World data;
 	World ghost;
+	//ghost.updateEntityVelocity(1, osg::Vec3f(0.0f, 1.0f, 0.0f));
 	DeadReckoning dr(&data, &ghost);
 	GraphicManager graphmng(&data, &ghost);
 

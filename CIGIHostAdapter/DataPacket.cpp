@@ -1,12 +1,15 @@
 #include "DataPacket.h"
 
 
-DataPacket::DataPacket(int id, double x, double y, double z, double t)
+DataPacket::DataPacket(int id, float x, float y, float z, float vx, float vy, float vz, float t)
 {
 	this->id = id;
 	this->x = x;
 	this->y = y;
 	this->z = z;
+	this->vx = vx;
+	this->vy = vy;
+	this->vz = vz;
 	this->t = t;
 }
 
@@ -15,22 +18,37 @@ int DataPacket::getID() const
 	return this->id;
 }
 
-double DataPacket::getX() const
+float DataPacket::getX() const
 {
 	return this->x;
 }
 
-double DataPacket::getY() const
+float DataPacket::getY() const
 {
 	return this->y;
 }
 
-double DataPacket::getZ() const
+float DataPacket::getZ() const
 {
 	return this->z;
 }
 
-double DataPacket::getTime() const
+float DataPacket::getVx() const
+{
+	return this->vx;
+}
+
+float DataPacket::getVy() const
+{
+	return this->vy;
+}
+
+float DataPacket::getVz() const
+{
+	return this->vz;
+}
+
+float DataPacket::getTime() const
 {
 	return this->t;
 }

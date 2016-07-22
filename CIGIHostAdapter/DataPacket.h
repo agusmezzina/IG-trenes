@@ -2,15 +2,18 @@
 class DataPacket
 {
 public:
-	DataPacket(int id, double x, double y, double z, double t);
+	DataPacket(int id, float x, float y, float z, float vx, float vy, float vz, float t);
 	int getID() const;
-	double getX() const;
-	double getY() const;
-	double getZ() const;
-	double getTime() const;
+	float getX() const;
+	float getY() const;
+	float getZ() const;
+	float getVx() const;
+	float getVy() const;
+	float getVz() const;
+	float getTime() const;
 	~DataPacket();
 private:
 	int id;
-	double x, y, z, t;
+	float x, y, z, vx, vy, vz, t;
 };
 

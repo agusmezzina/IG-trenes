@@ -16,31 +16,38 @@ const Entity World::getEntity(int id) const
 	return *it;
 }
 
-void World::updateEntityState(int id, double x, double y, double z, double vx, double vy, double vz)
+void World::updateEntityPosition(int id, osg::Vec3f position)
 {
 	std::lock_guard<std::mutex> g(m);
 	auto it = std::find_if(std::begin(entities), std::end(entities),
 		[&](Entity const& e) { return e.getID() == id; });
 	if ((*it).getID() == id)
-		(*it).setState(x, y, z, vx, vy, vz);
+		(*it).setPosition(position);
+}
+
+void World::updateEntityVelocity(int id, osg::Vec3f velocity)
+{
+	std::lock_guard<std::mutex> g(m);
+	auto it = std::find_if(std::begin(entities), std::end(entities),
+		[&](Entity const& e) { return e.getID() == id; });
+	if ((*it).getID() == id)
+		(*it).setVelocity(velocity);
 }
 
 void World::firstOrderPredictUpdate(
-	const std::function<double (double p, double v)>& predictionFunction)
+	const std::function<float (float p, float v)>& predictionFunction)
 {
 	std::lock_guard<std::mutex> g(m);
-	for (auto entity : entities)
+	for (auto it = entities.begin(); it != entities.end(); ++it)
 	{
-		double x, y, z;
-		double vx, vy, vz;
-		entity.getState(x, y, z, vx, vy, vz);
-		entity.setState(
-			predictionFunction(x, vx),
-			predictionFunction(y, vy),
-			predictionFunction(z, vz),
-			vx,
-			vy,
-			vz);
+		auto p = (*it).getPosition();
+		auto v = (*it).getVelocity();
+
+		float x = predictionFunction(p.x(), v.x());
+		float y = predictionFunction(p.y(), v.y());
+		float z = predictionFunction(p.z(), v.z());
+
+		(*it).setPosition(osg::Vec3f(x, y, z));
 	}
 }
 

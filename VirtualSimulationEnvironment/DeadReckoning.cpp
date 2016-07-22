@@ -2,20 +2,18 @@
 #include "DeadReckoning.h"
 #include <cmath>
 
-void DeadReckoning::updateGhost(double deltaT)
+void DeadReckoning::updateGhost(float deltaT)
 {
-	ghost->firstOrderPredictUpdate([deltaT](double p, double v) {return p + v * deltaT; });
+	ghost->firstOrderPredictUpdate([deltaT](float p, float v) {return p + v * deltaT; });
 }
 
 bool DeadReckoning::isThresholdViolated(int entityID)
 {
 	auto entity = model->getEntity(entityID);
 	auto ghostEntity = ghost->getEntity(entityID);
-	double x0, y0, z0, x1, y1, z1;
-	double vx, vy, vz;
-	entity.getState(x0, y0, z0, vx, vy, vz);
-	ghostEntity.getState(x1, y1, z1, vx, vy, vz);
-	if (sqrt(pow(x0 - x1, 2) + pow(y0 - y1, 2) + pow(z0 - z1, 2)) > rThreshold)
+	auto p0 = entity.getPosition();
+	auto p1 = ghostEntity.getPosition();
+	if (sqrt(pow(p0.x() - p1.x(), 2) + pow(p0.y() - p1.y(), 2) + pow(p0.z() - p1.z(), 2)) > rThreshold)
 	{
 		return true;
 	}
