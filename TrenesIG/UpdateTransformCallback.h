@@ -2,6 +2,7 @@
 #include <osg\NodeCallback>
 #include <osg\MatrixTransform>
 #include <chrono>
+#include <memory>
 #include "World.h"
 #include "DeadReckoning.h"
 
@@ -13,12 +14,11 @@ public:
 	virtual void operator()(osg::Node* node, osg::NodeVisitor* nv);
 protected:
 	std::chrono::system_clock::time_point prevTime;
-	float realY;
-	osg::Vec3f oldP;
 	World* _data;
 	World* _ghost;
-	bool predict;
-	int step;
-	int smoothness;
+	int correctionStep;
+	std::unique_ptr<DeadReckoning> dr;
+	osg::Vec3f oldP;
+	bool correcting;
 };
 

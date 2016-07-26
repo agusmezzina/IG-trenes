@@ -4,13 +4,15 @@
 class DeadReckoning
 {
 public:
-	void updateGhost(float deltaT);
-	void correctGhost();
+	void updateGhost(int entityID, float deltaT);
+	void correctGhost(int entityID, int step);
+	void correctGhost(int entityID);
 	bool isThresholdViolated(int entityID);
 	DeadReckoning(World* model, World* ghost);
 	virtual ~DeadReckoning();
 private:
-	double rThreshold;
+	float rThreshold;
+	int smoothness;
 	World* model;
 	World* ghost;
 };

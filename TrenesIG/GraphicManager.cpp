@@ -38,19 +38,29 @@ osg::ref_ptr<osg::Camera> GraphicManager::createCamera(const osg::Vec3& eye, con
 }
 
 void GraphicManager::createScene(){
+	osg::ref_ptr<osg::Group> scene = new osg::Group;
+
+	osg::ref_ptr<osg::ShapeDrawable> floorShape = new osg::ShapeDrawable;
+	floorShape->setShape(new osg::Box(osg::Vec3(0.0f, -0.01f, 0.0f), 1000.0f, 0.01f, 1000.0f));
+	//floorShape->setColor(osg::Vec4(1.0f, 0.0f, 0.0f, 1.0f));
+	osg::ref_ptr<osg::Geode> floor = new osg::Geode;
+	floor->addDrawable(floorShape.get());
+
 	osg::ref_ptr<osg::Geode> model = createBallNode(
-		osg::Vec3(0.0f, -0.5f, 0.0f),
+		osg::Vec3(0.0f, 0.1f, 0.0f),
 		0.1f,
 		osg::Vec4(1.0f, 1.0f, 0.5f, 1.0f));
 	//osg::ref_ptr<osg::Node> model = osgDB::readNodeFile("cessna.osg");
-	osg::ref_ptr<osg::MatrixTransform> scene = new osg::MatrixTransform;
-	scene->addChild(model.get());
+	osg::ref_ptr<osg::MatrixTransform> transf = new osg::MatrixTransform;
+	transf->addChild(model.get());
 	//osg::ref_ptr<osg::AnimationPathCallback> apcb = new	osg::AnimationPathCallback;
 	//apcb->setAnimationPath(_path);
 	//scene->setUpdateCallback(apcb.get());
 	//osg::ref_ptr<UpdateTransformCallback> updcb = new UpdateTransformCallback(_data);
-	scene->setUpdateCallback(new UpdateTransformCallback(_data, _ghost));
+	transf->setUpdateCallback(new UpdateTransformCallback(_data, _ghost));
 
+	scene->addChild(transf);
+	scene->addChild(floor);
 
 	//osg::Vec3 center = osg::Vec3(38.0f, -91.0f, 500.0f);
 	osg::Vec3 center = osg::Vec3(0.0f, 3.0f, 0.0f);

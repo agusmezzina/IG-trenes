@@ -9,6 +9,7 @@
 #include "DataPacket.h"
 #include "SceneData.h"
 #include "World.h"
+#include "DeadReckoning.h"
 
 class CigiHost
 {
@@ -19,6 +20,7 @@ public:
 private:
 	std::unique_ptr<CigiHostSession> cigiSession;
 	std::unique_ptr<IGControlProcessor> ctrlProcessor;
+	std::unique_ptr<DeadReckoning> dr;
 	CigiOutgoingMsg* outMsg;
 	CigiIncomingMsg* inMsg;
 	CigiIGCtrlV3_2 igControl;

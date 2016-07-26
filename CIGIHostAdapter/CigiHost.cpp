@@ -15,6 +15,7 @@ CigiHost::CigiHost(World* data, World* ghost, std::queue<DataPacket>* rawData)
 	this->rawData = rawData;
 	cigiSession = std::make_unique<CigiHostSession>(1, BUFFER_SIZE, 2, BUFFER_SIZE);
 	ctrlProcessor = std::make_unique<IGControlProcessor>();
+	dr = std::make_unique<DeadReckoning>(data, ghost);
 
 	CigiOutgoingMsg &Omsg = cigiSession->GetOutgoingMsgMgr();
 	CigiIncomingMsg &Imsg = cigiSession->GetIncomingMsgMgr();
@@ -44,7 +45,7 @@ CigiHost::CigiHost(World* data, World* ghost, std::queue<DataPacket>* rawData)
 
 void CigiHost::run()
 {
-	bool dr = true;
+	bool usingDR = true;
 
 	try
 	{
@@ -77,20 +78,17 @@ void CigiHost::run()
 				rawData->pop();
 			}
 
-			auto ghEnt = ghost->getEntity(1);
-			auto pg = ghEnt.getPosition();
-			auto vg = ghEnt.getVelocity();
-
-			ghost->updateEntityPosition(ghEnt.getID(), osg::Vec3f(pg.x(), pg.y() + vg.y() * deltaT.count(), pg.z()));
-
-			auto entity = data->getEntity(1);
-			auto p = entity.getPosition();
-			auto v = entity.getVelocity();
-
-			if ((!dr) || ((dr) && ((rawData->empty()) || (sqrt(pow(p.x() - pg.x(), 2) + pow(p.y() - pg.y(), 2) + pow(p.z() - pg.z(), 2)) > 0.1f)))) //Threshold violated
+			dr->updateGhost(1, deltaT.count());
+			
+			if ((dr->isThresholdViolated(1)) || (rawData->empty()))
 			{
-				ghost->updateEntityPosition(1, p);
-				ghost->updateEntityVelocity(1, v);
+				dr->correctGhost(1);
+				auto entity = data->getEntity(1);
+				auto p = entity.getPosition();
+				auto v = entity.getVelocity();
+
+				if (rawData->empty())
+					std::cout << v.y() << std::endl;
 
 				// load the IG Control
 				*outMsg << igControl;

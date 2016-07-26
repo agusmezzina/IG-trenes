@@ -5,51 +5,40 @@
 UpdateTransformCallback::UpdateTransformCallback(World* data, World* ghost) : _data(data), _ghost(ghost)
 {
 	prevTime = std::chrono::high_resolution_clock::now();
-	realY = _data->getEntity(1).getPosition().y();
+	correctionStep = 0;
+	dr = std::make_unique<DeadReckoning>(data, ghost);
 	oldP = _data->getEntity(1).getPosition();
-	predict = true;
-	step = 0;
-	smoothness = 20;
+	bool correcting = false;
 }
 
 void UpdateTransformCallback::operator()(osg::Node* node, osg::NodeVisitor* nv){
 	osg::MatrixTransform* transformNode = static_cast<osg::MatrixTransform*>(node);
-	bool dr = true;
-	osg::Vec3f p1;
 
-	if (dr)
+	auto actualTime = std::chrono::high_resolution_clock::now();
+	std::chrono::duration<float> time = actualTime - prevTime;
+	float deltaT = time.count();
+	prevTime = actualTime;
+
+	auto p = _data->getEntity(1).getPosition();
+
+	if (p != oldP)
+		correcting = true;
+
+	if (!correcting)
+		dr->updateGhost(1, deltaT);
+	else //correction
 	{
-		auto actualTime = std::chrono::high_resolution_clock::now();
-		std::chrono::duration<float> time = actualTime - prevTime;
-		float deltaT = time.count();
-		prevTime = actualTime;
-
-		//float newY = _data->getEntity(1).getPosition().y();
-		auto p = _data->getEntity(1).getPosition();
-
-
-		//if (newY == realY)
-		if (p == oldP)
+		oldP = p;
+		dr->correctGhost(1, correctionStep);
+		correctionStep++;
+		if (correctionStep > 10)
 		{
-			auto p0 = _ghost->getEntity(1).getPosition();
-			auto v0 = _ghost->getEntity(1).getVelocity();
-			_ghost->updateEntityPosition(1, osg::Vec3f(0.0f, p0.y() + v0.y()*deltaT, 0.0f));
+			correcting = false;
+			correctionStep = 0;
 		}
-		else //correction
-		{
-			oldP = oldP + (p - oldP) / smoothness;
-			//_ghost->updateEntityPosition(1, _data->getEntity(1).getPosition());
-			_ghost->updateEntityPosition(1, oldP);
-			_ghost->updateEntityVelocity(1, _data->getEntity(1).getVelocity());
-		}
-		p1 = _ghost->getEntity(1).getPosition();
 	}
-	else
-		p1 = _data->getEntity(1).getPosition();
-	//std::cout << deltaT << std::endl;
-	//std::cout << v1.y() << std::endl;
 	
-	//auto p1 = _data->getEntity(1).getPosition();
+	auto p1 = _ghost->getEntity(1).getPosition();
 	
 	transformNode->setMatrix(osg::Matrix::translate(p1));
 	traverse(node, nv);
