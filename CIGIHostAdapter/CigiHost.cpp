@@ -45,8 +45,8 @@ CigiHost::CigiHost(World* data, World* ghost, std::queue<DataPacket>* rawData)
 
 void CigiHost::run()
 {
-	bool usingDR = true;
-
+	bool usingDR = false;
+	bool started = false;
 	try
 	{
 		unsigned char* outBuffer;
@@ -72,6 +72,7 @@ void CigiHost::run()
 			prevTime = actualTime;
 			if (!rawData->empty())
 			{
+				started = true;
 				auto lastData = rawData->front();
 				data->updateEntityPosition(lastData.getID(), osg::Vec3f(lastData.getX(), lastData.getY(), lastData.getZ()));
 				data->updateEntityVelocity(lastData.getID(), osg::Vec3f(lastData.getVx(), lastData.getVy(), lastData.getVz()));
@@ -80,7 +81,7 @@ void CigiHost::run()
 
 			dr->updateGhost(1, deltaT.count());
 			
-			if ((dr->isThresholdViolated(1)) || (rawData->empty()))
+			if ((!usingDR && started) || ((((dr->isThresholdViolated(1)) || (rawData->empty())) && started)) && (usingDR) )
 			{
 				dr->correctGhost(1);
 				auto entity = data->getEntity(1);

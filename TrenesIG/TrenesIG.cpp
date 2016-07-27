@@ -19,7 +19,9 @@ int main(int argc, char* argv[])
 	//NetworkManager netmng;
 	//SceneData data;
 	World data;
+	data.updateEntityPosition(1, osg::Vec3f(0.0f, 3.0f, 0.0f));
 	World ghost;
+	ghost.updateEntityPosition(1, osg::Vec3f(0.0f, 3.0f, 0.0f));
 	//ghost.updateEntityVelocity(1, osg::Vec3f(0.0f, 1.0f, 0.0f));
 	DeadReckoning dr(&data, &ghost);
 	GraphicManager graphmng(&data, &ghost);
