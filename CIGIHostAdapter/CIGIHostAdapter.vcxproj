@@ -52,13 +52,13 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(BOOST_ROOT)\include\boost-1_61;$(CCL_SOURCE)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(BOOST_ROOT);$(CCL_SOURCE)\include;$(OSG_ROOT)\include;$(OSG_SOURCE)\include;C:\Users\AM\Documents\Tesis\Proyectos\SimulacionFerroviaria\VirtualSimulationEnvironment;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(BOOST_ROOT)\lib;$(CCL_ROOT)\lib\debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>cigicl_debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(BOOST_ROOT)\stage\lib;$(CCL_ROOT)\lib\debug;$(OSG_ROOT)\lib;C:\Users\AM\Documents\Tesis\Proyectos\SimulacionFerroviaria\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>cigicl_debug.lib;osgd.lib;VirtualSimulationEnvironment.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -83,6 +83,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CigiHost.h" />
+    <ClInclude Include="DataPacket.h" />
+    <ClInclude Include="EntityState.h" />
     <ClInclude Include="IGControlProcessor.h" />
     <ClInclude Include="ModelUpdater.h" />
     <ClInclude Include="SceneData.h" />
@@ -93,6 +95,8 @@
   <ItemGroup>
     <ClCompile Include="CigiHost.cpp" />
     <ClCompile Include="CIGIHostAdapter.cpp" />
+    <ClCompile Include="DataPacket.cpp" />
+    <ClCompile Include="EntityState.cpp" />
     <ClCompile Include="IGControlProcessor.cpp" />
     <ClCompile Include="ModelUpdater.cpp" />
     <ClCompile Include="SceneData.cpp" />
