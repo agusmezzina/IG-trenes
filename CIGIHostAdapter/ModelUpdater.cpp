@@ -7,7 +7,7 @@
 
 using boost::asio::ip::udp;
 
-ModelUpdater::ModelUpdater(SceneData* data)
+ModelUpdater::ModelUpdater(std::queue<DataPacket>* data)
 {
 	this->data = data;
 }
@@ -30,20 +30,27 @@ void ModelUpdater::run()
 		if (error && error != boost::asio::error::message_size)
 			throw boost::system::system_error(error);
 
-		double x, y, z = 0;
+		int id{ 0 };
+		float x{ 0 }, y{ 0 }, z{ 0 }, vx{ 0 }, vy{ 0 }, vz{ 0 }, t{ 0 };
+
 		std::string msg(reinterpret_cast<char*>(recv_buf.c_array()), len);
 		if (msg.back() == '\f'){
 			msg.pop_back();
 			std::vector<std::string> fields;
 			boost::split(fields, msg, boost::is_any_of(";"));
-			if (fields.size() == 4)
+			if (fields.size() == 8)
 			{
-				x = std::stod(fields[0]);
-				y = std::stod(fields[1]);
-				z = std::stod(fields[2]);
+				id = std::stoi(fields[0]);
+				x = std::stod(fields[1]);
+				y = std::stod(fields[2]);
+				z = std::stod(fields[3]);
+				vx = std::stod(fields[4]);
+				vy = std::stod(fields[5]);
+				vz = std::stod(fields[6]);
+				t = std::stod(fields[1]);
 			}
-			EntityState state(x, y, z);
-			data->addNew(state);
+			DataPacket state(id, x, y, z, vx, vy, vz, t);
+			data->push(state);
 		}
 		//std::cout << x << std::endl;
 		//std::cout << y << std::endl;

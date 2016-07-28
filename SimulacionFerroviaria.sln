@@ -7,6 +7,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TrenesIG", "TrenesIG\Trenes
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CIGIHostAdapter", "CIGIHostAdapter\CIGIHostAdapter.vcxproj", "{AC7D6A4D-EF43-41C8-8A63-2EF0B3316B51}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VirtualSimulationEnvironment", "VirtualSimulationEnvironment\VirtualSimulationEnvironment.vcxproj", "{3EED43E4-B351-4D57-A7C1-E41C79976629}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -21,6 +23,10 @@ Global
 		{AC7D6A4D-EF43-41C8-8A63-2EF0B3316B51}.Debug|Win32.Build.0 = Debug|Win32
 		{AC7D6A4D-EF43-41C8-8A63-2EF0B3316B51}.Release|Win32.ActiveCfg = Release|Win32
 		{AC7D6A4D-EF43-41C8-8A63-2EF0B3316B51}.Release|Win32.Build.0 = Release|Win32
+		{3EED43E4-B351-4D57-A7C1-E41C79976629}.Debug|Win32.ActiveCfg = Debug|Win32
+		{3EED43E4-B351-4D57-A7C1-E41C79976629}.Debug|Win32.Build.0 = Debug|Win32
+		{3EED43E4-B351-4D57-A7C1-E41C79976629}.Release|Win32.ActiveCfg = Release|Win32
+		{3EED43E4-B351-4D57-A7C1-E41C79976629}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,13 +1,15 @@
 #pragma once
 #include "SceneData.h"
+#include "DataPacket.h"
+#include <queue>
 
 class ModelUpdater
 {
 public:
-	ModelUpdater(SceneData* data);
+	ModelUpdater(std::queue<DataPacket>* data);
 	void run();
 	virtual ~ModelUpdater();
 private:
-	SceneData* data;
+	std::queue<DataPacket>* data;
 };
 

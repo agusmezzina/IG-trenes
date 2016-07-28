@@ -5,11 +5,15 @@
 #include <osgViewer/Viewer>
 #include "SceneData.h"
 #include "CigiNetworkManager.h"
+#include "World.h"
+#include "DeadReckoning.h"
 
 class GraphicManager
 {
 private:
-	SceneData* _data;
+	//SceneData* _data;
+	World* _data;
+	World* _ghost;
 	CigiNetworkManager netMgr;
 	osg::ref_ptr<osg::Node> _sceneRoot;
 	osg::ref_ptr<osg::AnimationPath> _path;
@@ -18,9 +22,10 @@ private:
 	osg::ref_ptr<osg::Camera> createCamera(const osg::Vec3& eye, const osg::Vec3& center, const osg::Vec3& up, osg::Node* scene);
 	void createScene();
 	int runViewer();
+	std::unique_ptr<DeadReckoning> dr;
 public:
 	void addKeyFrame(double x, double y, double z, double t);
-	GraphicManager(SceneData* data);
+	GraphicManager(World* data, World* ghost);
 	int runScene();
 	~GraphicManager();
 };

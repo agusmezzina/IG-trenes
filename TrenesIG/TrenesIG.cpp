@@ -9,14 +9,22 @@
 #include <vector>
 #include "CigiNetworkManager.h"
 #include "SceneData.h"
+#include "World.h"
+#include "DeadReckoning.h"
 
 //using boost::asio::ip::udp;
 
 int main(int argc, char* argv[])
 {
 	//NetworkManager netmng;
-	SceneData data;
-	GraphicManager graphmng(&data);
+	//SceneData data;
+	World data;
+	data.updateEntityPosition(1, osg::Vec3f(0.0f, 3.0f, 0.0f));
+	World ghost;
+	ghost.updateEntityPosition(1, osg::Vec3f(0.0f, 3.0f, 0.0f));
+	//ghost.updateEntityVelocity(1, osg::Vec3f(0.0f, 1.0f, 0.0f));
+	DeadReckoning dr(&data, &ghost);
+	GraphicManager graphmng(&data, &ghost);
 
 	//std::cout << "Esperando entrada de datos..." << std::endl;
 	//auto data = netmng.readSimulationData("127.0.0.1", "8888", 500);
