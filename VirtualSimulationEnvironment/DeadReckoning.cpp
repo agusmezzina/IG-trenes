@@ -2,13 +2,23 @@
 #include "DeadReckoning.h"
 #include <cmath>
 
-void DeadReckoning::updateGhost(int entityID, float deltaT)
+void DeadReckoning::firstOrderUpdateGhost(int entityID, float deltaT)
 {
 	//ghost->firstOrderPredictUpdate([deltaT](float p, float v) {return p + v * deltaT; });
 	auto ghostEntity = ghost->getEntity(entityID);
 	auto p = ghostEntity.getPosition();
 	auto v = ghostEntity.getVelocity();
 	ghost->updateEntityPosition(entityID, p + v * deltaT);
+}
+
+void DeadReckoning::secondOrderUpdateGhost(int entityID, float deltaT)
+{
+	//ghost->firstOrderPredictUpdate([deltaT](float p, float v) {return p + v * deltaT; });
+	auto ghostEntity = ghost->getEntity(entityID);
+	auto p = ghostEntity.getPosition();
+	auto v = ghostEntity.getVelocity();
+	auto a = ghostEntity.getAcceleration();
+	ghost->updateEntityPosition(entityID, p + v * deltaT + a * 0.5 * pow(deltaT, 2));
 }
 
 void DeadReckoning::correctGhost(int entityID, int step)
@@ -36,6 +46,7 @@ bool DeadReckoning::isThresholdViolated(int entityID)
 	auto ghostEntity = ghost->getEntity(entityID);
 	auto p0 = entity.getPosition();
 	auto p1 = ghostEntity.getPosition();
+	
 	if (sqrt(pow(p0.x() - p1.x(), 2) + pow(p0.y() - p1.y(), 2) + pow(p0.z() - p1.z(), 2)) > rThreshold)
 	{
 		return true;

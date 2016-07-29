@@ -31,14 +31,14 @@ void ModelUpdater::run()
 			throw boost::system::system_error(error);
 
 		int id{ 0 };
-		float x{ 0 }, y{ 0 }, z{ 0 }, vx{ 0 }, vy{ 0 }, vz{ 0 }, t{ 0 };
+		float x{ 0 }, y{ 0 }, z{ 0 }, vx{ 0 }, vy{ 0 }, vz{ 0 }, ax{ 0 }, ay{ 0 }, az{ 0 }, t{ 0 };
 
 		std::string msg(reinterpret_cast<char*>(recv_buf.c_array()), len);
 		if (msg.back() == '\f'){
 			msg.pop_back();
 			std::vector<std::string> fields;
 			boost::split(fields, msg, boost::is_any_of(";"));
-			if (fields.size() == 8)
+			if (fields.size() == 11)
 			{
 				id = std::stoi(fields[0]);
 				x = std::stod(fields[1]);
@@ -47,9 +47,12 @@ void ModelUpdater::run()
 				vx = std::stod(fields[4]);
 				vy = std::stod(fields[5]);
 				vz = std::stod(fields[6]);
-				t = std::stod(fields[1]);
+				ax = std::stod(fields[7]);
+				ay = std::stod(fields[8]);
+				az = std::stod(fields[9]);
+				t = std::stod(fields[10]);
 			}
-			DataPacket state(id, x, y, z, vx, vy, vz, t);
+			DataPacket state(id, x, y, z, vx, vy, vz, ax, ay, az, t);
 			data->push(state);
 		}
 		//std::cout << x << std::endl;

@@ -10,6 +10,7 @@ CigiNetworkManager::CigiNetworkManager(World* data) : data(data), inBufferSize(0
 	dataProcessor = std::make_unique<DataEventProcessor>(data);
 	controlProcessor = std::make_unique<ControlEventProcessor>();
 	rateProcessor = std::make_unique<RateEventProcessor>(data);
+	trajectoryProcessor = std::make_unique<TrajectoryEventProcessor>(data);
 	startOfFrame = std::make_unique<CigiSOFV3_2>();
 
 	CigiOutgoingMsg &Omsg = cigiSession->GetOutgoingMsgMgr();
@@ -27,6 +28,7 @@ CigiNetworkManager::CigiNetworkManager(World* data) : data(data), inBufferSize(0
 	inMsg->RegisterEventProcessor(CIGI_IG_CTRL_PACKET_ID_V3_2, controlProcessor.get());
 	inMsg->RegisterEventProcessor(CIGI_ENTITY_CTRL_PACKET_ID_V3_3, dataProcessor.get());
 	inMsg->RegisterEventProcessor(CIGI_RATE_CTRL_PACKET_ID_V3_2, rateProcessor.get());
+	inMsg->RegisterEventProcessor(CIGI_TRAJECTORY_DEF_PACKET_ID_V3, trajectoryProcessor.get());
 
 	startOfFrame->SetDatabaseID(1);
 	startOfFrame->SetIGStatus(0);

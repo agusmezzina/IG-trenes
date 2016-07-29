@@ -11,6 +11,7 @@ public:
 	const Entity getEntity(int id) const;
 	void updateEntityPosition(int id, osg::Vec3f position);
 	void updateEntityVelocity(int id, osg::Vec3f velocity);
+	void updateEntityAcceleration(int id, osg::Vec3f acceleration);
 	void firstOrderPredictUpdate(
 		const std::function<float (float p, float v)>& predictionFunction);
 	//void instantCorrect(World* reference, double threshold);
