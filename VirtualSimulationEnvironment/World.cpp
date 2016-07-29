@@ -34,6 +34,15 @@ void World::updateEntityVelocity(int id, osg::Vec3f velocity)
 		(*it).setVelocity(velocity);
 }
 
+void World::updateEntityAcceleration(int id, osg::Vec3f acceleration)
+{
+	std::lock_guard<std::mutex> g(m);
+	auto it = std::find_if(std::begin(entities), std::end(entities),
+		[&](Entity const& e) { return e.getID() == id; });
+	if ((*it).getID() == id)
+		(*it).setVelocity(acceleration);
+}
+
 void World::firstOrderPredictUpdate(
 	const std::function<float (float p, float v)>& predictionFunction)
 {

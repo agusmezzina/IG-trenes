@@ -4,7 +4,8 @@
 class DeadReckoning
 {
 public:
-	void updateGhost(int entityID, float deltaT);
+	void firstOrderUpdateGhost(int entityID, float deltaT);
+	void secondOrderUpdateGhost(int entityID, float deltaT);
 	void correctGhost(int entityID, int step);
 	void correctGhost(int entityID);
 	bool isThresholdViolated(int entityID);

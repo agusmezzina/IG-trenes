@@ -41,11 +41,12 @@ CigiHost::CigiHost(World* data, World* ghost, std::queue<DataPacket>* rawData)
 	ownship.SetEntityState(CigiBaseEntityCtrl::Active);
 
 	rateData.SetEntityID(1);
+	trajectoryData.SetEntityID(1);
 }
 
 void CigiHost::run()
 {
-	bool usingDR = false;
+	bool usingDR = true;
 	bool started = false;
 	try
 	{
@@ -76,10 +77,11 @@ void CigiHost::run()
 				auto lastData = rawData->front();
 				data->updateEntityPosition(lastData.getID(), osg::Vec3f(lastData.getX(), lastData.getY(), lastData.getZ()));
 				data->updateEntityVelocity(lastData.getID(), osg::Vec3f(lastData.getVx(), lastData.getVy(), lastData.getVz()));
+				data->updateEntityAcceleration(lastData.getID(), osg::Vec3f(lastData.getAx(), lastData.getAy(), lastData.getAz()));
 				rawData->pop();
 			}
 
-			dr->updateGhost(1, deltaT.count());
+			dr->secondOrderUpdateGhost(1, deltaT.count());
 			
 			if ((!usingDR && started) || ((((dr->isThresholdViolated(1)) || (rawData->empty())) && started)) && (usingDR) )
 			{
@@ -87,6 +89,7 @@ void CigiHost::run()
 				auto entity = data->getEntity(1);
 				auto p = entity.getPosition();
 				auto v = entity.getVelocity();
+				auto a = entity.getAcceleration();
 
 				if (rawData->empty())
 					std::cout << v.y() << std::endl;
@@ -97,8 +100,11 @@ void CigiHost::run()
 				
 				ownship.SetLon(p.y());
 				rateData.SetYRate(v.y());
+				trajectoryData.SetAccelY(a.y());
+
 				*outMsg << ownship;
 				*outMsg << rateData;
+				*outMsg << trajectoryData;
 				outMsg->PackageMsg(&outBuffer, outBufferSize);
 
 				//outMsg->UpdateIGCtrl(outBuffer, recv_buf.c_array());

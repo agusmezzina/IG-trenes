@@ -3,6 +3,7 @@
 #include <CigiIGCtrlV3_2.h>
 #include <CigiEntityCtrlV3_3.h>
 #include <CigiRateCtrlV3_2.h>
+#include <CigiTrajectoryDefV3.h>
 #include <memory>
 #include <queue>
 #include "IGControlProcessor.h"
@@ -26,6 +27,7 @@ private:
 	CigiIGCtrlV3_2 igControl;
 	CigiEntityCtrlV3_3 ownship;
 	CigiRateCtrlV3_2 rateData;
+	CigiTrajectoryDefV3 trajectoryData;
 	World* data;
 	World* ghost;
 	std::queue<DataPacket>* rawData;

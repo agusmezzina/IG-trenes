@@ -50,8 +50,8 @@ void GraphicManager::createScene(){
 
 
 	osg::ref_ptr<osg::ShapeDrawable> floorShape = new osg::ShapeDrawable;
-	floorShape->setShape(new osg::Box(osg::Vec3(0.0f, -0.01f, 0.0f), 10.0f, 0.01f, 10.0f));
-	floorShape->setColor(osg::Vec4(0.1f, 0.1f, 0.1f, 1.0f));
+	floorShape->setShape(new osg::Box(osg::Vec3(0.0f, -0.1f, 0.0f), 10.0f, 0.01f, 10.0f));
+	floorShape->setColor(osg::Vec4(0.9f, 0.9f, 0.9f, 1.0f));
 	osg::ref_ptr<osg::Geode> floor = new osg::Geode;
 	floor->addDrawable(floorShape.get());
 
