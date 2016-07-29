@@ -29,6 +29,15 @@ int Entity::getID() const
 Entity::Entity(int id)
 {
 	this->id = id;
+	this->aoi = 0.0f;
+	this->sr = 0.0f;
+}
+
+Entity::Entity(int id, float areaOfInterest, float sensitiveRegion)
+{
+	this->id = id;
+	this->aoi = areaOfInterest;
+	this->sr = sensitiveRegion;
 }
 
 Entity::~Entity()

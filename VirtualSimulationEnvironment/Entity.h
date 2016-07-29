@@ -10,11 +10,14 @@ public:
 	void setVelocity(osg::Vec3f newVelocity);
 	int getID() const;
 	Entity(int id);
+	Entity(int id, float areaOfInterest, float sensitiveRegion);
 	virtual ~Entity();
 private:
 	osg::Vec3f position;
 	osg::Vec3f orientation;
 	osg::Vec3f velocity;
 	int id;
+	float aoi;
+	float sr;
 };
 
