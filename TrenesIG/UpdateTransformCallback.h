@@ -14,6 +14,7 @@ public:
 	UpdateTransformCallback(World* data, World* ghost);
 	virtual ~UpdateTransformCallback();
 	virtual void operator()(osg::Node* node, osg::NodeVisitor* nv);
+	float calculateAngleOfEmbrace() const;
 protected:
 	std::ofstream dataFile;
 	std::chrono::system_clock::time_point prevTime;
@@ -22,9 +23,12 @@ protected:
 	World* _ghost;
 	int correctionStep;
 	std::unique_ptr<DeadReckoning> dr;
-	osg::Vec3f oldP;
+	osg::Vec3f p_1;
 	bool correcting;
 	bool started;
 	bool usingDR;
+	osg::Vec2f x_2;
+	osg::Vec2f x_1;
+	osg::Vec2f x;
 };
 

@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "Entity.h"
+#include <cmath>
 
 osg::Vec3f Entity::getPosition() const
 {
