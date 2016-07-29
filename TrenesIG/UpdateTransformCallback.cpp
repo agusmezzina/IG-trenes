@@ -12,7 +12,7 @@ UpdateTransformCallback::UpdateTransformCallback(World* data, World* ghost) : _d
 	correcting = false;
 	dataFile.open("data.csv");
 	started = false;
-	usingDR = false;
+	usingDR = true;
 }
 
 void UpdateTransformCallback::operator()(osg::Node* node, osg::NodeVisitor* nv){
@@ -38,7 +38,7 @@ void UpdateTransformCallback::operator()(osg::Node* node, osg::NodeVisitor* nv){
 			correcting = true;
 
 		if (!correcting)
-			dr->updateGhost(1, deltaT);
+			dr->secondOrderUpdateGhost(1, deltaT);
 		else //correction
 		{
 			oldP = p;
