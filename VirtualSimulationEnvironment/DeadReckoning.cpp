@@ -36,8 +36,10 @@ void DeadReckoning::correctGhost(int entityID)
 	auto entity = model->getEntity(entityID);
 	auto p = entity.getPosition();
 	auto v = entity.getVelocity();
+	auto a = entity.getAcceleration();
 	ghost->updateEntityPosition(entityID, p);
 	ghost->updateEntityVelocity(entityID, v);
+	ghost->updateEntityAcceleration(entityID, a);
 }
 
 bool DeadReckoning::isThresholdViolated(int entityID)
@@ -52,6 +54,11 @@ bool DeadReckoning::isThresholdViolated(int entityID)
 		return true;
 	}
 	return false;
+}
+
+int DeadReckoning::getSmoothness() const
+{
+	return this->smoothness;
 }
 
 DeadReckoning::DeadReckoning(World* model, World* ghost) : model(model), ghost(ghost)

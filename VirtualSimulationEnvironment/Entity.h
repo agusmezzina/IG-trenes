@@ -11,6 +11,8 @@ public:
 	osg::Vec3f getAcceleration() const;
 	void setAcceleration(osg::Vec3f newAcceleration);
 	int getID() const;
+	float getSR() const;
+	float getAOI() const;
 	Entity(int id);
 	Entity(int id, float areaOfInterest, float sensitiveRegion);
 	virtual ~Entity();

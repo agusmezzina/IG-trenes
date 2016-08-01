@@ -40,7 +40,7 @@ void World::updateEntityAcceleration(int id, osg::Vec3f acceleration)
 	auto it = std::find_if(std::begin(entities), std::end(entities),
 		[&](Entity const& e) { return e.getID() == id; });
 	if ((*it).getID() == id)
-		(*it).setVelocity(acceleration);
+		(*it).setAcceleration(acceleration);
 }
 
 void World::firstOrderPredictUpdate(

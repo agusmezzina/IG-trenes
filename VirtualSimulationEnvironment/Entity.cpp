@@ -37,6 +37,16 @@ int Entity::getID() const
 	return this->id;
 }
 
+float Entity::getSR() const
+{
+	return this->sr;
+}
+
+float Entity::getAOI() const
+{
+	return this->aoi;
+}
+
 Entity::Entity(int id)
 {
 	this->id = id;

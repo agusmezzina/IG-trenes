@@ -2,6 +2,7 @@
 #include <boost\array.hpp>
 #include <boost\asio.hpp>
 #include <iostream>
+#include <fstream>
 #include <future>
 #include <chrono>
 #define BUFFER_SIZE 32768
@@ -50,6 +51,8 @@ void CigiHost::run()
 	bool started = false;
 	try
 	{
+		std::ofstream log;
+		log.open("logHost.txt");
 		unsigned char* outBuffer;
 		int outBufferSize = 0;
 
@@ -68,9 +71,10 @@ void CigiHost::run()
 		for (;;)
 		{
 			std::this_thread::sleep_for(std::chrono::milliseconds(10));
-			auto actualTime = std::chrono::high_resolution_clock::now();
-			std::chrono::duration<float> deltaT = actualTime - prevTime;
-			prevTime = actualTime;
+			//auto actualTime = std::chrono::high_resolution_clock::now();
+			//std::chrono::duration<float> deltaT = actualTime - prevTime;
+			//prevTime = actualTime;
+			float time = 0;
 			if (!rawData->empty())
 			{
 				started = true;
@@ -78,21 +82,28 @@ void CigiHost::run()
 				data->updateEntityPosition(lastData.getID(), osg::Vec3f(lastData.getX(), lastData.getY(), lastData.getZ()));
 				data->updateEntityVelocity(lastData.getID(), osg::Vec3f(lastData.getVx(), lastData.getVy(), lastData.getVz()));
 				data->updateEntityAcceleration(lastData.getID(), osg::Vec3f(lastData.getAx(), lastData.getAy(), lastData.getAz()));
+				time = lastData.getTime();
 				rawData->pop();
 			}
 
-			dr->secondOrderUpdateGhost(1, deltaT.count());
+			//dr->secondOrderUpdateGhost(1, deltaT.count());
+			dr->secondOrderUpdateGhost(1, 0.01f);
 			
-			if ((!usingDR && started) || ((((dr->isThresholdViolated(1)) || (rawData->empty())) && started)) && (usingDR) )
+			//if ((!usingDR && started) || ((((dr->isThresholdViolated(1)) || (rawData->empty())) && started)) && (usingDR) )
+			if (started && dr->isThresholdViolated(1))
 			{
+				auto pg = ghost->getEntity(1).getPosition();
 				dr->correctGhost(1);
 				auto entity = data->getEntity(1);
 				auto p = entity.getPosition();
 				auto v = entity.getVelocity();
 				auto a = entity.getAcceleration();
 
-				if (rawData->empty())
-					std::cout << v.y() << std::endl;
+				//float thresh = sqrt(pow(p.x() - pg.x(), 2) + pow(p.y() - pg.y(), 2) + pow(p.z() - pg.z(), 2));
+				log << "Correcting: time = " << time << "; ghost = " << pg.y() << "; model = " << p.y() << "; " << v.y() << ";" << a.y() << std::endl;
+
+				/*if (rawData->empty())
+					std::cout << v.y() << std::endl;*/
 
 				// load the IG Control
 				*outMsg << igControl;
@@ -118,6 +129,7 @@ void CigiHost::run()
 			}
 		}
 		socket.close();
+		log.close();
 	}
 	catch (std::exception& e)
 	{

@@ -46,10 +46,10 @@ void UpdateTransformCallback::operator()(osg::Node* node, osg::NodeVisitor* nv){
 			x_2 = x_1;
 			x_1 = x;
 			x = osg::Vec2f(p.y(), elapsed.count());
-			if (calculateAngleOfEmbrace() > 90.0f)
+			/*if (calculateAngleOfEmbrace() > 90.0f)
 				quadratic = true;
 			else
-				quadratic = false;
+				quadratic = false;*/
 		}
 
 		if (!correcting)
@@ -64,7 +64,7 @@ void UpdateTransformCallback::operator()(osg::Node* node, osg::NodeVisitor* nv){
 			p_1 = p;
 			dr->correctGhost(1, correctionStep);
 			correctionStep++;
-			if (correctionStep > 10)
+			if (correctionStep > dr->getSmoothness())
 			{
 				correcting = false;
 				correctionStep = 0;
@@ -79,7 +79,7 @@ void UpdateTransformCallback::operator()(osg::Node* node, osg::NodeVisitor* nv){
 	if (started)
 	{
 		//std::chrono::duration<float> elapsed = actualTime - startTime;
-		dataFile << pDraw.y() << ";" << elapsed.count() << ";" << calculateAngleOfEmbrace() << ";" << std::endl;
+		dataFile << pDraw.y() << ";" << elapsed.count() << /*";" << calculateAngleOfEmbrace() << ";" << */std::endl;
 	}
 	
 	transformNode->setMatrix(osg::Matrix::translate(pDraw));
