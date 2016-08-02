@@ -17,6 +17,7 @@ public:
 	float calculateAngleOfEmbrace() const;
 protected:
 	std::ofstream dataFile;
+	std::ofstream logFile;
 	std::chrono::system_clock::time_point prevTime;
 	std::chrono::system_clock::time_point startTime;
 	World* _data;

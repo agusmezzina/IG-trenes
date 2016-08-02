@@ -49,6 +49,7 @@ void CigiHost::run()
 {
 	bool usingDR = true;
 	bool started = false;
+	int packetCount = 0;
 	try
 	{
 		std::ofstream log;
@@ -78,6 +79,7 @@ void CigiHost::run()
 			if (!rawData->empty())
 			{
 				started = true;
+				packetCount++;
 				auto lastData = rawData->front();
 				data->updateEntityPosition(lastData.getID(), osg::Vec3f(lastData.getX(), lastData.getY(), lastData.getZ()));
 				data->updateEntityVelocity(lastData.getID(), osg::Vec3f(lastData.getVx(), lastData.getVy(), lastData.getVz()));
@@ -86,24 +88,19 @@ void CigiHost::run()
 				rawData->pop();
 			}
 
-			//dr->secondOrderUpdateGhost(1, deltaT.count());
 			dr->secondOrderUpdateGhost(1, 0.01f);
-			
+
 			//if ((!usingDR && started) || ((((dr->isThresholdViolated(1)) || (rawData->empty())) && started)) && (usingDR) )
-			if (started && dr->isThresholdViolated(1))
-			{
-				auto pg = ghost->getEntity(1).getPosition();
-				dr->correctGhost(1);
+			if ((started && dr->isThresholdViolated(1)) || (packetCount == 1))
+			{	
 				auto entity = data->getEntity(1);
 				auto p = entity.getPosition();
 				auto v = entity.getVelocity();
 				auto a = entity.getAcceleration();
+				auto pg = ghost->getEntity(1).getPosition();
+				log << "Correcting Time = " << time << "; ghost = " << pg.y() << "; model = " << p.y() << "; " << v.y() << ";" << a.y() << std::endl;
 
-				//float thresh = sqrt(pow(p.x() - pg.x(), 2) + pow(p.y() - pg.y(), 2) + pow(p.z() - pg.z(), 2));
-				log << "Correcting: time = " << time << "; ghost = " << pg.y() << "; model = " << p.y() << "; " << v.y() << ";" << a.y() << std::endl;
-
-				/*if (rawData->empty())
-					std::cout << v.y() << std::endl;*/
+				dr->correctGhost(1);
 
 				// load the IG Control
 				*outMsg << igControl;

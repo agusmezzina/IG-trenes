@@ -60,7 +60,7 @@ void GraphicManager::createScene(){
 		0.1f,
 		osg::Vec4(1.0f, 1.0f, 0.5f, 1.0f));
 	osg::ref_ptr<osg::MatrixTransform> transf = new osg::MatrixTransform;
-	transf->setMatrix(osg::Matrix::translate(osg::Vec3f(0.0f, 3.0f, 0.0f)));
+	transf->setMatrix(osg::Matrix::translate(osg::Vec3f()));
 	transf->addChild(model.get());
 	transf->setUpdateCallback(new UpdateTransformCallback(_data, _ghost));
 

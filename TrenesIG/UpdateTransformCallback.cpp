@@ -12,6 +12,7 @@ UpdateTransformCallback::UpdateTransformCallback(World* data, World* ghost) : _d
 	p_1 = _data->getEntity(1).getPosition();
 	correcting = false;
 	dataFile.open("data.csv");
+	logFile.open("logIG.txt");
 	started = false;
 	usingDR = true;
 	x = osg::Vec2f(p_1.y(), 0.0f);
@@ -24,15 +25,14 @@ void UpdateTransformCallback::operator()(osg::Node* node, osg::NodeVisitor* nv){
 	bool quadratic = true;
 
 	auto actualTime = std::chrono::high_resolution_clock::now();
-	std::chrono::duration<float> time = actualTime - prevTime;
-	float deltaT = time.count();
+	std::chrono::duration<float> deltaT = actualTime - prevTime;
 	prevTime = actualTime;
 	std::chrono::duration<float> elapsed = actualTime - startTime;
 
 	auto p = _data->getEntity(1).getPosition();
 	osg::Vec3f pDraw;
 
-	if ((p.y() != 3.0f) && (!started))
+	if ((p.y() != 0.0f) && (!started))
 	{
 		started = true;
 		startTime = std::chrono::high_resolution_clock::now();
@@ -46,25 +46,29 @@ void UpdateTransformCallback::operator()(osg::Node* node, osg::NodeVisitor* nv){
 			x_2 = x_1;
 			x_1 = x;
 			x = osg::Vec2f(p.y(), elapsed.count());
-			/*if (calculateAngleOfEmbrace() > 90.0f)
-				quadratic = true;
-			else
-				quadratic = false;*/
 		}
 
 		if (!correcting)
 		{
 			if (quadratic)
-				dr->secondOrderUpdateGhost(1, deltaT);
+			{
+				auto entity = _ghost->getEntity(1);
+				auto pg = entity.getPosition();
+				auto vg = entity.getVelocity();
+				auto ag = entity.getAcceleration();
+				logFile << pg.y() << "; " << vg.y() << "; " << ag.y() << "; " << deltaT.count() << "; " << elapsed.count() << std::endl;
+				dr->secondOrderUpdateGhost(1, deltaT.count());
+			}
 			else
-				dr->firstOrderUpdateGhost(1, deltaT);
+				dr->firstOrderUpdateGhost(1, deltaT.count());
 		}
 		else //correction
 		{
 			p_1 = p;
-			dr->correctGhost(1, correctionStep);
+			//dr->correctGhost(1, correctionStep);
+			dr->correctGhost(1);
 			correctionStep++;
-			if (correctionStep > dr->getSmoothness())
+			if (correctionStep >= dr->getSmoothness())
 			{
 				correcting = false;
 				correctionStep = 0;
@@ -98,4 +102,5 @@ float UpdateTransformCallback::calculateAngleOfEmbrace() const
 UpdateTransformCallback::~UpdateTransformCallback()
 {
 	dataFile.close();
+	logFile.close();
 }
