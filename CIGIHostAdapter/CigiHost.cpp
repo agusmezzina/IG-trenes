@@ -49,7 +49,7 @@ void CigiHost::run()
 {
 	bool usingDR = true;
 	bool started = false;
-	bool quadratic = false;
+	bool quadratic = true;
 	int packetCount = 0;
 	try
 	{
@@ -69,6 +69,7 @@ void CigiHost::run()
 
 		outMsg->BeginMsg();
 		auto prevTime = std::chrono::high_resolution_clock::now();
+		float prevSimTime = 0;
 
 		for (;;)
 		{	
@@ -94,10 +95,11 @@ void CigiHost::run()
 			std::this_thread::sleep_for(std::chrono::milliseconds(waitFor));
 
 			if (quadratic)
-				dr->secondOrderUpdateGhost(1, 0.01f);
+				dr->secondOrderUpdateGhost(1, time-prevSimTime);
 			else
-				dr->firstOrderUpdateGhost(1, 0.01f);
+				dr->firstOrderUpdateGhost(1, time - prevSimTime);
 
+			prevSimTime = time;
 			bool sendUpdate = true;
 			if (usingDR)
 				sendUpdate = (started && dr->isThresholdViolated(1)) || (packetCount == 1);
