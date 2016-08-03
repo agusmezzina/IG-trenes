@@ -18,8 +18,8 @@ int _tmain(int argc, _TCHAR* argv[])
 	std::queue<DataPacket> data;
 	World worldData;
 	World ghostData;
-	worldData.updateEntityPosition(1, osg::Vec3f(0.0f, 3.0f, 0.0f));
-	ghostData.updateEntityPosition(1, osg::Vec3f(0.0f, 3.0f, 0.0f));
+	/*worldData.updateEntityPosition(1, osg::Vec3f(0.0f, 3.0f, 0.0f));
+	ghostData.updateEntityPosition(1, osg::Vec3f(0.0f, 3.0f, 0.0f));*/
 	CigiHost server(&worldData, &ghostData, &data);
 	ModelUpdater model(&data);
 	//SimulationTimer timer(&data, &worldData);

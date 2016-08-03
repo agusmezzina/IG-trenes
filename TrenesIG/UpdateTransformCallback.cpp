@@ -22,7 +22,7 @@ UpdateTransformCallback::UpdateTransformCallback(World* data, World* ghost) : _d
 
 void UpdateTransformCallback::operator()(osg::Node* node, osg::NodeVisitor* nv){
 	osg::MatrixTransform* transformNode = static_cast<osg::MatrixTransform*>(node);
-	bool quadratic = true;
+	bool quadratic = false;
 
 	auto actualTime = std::chrono::high_resolution_clock::now();
 	std::chrono::duration<float> deltaT = actualTime - prevTime;
@@ -42,13 +42,12 @@ void UpdateTransformCallback::operator()(osg::Node* node, osg::NodeVisitor* nv){
 	{
 		if (p != p_1)
 		{
-			correcting = true;
-			x_2 = x_1;
-			x_1 = x;
-			x = osg::Vec2f(p.y(), elapsed.count());
-		}
+			p_1 = p;
+			dr->correctGhost(1);
+			logFile << "Corrected" << std::endl;
 
-		if (!correcting)
+		}
+		else
 		{
 			if (quadratic)
 			{
@@ -61,18 +60,6 @@ void UpdateTransformCallback::operator()(osg::Node* node, osg::NodeVisitor* nv){
 			}
 			else
 				dr->firstOrderUpdateGhost(1, deltaT.count());
-		}
-		else //correction
-		{
-			p_1 = p;
-			//dr->correctGhost(1, correctionStep);
-			dr->correctGhost(1);
-			correctionStep++;
-			if (correctionStep >= dr->getSmoothness())
-			{
-				correcting = false;
-				correctionStep = 0;
-			}
 		}
 
 		pDraw = _ghost->getEntity(1).getPosition();

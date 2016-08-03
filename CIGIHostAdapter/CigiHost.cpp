@@ -49,6 +49,7 @@ void CigiHost::run()
 {
 	bool usingDR = true;
 	bool started = false;
+	bool quadratic = false;
 	int packetCount = 0;
 	try
 	{
@@ -70,11 +71,8 @@ void CigiHost::run()
 		auto prevTime = std::chrono::high_resolution_clock::now();
 
 		for (;;)
-		{
-			std::this_thread::sleep_for(std::chrono::milliseconds(10));
-			//auto actualTime = std::chrono::high_resolution_clock::now();
-			//std::chrono::duration<float> deltaT = actualTime - prevTime;
-			//prevTime = actualTime;
+		{	
+			//std::this_thread::sleep_for(std::chrono::milliseconds(10));
 			float time = 0;
 			if (!rawData->empty())
 			{
@@ -88,17 +86,31 @@ void CigiHost::run()
 				rawData->pop();
 			}
 
-			dr->secondOrderUpdateGhost(1, 0.01f);
+			auto actualTime = std::chrono::high_resolution_clock::now();
+			if (packetCount == 1)
+				prevTime = actualTime;
+			std::chrono::duration<float> simulationTime = actualTime - prevTime;
+			int waitFor = (time - simulationTime.count())*1000;
+			std::this_thread::sleep_for(std::chrono::milliseconds(waitFor));
 
-			//if ((!usingDR && started) || ((((dr->isThresholdViolated(1)) || (rawData->empty())) && started)) && (usingDR) )
-			if ((started && dr->isThresholdViolated(1)) || (packetCount == 1))
-			{	
+			if (quadratic)
+				dr->secondOrderUpdateGhost(1, 0.01f);
+			else
+				dr->firstOrderUpdateGhost(1, 0.01f);
+
+			bool sendUpdate = true;
+			if (usingDR)
+				sendUpdate = (started && dr->isThresholdViolated(1)) || (packetCount == 1);
+
+			if (sendUpdate){
 				auto entity = data->getEntity(1);
 				auto p = entity.getPosition();
 				auto v = entity.getVelocity();
 				auto a = entity.getAcceleration();
 				auto pg = ghost->getEntity(1).getPosition();
-				log << "Correcting Time = " << time << "; ghost = " << pg.y() << "; model = " << p.y() << "; " << v.y() << ";" << a.y() << std::endl;
+				auto tick = std::chrono::high_resolution_clock::now();
+				std::chrono::duration<float> elapsed = tick - prevTime;
+				log << "Correcting Time = " << time << "; ghost = " << pg.y() << "; model = " << p.y() << "; " << v.y() << ";" << a.y() << "; " << elapsed.count() << std::endl;
 
 				dr->correctGhost(1);
 
