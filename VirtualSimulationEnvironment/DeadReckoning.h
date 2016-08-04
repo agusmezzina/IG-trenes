@@ -9,6 +9,7 @@ public:
 	void correctGhost(int entityID, int step);
 	void correctGhost(int entityID);
 	bool isThresholdViolated(int entityID);
+	int getSmoothness() const;
 	DeadReckoning(World* model, World* ghost);
 	virtual ~DeadReckoning();
 private:

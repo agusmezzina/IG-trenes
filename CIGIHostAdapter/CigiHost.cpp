@@ -2,6 +2,7 @@
 #include <boost\array.hpp>
 #include <boost\asio.hpp>
 #include <iostream>
+#include <fstream>
 #include <future>
 #include <chrono>
 #define BUFFER_SIZE 32768
@@ -48,8 +49,12 @@ void CigiHost::run()
 {
 	bool usingDR = true;
 	bool started = false;
+	bool quadratic = true;
+	int packetCount = 0;
 	try
 	{
+		std::ofstream log;
+		log.open("logHost.txt");
 		unsigned char* outBuffer;
 		int outBufferSize = 0;
 
@@ -64,35 +69,52 @@ void CigiHost::run()
 
 		outMsg->BeginMsg();
 		auto prevTime = std::chrono::high_resolution_clock::now();
+		float prevSimTime = 0;
 
 		for (;;)
-		{
-			std::this_thread::sleep_for(std::chrono::milliseconds(10));
-			auto actualTime = std::chrono::high_resolution_clock::now();
-			std::chrono::duration<float> deltaT = actualTime - prevTime;
-			prevTime = actualTime;
+		{	
+			//std::this_thread::sleep_for(std::chrono::milliseconds(10));
+			float time = 0;
 			if (!rawData->empty())
 			{
 				started = true;
+				packetCount++;
 				auto lastData = rawData->front();
 				data->updateEntityPosition(lastData.getID(), osg::Vec3f(lastData.getX(), lastData.getY(), lastData.getZ()));
 				data->updateEntityVelocity(lastData.getID(), osg::Vec3f(lastData.getVx(), lastData.getVy(), lastData.getVz()));
 				data->updateEntityAcceleration(lastData.getID(), osg::Vec3f(lastData.getAx(), lastData.getAy(), lastData.getAz()));
+				time = lastData.getTime();
 				rawData->pop();
 			}
 
-			dr->secondOrderUpdateGhost(1, deltaT.count());
-			
-			if ((!usingDR && started) || ((((dr->isThresholdViolated(1)) || (rawData->empty())) && started)) && (usingDR) )
-			{
-				dr->correctGhost(1);
+			auto actualTime = std::chrono::high_resolution_clock::now();
+			if (packetCount == 1)
+				prevTime = actualTime;
+			std::chrono::duration<float> simulationTime = actualTime - prevTime;
+			int waitFor = (time - simulationTime.count())*1000;
+			std::this_thread::sleep_for(std::chrono::milliseconds(waitFor));
+
+			if (quadratic)
+				dr->secondOrderUpdateGhost(1, time-prevSimTime);
+			else
+				dr->firstOrderUpdateGhost(1, time - prevSimTime);
+
+			prevSimTime = time;
+			bool sendUpdate = true;
+			if (usingDR)
+				sendUpdate = (started && dr->isThresholdViolated(1)) || (packetCount == 1);
+
+			if (sendUpdate){
 				auto entity = data->getEntity(1);
 				auto p = entity.getPosition();
 				auto v = entity.getVelocity();
 				auto a = entity.getAcceleration();
+				auto pg = ghost->getEntity(1).getPosition();
+				auto tick = std::chrono::high_resolution_clock::now();
+				std::chrono::duration<float> elapsed = tick - prevTime;
+				log << "Correcting Time = " << time << "; ghost = " << pg.y() << "; model = " << p.y() << "; " << v.y() << ";" << a.y() << "; " << elapsed.count() << std::endl;
 
-				if (rawData->empty())
-					std::cout << v.y() << std::endl;
+				dr->correctGhost(1);
 
 				// load the IG Control
 				*outMsg << igControl;
@@ -118,6 +140,7 @@ void CigiHost::run()
 			}
 		}
 		socket.close();
+		log.close();
 	}
 	catch (std::exception& e)
 	{

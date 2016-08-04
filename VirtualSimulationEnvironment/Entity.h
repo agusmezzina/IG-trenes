@@ -11,7 +11,10 @@ public:
 	osg::Vec3f getAcceleration() const;
 	void setAcceleration(osg::Vec3f newAcceleration);
 	int getID() const;
+	float getSR() const;
+	float getAOI() const;
 	Entity(int id);
+	Entity(int id, float areaOfInterest, float sensitiveRegion);
 	virtual ~Entity();
 private:
 	osg::Vec3f position;
@@ -19,5 +22,7 @@ private:
 	osg::Vec3f velocity;
 	osg::Vec3f acceleration;
 	int id;
+	float aoi;
+	float sr;
 };
 

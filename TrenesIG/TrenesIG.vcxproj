@@ -53,15 +53,15 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(OSG_SOURCE)\include;$(OSG_ROOT)\include;$(BOOST_ROOT)\include\boost-1_61;$(CCL_SOURCE)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OSG_SOURCE)\include;$(OSG_ROOT)\include;$(BOOST_ROOT);$(CCL_SOURCE)\include;C:\Users\AM\Documents\Tesis\Proyectos\SimulacionFerroviaria\VirtualSimulationEnvironment;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
       <PrecompiledHeaderFile />
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(BOOST_ROOT)\lib;$(OSG_ROOT)\lib;$(CCL_ROOT)\lib\debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>osgd.lib;osgDBd.lib;osgViewerd.lib;osgGAd.lib;OpenThreadsd.lib;cigicl_debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(BOOST_ROOT)\stage\lib;$(OSG_ROOT)\lib;$(CCL_ROOT)\lib\debug;C:\Users\AM\Documents\Tesis\Proyectos\SimulacionFerroviaria\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>osgd.lib;osgDBd.lib;osgViewerd.lib;osgGAd.lib;OpenThreadsd.lib;cigicl_debug.lib;VirtualSimulationEnvironment.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -92,9 +92,11 @@
     <ClInclude Include="DataPacket.h" />
     <ClInclude Include="GraphicManager.h" />
     <ClInclude Include="NetworkManager.h" />
+    <ClInclude Include="RateEventProcessor.h" />
     <ClInclude Include="SceneData.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="TrajectoryEventProcessor.h" />
     <ClInclude Include="UpdateTransformCallback.h" />
   </ItemGroup>
   <ItemGroup>
@@ -105,7 +107,9 @@
     <ClCompile Include="DataPacket.cpp" />
     <ClCompile Include="GraphicManager.cpp" />
     <ClCompile Include="NetworkManager.cpp" />
+    <ClCompile Include="RateEventProcessor.cpp" />
     <ClCompile Include="SceneData.cpp" />
+    <ClCompile Include="TrajectoryEventProcessor.cpp" />
     <ClCompile Include="TrenesIG.cpp" />
     <ClCompile Include="UpdateTransformCallback.cpp" />
   </ItemGroup>
