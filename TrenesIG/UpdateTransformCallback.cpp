@@ -10,6 +10,8 @@ UpdateTransformCallback::UpdateTransformCallback(World* data, World* ghost) : _d
 	correctionStep = 0;
 	dr = std::make_unique<DeadReckoning>(data, ghost);
 	p_1 = _data->getEntity(1).getPosition();
+	p_1 = _data->getEntity(1).getVelocity();
+	p_1 = _data->getEntity(1).getAcceleration();
 	correcting = false;
 	dataFile.open("data.csv");
 	logFile.open("logIG.txt");
@@ -22,7 +24,7 @@ UpdateTransformCallback::UpdateTransformCallback(World* data, World* ghost) : _d
 
 void UpdateTransformCallback::operator()(osg::Node* node, osg::NodeVisitor* nv){
 	osg::MatrixTransform* transformNode = static_cast<osg::MatrixTransform*>(node);
-	bool quadratic = false;
+	bool quadratic = true;
 
 	auto actualTime = std::chrono::high_resolution_clock::now();
 	std::chrono::duration<float> deltaT = actualTime - prevTime;
@@ -30,19 +32,26 @@ void UpdateTransformCallback::operator()(osg::Node* node, osg::NodeVisitor* nv){
 	std::chrono::duration<float> elapsed = actualTime - startTime;
 
 	auto p = _data->getEntity(1).getPosition();
+	auto v = _data->getEntity(1).getAcceleration();
+	auto a = _data->getEntity(1).getAcceleration();
 	osg::Vec3f pDraw;
 
-	if ((p.y() != 0.0f) && (!started))
+	logFile << a.x() << std::endl;
+
+	if ((a.x() != 0.0f) && (!started))
 	{
+		logFile << "Started" << std::endl;
 		started = true;
 		startTime = std::chrono::high_resolution_clock::now();
 	}
 
 	if (usingDR)
 	{
-		if (p != p_1)
+		if ((p != p_1) || (v != v_1) || (a != a_1))
 		{
 			p_1 = p;
+			v_1 = v;
+			a_1 = a;
 			dr->correctGhost(1);
 			logFile << "Corrected" << std::endl;
 
@@ -55,7 +64,7 @@ void UpdateTransformCallback::operator()(osg::Node* node, osg::NodeVisitor* nv){
 				auto pg = entity.getPosition();
 				auto vg = entity.getVelocity();
 				auto ag = entity.getAcceleration();
-				logFile << pg.y() << "; " << vg.y() << "; " << ag.y() << "; " << deltaT.count() << "; " << elapsed.count() << std::endl;
+				logFile << pg.x() << "; " << vg.x() << "; " << ag.x() << "; " << deltaT.count() << "; " << elapsed.count() << std::endl;
 				dr->secondOrderUpdateGhost(1, deltaT.count());
 			}
 			else
@@ -70,7 +79,7 @@ void UpdateTransformCallback::operator()(osg::Node* node, osg::NodeVisitor* nv){
 	if (started)
 	{
 		//std::chrono::duration<float> elapsed = actualTime - startTime;
-		dataFile << pDraw.y() << ";" << elapsed.count() << /*";" << calculateAngleOfEmbrace() << ";" << */std::endl;
+		dataFile << pDraw.x() << ";" << elapsed.count() << /*";" << calculateAngleOfEmbrace() << ";" << */std::endl;
 	}
 	
 	transformNode->setMatrix(osg::Matrix::translate(pDraw));

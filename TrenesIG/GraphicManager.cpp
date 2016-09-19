@@ -55,10 +55,11 @@ void GraphicManager::createScene(){
 	osg::ref_ptr<osg::Geode> floor = new osg::Geode;
 	floor->addDrawable(floorShape.get());
 
-	osg::ref_ptr<osg::Geode> model = createBallNode(
+	/*osg::ref_ptr<osg::Geode> model = createBallNode(
 		osg::Vec3(0.0f, 0.0f, 0.0f),
 		0.1f,
-		osg::Vec4(1.0f, 1.0f, 0.5f, 1.0f));
+		osg::Vec4(1.0f, 1.0f, 0.5f, 1.0f));*/
+	osg::ref_ptr<osg::Node> model = osgDB::readNodeFile("C:\\ObjetosVarios\\EstacionDemo\\vagon.flt.270,90,0.rot");
 	osg::ref_ptr<osg::MatrixTransform> transf = new osg::MatrixTransform;
 	transf->setMatrix(osg::Matrix::translate(osg::Vec3f()));
 	transf->addChild(model.get());
@@ -66,7 +67,7 @@ void GraphicManager::createScene(){
 
 	scene->addChild(light);
 	scene->addChild(transf);
-	scene->addChild(floor);
+	//scene->addChild(floor);
 	//scene->addChild(model);
 
 	//osg::Vec3 center = osg::Vec3(38.0f, -91.0f, 500.0f);

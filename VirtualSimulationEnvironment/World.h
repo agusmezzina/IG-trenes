@@ -2,6 +2,7 @@
 #include <list>
 #include <mutex>
 #include <functional>
+#include <osg\Vec3f>
 #include "Entity.h"
 
 class World

@@ -22,6 +22,7 @@ private:
 	osg::Vec3f velocity;
 	osg::Vec3f acceleration;
 	int id;
+	bool updated;
 	float aoi;
 	float sr;
 };
