@@ -23,9 +23,19 @@ void CigiHost::setupNetwork(const std::string& ip, const std::string& port)
 	socket.open(udp::v4());
 }
 
-void CigiHost::setupTimer()
+float CigiHost::waitForRealTime()
 {
-
+	auto deltaSimTime = simulationTime - prevSimulationTime;
+	auto realTime = std::chrono::high_resolution_clock::now();
+	std::chrono::duration<float> deltaRealTime = realTime - prevRealTime;
+	std::chrono::duration<float> elapsedTime = realTime - initial;
+	//log << "Sim: " << simulationTime << "; Real: " << elapsedTime.count() << "; DeltaSim = " << deltaSimTime << "; DeltaReal =" << deltaRealTime.count() << "; ";
+	int waitFor = (deltaSimTime - deltaRealTime.count()) * 1000;
+	std::this_thread::sleep_for(std::chrono::milliseconds(waitFor));
+	prevSimulationTime = simulationTime;
+	prevRealTime = std::chrono::high_resolution_clock::now();
+	//log << waitFor << std::endl;
+	return deltaSimTime;
 }
 
 void CigiHost::setupCigi()
@@ -35,7 +45,9 @@ void CigiHost::setupCigi()
 
 void CigiHost::initializeTimer()
 {
-
+	prevSimulationTime = 0;
+	prevRealTime = std::chrono::high_resolution_clock::now();
+	initial = prevRealTime;
 }
 
 void CigiHost::updateModelFromNetwork()
@@ -59,7 +71,8 @@ void CigiHost::run()
 	bool usingDR = true;
 	bool started = false;
 	bool quadratic = true;
-	int packetCount = 0;
+	
+	bool first = true;
 	try
 	{
 		std::ofstream log;
@@ -73,16 +86,13 @@ void CigiHost::run()
 		for (;;)
 		{
 			updateModelFromNetwork();
-			auto deltaSimTime = simulationTime - prevSimulationTime;
-			auto realTime = std::chrono::high_resolution_clock::now();
-			std::chrono::duration<float> deltaRealTime = realTime - prevRealTime;
-			log << "Sim: " << deltaSimTime << "; Real: " << deltaRealTime.count() << "; ";
-				
-			int waitFor = (deltaSimTime - deltaRealTime.count())*1000;
-			std::this_thread::sleep_for(std::chrono::milliseconds(waitFor));
-			prevSimulationTime = simulationTime;
-			prevRealTime = realTime;
-			log << waitFor << std::endl;
+			if (first)
+			{
+				initializeTimer();
+				first = false;
+			}
+			
+			auto deltaSimTime = waitForRealTime();
 
 			if (quadratic)
 				dr->secondOrderUpdateGhost(1, deltaSimTime);
@@ -92,20 +102,17 @@ void CigiHost::run()
 			bool sendUpdate = true;
 			if (usingDR)
 				sendUpdate = dr->isThresholdViolated(1);
-				//sendUpdate = (started && dr->isThresholdViolated(1)) || (packetCount == 1);
 
 			if (sendUpdate){
-				/*auto tick = std::chrono::high_resolution_clock::now();
-				std::chrono::duration<float> elapsed = tick - prevTime;*/
+				auto tick = std::chrono::high_resolution_clock::now();
+				std::chrono::duration<float> elapsed = tick - initial;
 
 				auto entity = data->getEntity(1);
 				/*auto p = entity.getPosition();
 				auto v = entity.getVelocity();
 				auto a = entity.getAcceleration();
 				auto pg = ghost->getEntity(1).getPosition();
-				
-				log << "Correcting Time = " << time << "; ghost = " << pg.x() << "; model = " << p.x() << "; " << v.x() << ";" << a.x() << "; " << std::endl;
-*/
+				log << "Correcting Time = " << simulationTime << "; ghost = " << pg.x() << "; model = " << p.x() << "; " << v.x() << ";" << a.x() << "; " << elapsed.count() << std::endl;*/
 				dr->correctGhost(1);
 				cigi->packData(entity, &outBuffer, outBufferSize);
 

@@ -20,7 +20,7 @@ public:
 	virtual ~CigiHost();
 private:
 	void setupNetwork(const std::string& ip, const std::string& port);
-	void setupTimer();
+	float waitForRealTime();
 	void setupCigi();
 	void initializeTimer();
 	void updateModelFromNetwork();
@@ -40,5 +40,6 @@ private:
 	std::chrono::high_resolution_clock::time_point prevRealTime;
 	float simulationTime;
 	std::chrono::high_resolution_clock::time_point realTime;
+	std::chrono::high_resolution_clock::time_point initial;
 };
 

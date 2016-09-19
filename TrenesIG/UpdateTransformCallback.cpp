@@ -36,7 +36,7 @@ void UpdateTransformCallback::operator()(osg::Node* node, osg::NodeVisitor* nv){
 	auto a = _data->getEntity(1).getAcceleration();
 	osg::Vec3f pDraw;
 
-	logFile << a.x() << std::endl;
+	//logFile << a.x() << std::endl;
 
 	if ((a.x() != 0.0f) && (!started))
 	{
