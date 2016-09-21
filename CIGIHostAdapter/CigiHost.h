@@ -9,6 +9,7 @@
 #include "DeadReckoning.h"
 #include "CigiManager.h"
 #include "Semaphore.h"
+#include <fstream>
 
 using boost::asio::ip::udp;
 
@@ -20,7 +21,7 @@ public:
 	virtual ~CigiHost();
 private:
 	void setupNetwork(const std::string& ip, const std::string& port);
-	float waitForRealTime();
+	void syncWithRealTime();
 	void setupCigi();
 	void initializeTimer();
 	void updateModelFromNetwork();
@@ -39,7 +40,10 @@ private:
 	float prevSimulationTime;
 	std::chrono::high_resolution_clock::time_point prevRealTime;
 	float simulationTime;
+	float compensationTime;
 	std::chrono::high_resolution_clock::time_point realTime;
 	std::chrono::high_resolution_clock::time_point initial;
+
+	std::ofstream log;
 };
 
