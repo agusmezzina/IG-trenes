@@ -25,6 +25,8 @@ protected:
 	int correctionStep;
 	std::unique_ptr<DeadReckoning> dr;
 	osg::Vec3f p_1;
+	osg::Vec3f v_1;
+	osg::Vec3f a_1;
 	bool correcting;
 	bool started;
 	bool usingDR;

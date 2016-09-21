@@ -7,9 +7,10 @@
 
 using boost::asio::ip::udp;
 
-ModelUpdater::ModelUpdater(std::queue<DataPacket>* data)
+ModelUpdater::ModelUpdater(Semaphore* sem, std::queue<DataPacket>* data)
 {
 	this->data = data;
+	this->s = sem;
 }
 
 void ModelUpdater::run()
@@ -54,6 +55,7 @@ void ModelUpdater::run()
 			}
 			DataPacket state(id, x, y, z, vx, vy, vz, ax, ay, az, t);
 			data->push(state);
+			s->notify();
 		}
 		//std::cout << x << std::endl;
 		//std::cout << y << std::endl;

@@ -52,6 +52,7 @@ Entity::Entity(int id)
 	this->id = id;
 	this->aoi = 0.0f;
 	this->sr = 0.0f;
+	this->updated = false;
 }
 
 Entity::Entity(int id, float areaOfInterest, float sensitiveRegion)
@@ -59,6 +60,7 @@ Entity::Entity(int id, float areaOfInterest, float sensitiveRegion)
 	this->id = id;
 	this->aoi = areaOfInterest;
 	this->sr = sensitiveRegion;
+	this->updated = false;
 }
 
 Entity::~Entity()

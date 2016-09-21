@@ -1,48 +1,69 @@
 #include "CigiHost.h"
-#include <boost\array.hpp>
-#include <boost\asio.hpp>
 #include <iostream>
 #include <fstream>
 #include <future>
 #include <chrono>
 #define BUFFER_SIZE 32768
 
-using boost::asio::ip::udp;
-
-CigiHost::CigiHost(World* data, World* ghost, std::queue<DataPacket>* rawData)
+CigiHost::CigiHost(World* data, World* ghost, Semaphore* sem, std::queue<DataPacket>* rawData) : io_service(), socket(io_service)
 {
 	this->data = data;
 	this->ghost = ghost;
+	this->s = sem;
 	this->rawData = rawData;
-	cigiSession = std::make_unique<CigiHostSession>(1, BUFFER_SIZE, 2, BUFFER_SIZE);
-	ctrlProcessor = std::make_unique<IGControlProcessor>();
+	cigi = std::make_unique<CigiManager>();
 	dr = std::make_unique<DeadReckoning>(data, ghost);
+}
 
-	CigiOutgoingMsg &Omsg = cigiSession->GetOutgoingMsgMgr();
-	CigiIncomingMsg &Imsg = cigiSession->GetIncomingMsgMgr();
-	outMsg = &Omsg;
-	inMsg = &Imsg;
+void CigiHost::setupNetwork(const std::string& ip, const std::string& port)
+{
+	udp::resolver resolver(io_service);
+	udp::resolver::query query(udp::v4(), ip, port);
+	receiver_endpoint = *resolver.resolve(query);
+	socket.open(udp::v4());
+}
 
-	cigiSession->SetCigiVersion(3, 3);
-	cigiSession->SetSynchronous(false);
+float CigiHost::waitForRealTime()
+{
+	auto deltaSimTime = simulationTime - prevSimulationTime;
+	auto realTime = std::chrono::high_resolution_clock::now();
+	std::chrono::duration<float> deltaRealTime = realTime - prevRealTime;
+	std::chrono::duration<float> elapsedTime = realTime - initial;
+	//log << "Sim: " << simulationTime << "; Real: " << elapsedTime.count() << "; DeltaSim = " << deltaSimTime << "; DeltaReal =" << deltaRealTime.count() << "; ";
+	int waitFor = (deltaSimTime - deltaRealTime.count()) * 1000;
+	std::this_thread::sleep_for(std::chrono::milliseconds(waitFor));
+	prevSimulationTime = simulationTime;
+	prevRealTime = std::chrono::high_resolution_clock::now();
+	//log << waitFor << std::endl;
+	return deltaSimTime;
+}
 
-	inMsg->SetReaderCigiVersion(3, 3);
-	inMsg->UsingIteration(false);
+void CigiHost::setupCigi()
+{
 
-	// register SOF
-	Imsg.RegisterEventProcessor(CIGI_SOF_PACKET_ID_V3_2, ctrlProcessor.get());
+}
 
-	// initialize the IG Control
-	igControl.SetIGMode(CigiBaseIGCtrl::Operate);
+void CigiHost::initializeTimer()
+{
+	prevSimulationTime = 0;
+	prevRealTime = std::chrono::high_resolution_clock::now();
+	initial = prevRealTime;
+}
 
-	// initialize the Ownship
-	//  the other parameters are set by CigiEntityCtrlV3_3
-	ownship.SetEntityID(1);
-	ownship.SetEntityType(0);
-	ownship.SetEntityState(CigiBaseEntityCtrl::Active);
+void CigiHost::updateModelFromNetwork()
+{
+	s->wait();
+	auto lastData = rawData->front();
+	data->updateEntityPosition(lastData.getID(), osg::Vec3f(lastData.getX(), lastData.getY(), lastData.getZ()));
+	data->updateEntityVelocity(lastData.getID(), osg::Vec3f(lastData.getVx(), lastData.getVy(), lastData.getVz()));
+	data->updateEntityAcceleration(lastData.getID(), osg::Vec3f(lastData.getAx(), lastData.getAy(), lastData.getAz()));
+	simulationTime = lastData.getTime();
+	rawData->pop();
+}
 
-	rateData.SetEntityID(1);
-	trajectoryData.SetEntityID(1);
+void CigiHost::sendCigiPacket()
+{
+
 }
 
 void CigiHost::run()
@@ -50,93 +71,60 @@ void CigiHost::run()
 	bool usingDR = true;
 	bool started = false;
 	bool quadratic = true;
-	int packetCount = 0;
+	
+	bool first = true;
 	try
 	{
 		std::ofstream log;
 		log.open("logHost.txt");
+
 		unsigned char* outBuffer;
 		int outBufferSize = 0;
-
-		boost::asio::io_service io_service;
-		udp::socket socket(io_service, udp::endpoint(udp::v4(), 8001));
-
-		udp::resolver resolver(io_service);
-		udp::resolver::query query(udp::v4(), "127.0.0.1", "8888");
-		udp::endpoint receiver_endpoint = *resolver.resolve(query);
-
-		boost::system::error_code ignored_error;
-
-		outMsg->BeginMsg();
-		auto prevTime = std::chrono::high_resolution_clock::now();
-		float prevSimTime = 0;
+		setupNetwork("127.0.0.1", "8888");
+		setupCigi();
 
 		for (;;)
-		{	
-			//std::this_thread::sleep_for(std::chrono::milliseconds(10));
-			float time = 0;
-			if (!rawData->empty())
+		{
+			updateModelFromNetwork();
+			if (first)
 			{
-				started = true;
-				packetCount++;
-				auto lastData = rawData->front();
-				data->updateEntityPosition(lastData.getID(), osg::Vec3f(lastData.getX(), lastData.getY(), lastData.getZ()));
-				data->updateEntityVelocity(lastData.getID(), osg::Vec3f(lastData.getVx(), lastData.getVy(), lastData.getVz()));
-				data->updateEntityAcceleration(lastData.getID(), osg::Vec3f(lastData.getAx(), lastData.getAy(), lastData.getAz()));
-				time = lastData.getTime();
-				rawData->pop();
+				initializeTimer();
 			}
-
-			auto actualTime = std::chrono::high_resolution_clock::now();
-			if (packetCount == 1)
-				prevTime = actualTime;
-			std::chrono::duration<float> simulationTime = actualTime - prevTime;
-			int waitFor = (time - simulationTime.count())*1000;
-			std::this_thread::sleep_for(std::chrono::milliseconds(waitFor));
+			
+			auto deltaSimTime = waitForRealTime();
 
 			if (quadratic)
-				dr->secondOrderUpdateGhost(1, time-prevSimTime);
+				dr->secondOrderUpdateGhost(1, deltaSimTime);
 			else
-				dr->firstOrderUpdateGhost(1, time - prevSimTime);
+				dr->firstOrderUpdateGhost(1, deltaSimTime);
 
-			prevSimTime = time;
 			bool sendUpdate = true;
 			if (usingDR)
-				sendUpdate = (started && dr->isThresholdViolated(1)) || (packetCount == 1);
+				sendUpdate = dr->isThresholdViolated(1) || first;
+
+			if (first)
+				first = false;
 
 			if (sendUpdate){
+				auto tick = std::chrono::high_resolution_clock::now();
+				std::chrono::duration<float> elapsed = tick - initial;
+
 				auto entity = data->getEntity(1);
 				auto p = entity.getPosition();
 				auto v = entity.getVelocity();
 				auto a = entity.getAcceleration();
 				auto pg = ghost->getEntity(1).getPosition();
-				auto tick = std::chrono::high_resolution_clock::now();
-				std::chrono::duration<float> elapsed = tick - prevTime;
-				log << "Correcting Time = " << time << "; ghost = " << pg.y() << "; model = " << p.y() << "; " << v.y() << ";" << a.y() << "; " << elapsed.count() << std::endl;
-
+				log << "Correcting Time = " << simulationTime << "; ghost = " << pg.x() << "; model = " << p.x() << "; " << v.x() << ";" << a.x() << "; " << elapsed.count() << std::endl;
 				dr->correctGhost(1);
+				cigi->packData(entity, &outBuffer, outBufferSize);
 
-				// load the IG Control
-				*outMsg << igControl;
-				//Update position
-				
-				ownship.SetLon(p.y());
-				rateData.SetYRate(v.y());
-				trajectoryData.SetAccelY(a.y());
-
-				*outMsg << ownship;
-				*outMsg << rateData;
-				*outMsg << trajectoryData;
-				outMsg->PackageMsg(&outBuffer, outBufferSize);
-
-				//outMsg->UpdateIGCtrl(outBuffer, recv_buf.c_array());
-
+				boost::system::error_code ignored_error;
 				socket.send_to(boost::asio::buffer(outBuffer, outBufferSize),
 					receiver_endpoint,
 					0,
 					ignored_error);
 
-				outMsg->FreeMsg();
+				cigi->freeMessage();
 			}
 		}
 		socket.close();
