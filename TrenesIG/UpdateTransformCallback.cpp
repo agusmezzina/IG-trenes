@@ -10,8 +10,8 @@ UpdateTransformCallback::UpdateTransformCallback(World* data, World* ghost) : _d
 	correctionStep = 0;
 	dr = std::make_unique<DeadReckoning>(data, ghost);
 	p_1 = _data->getEntity(1).getPosition();
-	p_1 = _data->getEntity(1).getVelocity();
-	p_1 = _data->getEntity(1).getAcceleration();
+	v_1 = _data->getEntity(1).getVelocity();
+	a_1 = _data->getEntity(1).getAcceleration();
 	correcting = false;
 	dataFile.open("data.csv");
 	logFile.open("logIG.txt");
@@ -26,10 +26,10 @@ void UpdateTransformCallback::operator()(osg::Node* node, osg::NodeVisitor* nv){
 	osg::MatrixTransform* transformNode = static_cast<osg::MatrixTransform*>(node);
 	bool quadratic = true;
 
-	auto actualTime = std::chrono::high_resolution_clock::now();
-	std::chrono::duration<float> deltaT = actualTime - prevTime;
-	prevTime = actualTime;
-	std::chrono::duration<float> elapsed = actualTime - startTime;
+	auto currentTime = std::chrono::high_resolution_clock::now();
+	std::chrono::duration<float> deltaT = currentTime - prevTime;
+	prevTime = currentTime;
+	std::chrono::duration<float> elapsed = currentTime - startTime;
 
 	auto p = _data->getEntity(1).getPosition();
 	auto v = _data->getEntity(1).getAcceleration();

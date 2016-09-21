@@ -89,7 +89,6 @@ void CigiHost::run()
 			if (first)
 			{
 				initializeTimer();
-				first = false;
 			}
 			
 			auto deltaSimTime = waitForRealTime();
@@ -101,18 +100,21 @@ void CigiHost::run()
 
 			bool sendUpdate = true;
 			if (usingDR)
-				sendUpdate = dr->isThresholdViolated(1);
+				sendUpdate = dr->isThresholdViolated(1) || first;
+
+			if (first)
+				first = false;
 
 			if (sendUpdate){
 				auto tick = std::chrono::high_resolution_clock::now();
 				std::chrono::duration<float> elapsed = tick - initial;
 
 				auto entity = data->getEntity(1);
-				/*auto p = entity.getPosition();
+				auto p = entity.getPosition();
 				auto v = entity.getVelocity();
 				auto a = entity.getAcceleration();
 				auto pg = ghost->getEntity(1).getPosition();
-				log << "Correcting Time = " << simulationTime << "; ghost = " << pg.x() << "; model = " << p.x() << "; " << v.x() << ";" << a.x() << "; " << elapsed.count() << std::endl;*/
+				log << "Correcting Time = " << simulationTime << "; ghost = " << pg.x() << "; model = " << p.x() << "; " << v.x() << ";" << a.x() << "; " << elapsed.count() << std::endl;
 				dr->correctGhost(1);
 				cigi->packData(entity, &outBuffer, outBufferSize);
 
