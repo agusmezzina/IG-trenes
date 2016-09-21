@@ -1,6 +1,7 @@
 #pragma once
 #include <memory>
 #include <queue>
+#include <fstream>
 #include <boost\array.hpp>
 #include <boost\asio.hpp>
 #include "DataPacket.h"
@@ -9,7 +10,7 @@
 #include "DeadReckoning.h"
 #include "CigiManager.h"
 #include "Semaphore.h"
-#include <fstream>
+#include "RealTimeClock.h"
 
 using boost::asio::ip::udp;
 
@@ -23,7 +24,7 @@ private:
 	void setupNetwork(const std::string& ip, const std::string& port);
 	void syncWithRealTime();
 	void setupCigi();
-	void initializeTimer();
+	//void initializeTimer();
 	void updateModelFromNetwork();
 	void sendCigiPacket();
 
@@ -33,16 +34,13 @@ private:
 
 	std::unique_ptr<CigiManager> cigi;
 	std::unique_ptr<DeadReckoning> dr;
+	std::unique_ptr<RealTimeClock> clock;
 	World* data;
 	World* ghost;
 	std::queue<DataPacket>* rawData;
 	Semaphore* s;
 	float prevSimulationTime;
-	std::chrono::high_resolution_clock::time_point prevRealTime;
 	float simulationTime;
-	float compensationTime;
-	std::chrono::high_resolution_clock::time_point realTime;
-	std::chrono::high_resolution_clock::time_point initial;
 
 	std::ofstream log;
 };
