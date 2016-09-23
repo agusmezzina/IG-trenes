@@ -16,6 +16,8 @@ public:
 	virtual void operator()(osg::Node* node, osg::NodeVisitor* nv);
 	float calculateAngleOfEmbrace() const;
 protected:
+	bool modelChanged();
+
 	std::ofstream dataFile;
 	std::ofstream logFile;
 	std::chrono::system_clock::time_point prevTime;

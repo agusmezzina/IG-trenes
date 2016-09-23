@@ -85,7 +85,7 @@ void CigiHost::run()
 			if (sendUpdate){
 				auto entity = data->getEntity(1);				
 				dr->correctGhost(1);
-				cigi->packData(entity, &outBuffer, outBufferSize);
+				cigi->packData(entity, simulationTime, &outBuffer, outBufferSize);
 
 				auto p = entity.getPosition();
 				auto v = entity.getVelocity();

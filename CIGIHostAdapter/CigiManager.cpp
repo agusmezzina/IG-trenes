@@ -17,7 +17,7 @@ CigiManager::CigiManager()
 	Imsg.RegisterEventProcessor(CIGI_SOF_PACKET_ID_V3_2, ctrlProcessor.get());	
 }
 
-void CigiManager::packData(const Entity& entity, unsigned char** buffer, int& bufferSize)
+void CigiManager::packData(const Entity& entity, float simulationTime, unsigned char** buffer, int& bufferSize)
 {
 	outMsg->BeginMsg();
 
@@ -31,6 +31,8 @@ void CigiManager::packData(const Entity& entity, unsigned char** buffer, int& bu
 	auto a = entity.getAcceleration();
 
 	igControl.SetIGMode(CigiBaseIGCtrl::Operate);
+	igControl.SetTimeStampValid(true);
+	igControl.SetTimeStamp(simulationTime);
 	entityData.SetEntityID(1);
 	entityData.SetEntityType(0);
 	entityData.SetEntityState(CigiBaseEntityCtrl::Active);
