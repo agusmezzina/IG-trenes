@@ -8,7 +8,7 @@ CigiNetworkManager::CigiNetworkManager(World* data) : data(data), inBufferSize(0
 	socket = std::make_unique<udp::socket>(io_service, udp::endpoint(udp::v4(), 8888));
 	cigiSession = std::make_unique<CigiIGSession>(1, RECV_BUFFER_SIZE, 2, SEND_BUFFER_SIZE);
 	dataProcessor = std::make_unique<DataEventProcessor>(data);
-	controlProcessor = std::make_unique<ControlEventProcessor>();
+	controlProcessor = std::make_unique<ControlEventProcessor>(data);
 	rateProcessor = std::make_unique<RateEventProcessor>(data);
 	trajectoryProcessor = std::make_unique<TrajectoryEventProcessor>(data);
 	startOfFrame = std::make_unique<CigiSOFV3_2>();

@@ -18,18 +18,25 @@ void DeadReckoning::secondOrderUpdateGhost(int entityID, float deltaT)
 	auto p = ghostEntity.getPosition();
 	auto v = ghostEntity.getVelocity();
 	auto a = ghostEntity.getAcceleration();
-	ghost->updateEntityPosition(entityID, p + v * deltaT + a * 0.5 * pow(deltaT, 2));
+	ghost->updateEntityPosition(entityID, p + v * deltaT + a * 0.5f * pow(deltaT, 2));
 	ghost->updateEntityVelocity(entityID, v + a * deltaT);
 }
 
-void DeadReckoning::correctGhost(int entityID, int step)
+void DeadReckoning::correctGhost(int entityID, int step, float deltaT)
 {
 	auto entity = model->getEntity(entityID);
 	auto p = entity.getPosition();
 	auto v = entity.getVelocity();
 	auto a = entity.getAcceleration();
 	auto pg = ghost->getEntity(entityID).getPosition();
-	ghost->updateEntityPosition(entityID, pg + (p - pg) * step / smoothness);
+
+	if (step == 1)
+	{
+		auto convergenceTime = smoothness * deltaT;
+		convergencePoint = p + v * convergenceTime + a * 0.5f * pow(convergenceTime, 2);
+	}
+
+	ghost->updateEntityPosition(entityID, pg + (convergencePoint - pg) * step / smoothness);
 	ghost->updateEntityVelocity(entityID, v);
 	ghost->updateEntityAcceleration(entityID, a);
 }
