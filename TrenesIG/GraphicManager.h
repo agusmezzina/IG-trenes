@@ -20,6 +20,7 @@ private:
 	osg::ref_ptr<CameraController> _cameraCtrl;
 	osg::ref_ptr<osg::Geode> createBallNode(const osg::Vec3& center, float radius, const osg::Vec4& color);
 	osg::ref_ptr<osg::Camera> createCamera(const osg::Vec3& eye, const osg::Vec3& center, const osg::Vec3& up, osg::Node* scene);
+	osg::ref_ptr<osg::Geode> createFloor();
 	void createScene();
 	int runViewer();
 	std::unique_ptr<DeadReckoning> dr;

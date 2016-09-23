@@ -1,15 +1,17 @@
 #include "GraphicManager.h"
+#include "UpdateTransformCallback.h"
+#include "Skybox.h"
 #include <osg\Geode>
 #include <osg\ShapeDrawable>
 #include <osg\MatrixTransform>
 #include <osg\Switch>
+#include <osg\TexGen>
 #include <osgDB\ReadFile>
 #include <osgGA\TrackballManipulator>
 #include <osgViewer\ViewerEventHandlers>
 #include <osgViewer\config\SingleWindow>
 #include <iostream>
 #include <chrono>
-#include "UpdateTransformCallback.h"
 
 GraphicManager::GraphicManager(World* data, World* ghost) : _data(data), _ghost(ghost), netMgr(data), _path(nullptr), _sceneRoot(nullptr), _cameraCtrl(nullptr)
 {
@@ -37,7 +39,43 @@ osg::ref_ptr<osg::Camera> GraphicManager::createCamera(const osg::Vec3& eye, con
 	return camera.release();
 }
 
+osg::ref_ptr<osg::Geode> GraphicManager::createFloor()
+{
+	osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array;
+	vertices->push_back(osg::Vec3(-250.0f, 0.3f, -250.0f));
+	vertices->push_back(osg::Vec3(250.0f, 0.3f, -250.0f));
+	vertices->push_back(osg::Vec3(250.0f, 0.3f, 250.0f));
+	vertices->push_back(osg::Vec3(-250.0f, 0.3f, 250.0f));
+
+	osg::ref_ptr<osg::Vec3Array> normals = new osg::Vec3Array;
+	normals->push_back(osg::Vec3(0.0f, 1.0f, 0.0f));
+
+	osg::ref_ptr<osg::Vec2Array> texcoords = new osg::Vec2Array;
+	texcoords->push_back(osg::Vec2(0.0f, 0.0f));
+	texcoords->push_back(osg::Vec2(0.0f, 1.0f));
+	texcoords->push_back(osg::Vec2(1.0f, 1.0f));
+	texcoords->push_back(osg::Vec2(1.0f, 0.0f));
+
+	osg::ref_ptr<osg::Geometry> quad = new osg::Geometry;
+	quad->setVertexArray(vertices.get());
+	quad->setNormalArray(normals.get());
+	quad->setNormalBinding(osg::Geometry::BIND_OVERALL);
+	quad->setTexCoordArray(0, texcoords.get());
+	quad->addPrimitiveSet(new osg::DrawArrays(GL_QUADS, 0, 4));
+
+	osg::ref_ptr<osg::Texture2D> texture = new osg::Texture2D;
+	osg::ref_ptr<osg::Image> image = osgDB::readImageFile("C:\\ObjetosVarios\\field_negy.jpg");
+	texture->setImage(image.get());	
+
+	osg::ref_ptr<osg::Geode> floor = new osg::Geode;
+	floor->addDrawable(quad.get());
+	floor->getOrCreateStateSet()->setTextureAttributeAndModes(
+		0, texture.get());
+	return floor.release();
+}
+
 void GraphicManager::createScene(){
+	osg::ref_ptr<osg::Group> root = new osg::Group;
 	osg::ref_ptr<osg::Group> scene = new osg::Group;
 
 	osg::ref_ptr<osg::LightSource> light = new osg::LightSource;
@@ -48,19 +86,26 @@ void GraphicManager::createScene(){
 	light->getLight()->setDiffuse(osg::Vec4(0.8, 0.8, 0.8, 1.0)
 		);
 
+	osg::ref_ptr<osg::Node> model = osgDB::readNodeFile("C:\\ObjetosVarios\\EstacionDemo\\vagon.flt.90,270,0.rot");
+	osg::ref_ptr<osg::Node> rail = osgDB::readNodeFile("C:\\ObjetosVarios\\EstacionDemo\\tramo_vias2.flt.90,90,0.rot");
 
-	osg::ref_ptr<osg::ShapeDrawable> floorShape = new osg::ShapeDrawable;
-	floorShape->setShape(new osg::Box(osg::Vec3(0.0f, -0.1f, 0.0f), 10.0f, 0.01f, 10.0f));
-	floorShape->setColor(osg::Vec4(0.9f, 0.9f, 0.9f, 1.0f));
-	osg::ref_ptr<osg::Geode> floor = new osg::Geode;
-	floor->addDrawable(floorShape.get());
+	osg::ref_ptr<osg::Geode> floor = createFloor();
 
-	/*osg::ref_ptr<osg::Geode> model = createBallNode(
-		osg::Vec3(0.0f, 0.0f, 0.0f),
-		0.1f,
-		osg::Vec4(1.0f, 1.0f, 0.5f, 1.0f));*/
-	osg::ref_ptr<osg::Node> model = osgDB::readNodeFile("C:\\ObjetosVarios\\EstacionDemo\\vagon.flt.270,90,0.rot");
-	osg::ref_ptr<osg::Node> rail = osgDB::readNodeFile("C:\\ObjetosVarios\\EstacionDemo\\tramo_vias2.flt.270,90,0.rot");
+	osg::ref_ptr<osg::Geode> geode = new osg::Geode;
+	geode->addDrawable(new osg::ShapeDrawable(new osg::Sphere(osg::Vec3(), scene->getBound().radius())));
+	osg::ref_ptr<Skybox> skybox = new Skybox;
+	skybox->getOrCreateStateSet()->setTextureAttributeAndModes(
+		0, new osg::TexGen);
+	skybox->setEnvironmentMap(0,
+		osgDB::readImageFile("C:\\ObjetosVarios\\field_posx.jpg"),
+		osgDB::readImageFile("C:\\ObjetosVarios\\field_negx.jpg"),
+		osgDB::readImageFile("C:\\ObjetosVarios\\field_posy.jpg"),
+		osgDB::readImageFile("C:\\ObjetosVarios\\field_negy.jpg"),
+		osgDB::readImageFile("C:\\ObjetosVarios\\field_posz.jpg"),
+		osgDB::readImageFile("C:\\ObjetosVarios\\field_negz.jpg"));
+	skybox->addChild(geode.get());
+
+
 	osg::ref_ptr<osg::MatrixTransform> transf = new osg::MatrixTransform;
 	transf->setMatrix(osg::Matrix::translate(osg::Vec3f()));
 	transf->addChild(model.get());
@@ -77,6 +122,9 @@ void GraphicManager::createScene(){
 	scene->addChild(light);
 	scene->addChild(transf);
 	scene->addChild(rail);
+	scene->addChild(floor);
+	root->addChild(scene);
+	root->addChild(skybox);
 
 	//osg::Vec3 center = osg::Vec3(38.0f, -91.0f, 500.0f);
 	/*osg::Vec3 center = osg::Vec3(0.0f, 3.0f, 0.0f);
@@ -93,7 +141,7 @@ void GraphicManager::createScene(){
 
 	_cameraCtrl = new CameraController(cameras.get());*/
 	//_sceneRoot = cameras;
-	_sceneRoot = scene;
+	_sceneRoot = root;
 }
 
 int GraphicManager::runViewer(){
