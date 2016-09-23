@@ -22,6 +22,19 @@ UpdateTransformCallback::UpdateTransformCallback(World* data, World* ghost) : _d
 	x_2 = x;
 }
 
+bool UpdateTransformCallback::modelChanged()
+{
+	auto p = _data->getEntity(1).getPosition();
+	auto v = _data->getEntity(1).getAcceleration();
+	auto a = _data->getEntity(1).getAcceleration();
+	bool result = (p != p_1) || (v != v_1) || (a != a_1);
+	if (result)
+		p_1 = p;
+		v_1 = v;
+		a_1 = a;
+	return result;
+}
+
 void UpdateTransformCallback::operator()(osg::Node* node, osg::NodeVisitor* nv){
 	osg::MatrixTransform* transformNode = static_cast<osg::MatrixTransform*>(node);
 	bool quadratic = true;
@@ -30,15 +43,12 @@ void UpdateTransformCallback::operator()(osg::Node* node, osg::NodeVisitor* nv){
 	std::chrono::duration<float> deltaT = currentTime - prevTime;
 	prevTime = currentTime;
 	std::chrono::duration<float> elapsed = currentTime - startTime;
-
 	auto p = _data->getEntity(1).getPosition();
-	auto v = _data->getEntity(1).getAcceleration();
-	auto a = _data->getEntity(1).getAcceleration();
 	osg::Vec3f pDraw;
-
+	bool changed = modelChanged();
 	//logFile << a.x() << std::endl;
 
-	if ((a.x() != 0.0f) && (!started))
+	if (changed && !started)
 	{
 		logFile << "Started" << std::endl;
 		started = true;
@@ -47,14 +57,20 @@ void UpdateTransformCallback::operator()(osg::Node* node, osg::NodeVisitor* nv){
 
 	if (usingDR)
 	{
-		if ((p != p_1) || (v != v_1) || (a != a_1))
-		{
-			p_1 = p;
-			v_1 = v;
-			a_1 = a;
-			dr->correctGhost(1);
-			logFile << "Corrected" << std::endl;
+		if (changed)
+			correcting = true;
+		else
+			correcting = false;
 
+		if (correcting)
+		{
+			dr->correctGhost(1, correctionStep, deltaT.count());
+			correctionStep++;
+			if (correctionStep > dr->getSmoothness())
+			{
+				correcting = false;
+				correctionStep = 0;
+			}
 		}
 		else
 		{
@@ -64,7 +80,7 @@ void UpdateTransformCallback::operator()(osg::Node* node, osg::NodeVisitor* nv){
 				auto pg = entity.getPosition();
 				auto vg = entity.getVelocity();
 				auto ag = entity.getAcceleration();
-				logFile << pg.x() << "; " << vg.x() << "; " << ag.x() << "; " << deltaT.count() << "; " << elapsed.count() << std::endl;
+				//logFile << pg.x() << "; " << vg.x() << "; " << ag.x() << "; " << deltaT.count() << "; " << elapsed.count() << std::endl;
 				dr->secondOrderUpdateGhost(1, deltaT.count());
 			}
 			else

@@ -60,6 +60,16 @@ void World::firstOrderPredictUpdate(
 	}
 }
 
+void World::setTimestamp(float t)
+{
+	this->timestamp = t;
+}
+
+float World::getTimestamp() const
+{
+	return this->timestamp;
+}
+
 //void World::instantCorrect(World* reference, double threshold)
 //{
 //	std::lock_guard<std::mutex> g(m);
@@ -76,6 +86,7 @@ World::World()
 {
 	Entity ownship(1);
 	entities.push_back(ownship);
+	timestamp = 0.0f;
 }
 
 

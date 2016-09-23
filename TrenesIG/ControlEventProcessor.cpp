@@ -2,7 +2,7 @@
 #include "ControlEventProcessor.h"
 #include <iostream>
 
-ControlEventProcessor::ControlEventProcessor()
+ControlEventProcessor::ControlEventProcessor(World* data) : TPckt(nullptr), data(data)
 {
 }
 
@@ -16,6 +16,8 @@ void ControlEventProcessor::OnPacketReceived(CigiBasePacket *Packet)
 	CigiIGCtrlV3_3 *InPckt = (CigiIGCtrlV3_3 *)Packet;
 	SetOrigPckt(InPckt);
 
+	if (InPckt->GetTimeStampValid())
+		data->setTimestamp(InPckt->GetTimeStamp());
 	/*std::cout << "===> IGCtrl <===" << std::endl;
 
 	std::cout << "Version ==> " << InPckt->GetVersion() << std::endl;
