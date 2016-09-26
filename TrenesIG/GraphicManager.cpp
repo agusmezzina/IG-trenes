@@ -42,19 +42,19 @@ osg::ref_ptr<osg::Camera> GraphicManager::createCamera(const osg::Vec3& eye, con
 osg::ref_ptr<osg::Geode> GraphicManager::createFloor()
 {
 	osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array;
-	vertices->push_back(osg::Vec3(-250.0f, 0.3f, -250.0f));
-	vertices->push_back(osg::Vec3(250.0f, 0.3f, -250.0f));
-	vertices->push_back(osg::Vec3(250.0f, 0.3f, 250.0f));
-	vertices->push_back(osg::Vec3(-250.0f, 0.3f, 250.0f));
+	vertices->push_back(osg::Vec3(-500.0f, 0.3f, -500.0f));
+	vertices->push_back(osg::Vec3(500.0f, 0.3f, -500.0f));
+	vertices->push_back(osg::Vec3(500.0f, 0.3f, 500.0f));
+	vertices->push_back(osg::Vec3(-500.0f, 0.3f, 500.0f));
 
 	osg::ref_ptr<osg::Vec3Array> normals = new osg::Vec3Array;
-	normals->push_back(osg::Vec3(0.0f, 1.0f, 0.0f));
+	normals->push_back(osg::Vec3(0.0f, -1.0f, 0.0f));
 
 	osg::ref_ptr<osg::Vec2Array> texcoords = new osg::Vec2Array;
 	texcoords->push_back(osg::Vec2(0.0f, 0.0f));
-	texcoords->push_back(osg::Vec2(0.0f, 1.0f));
-	texcoords->push_back(osg::Vec2(1.0f, 1.0f));
-	texcoords->push_back(osg::Vec2(1.0f, 0.0f));
+	texcoords->push_back(osg::Vec2(0.0f, 100.0f));
+	texcoords->push_back(osg::Vec2(100.0f, 100.0f));
+	texcoords->push_back(osg::Vec2(100.0f, 0.0f));
 
 	osg::ref_ptr<osg::Geometry> quad = new osg::Geometry;
 	quad->setVertexArray(vertices.get());
@@ -64,8 +64,12 @@ osg::ref_ptr<osg::Geode> GraphicManager::createFloor()
 	quad->addPrimitiveSet(new osg::DrawArrays(GL_QUADS, 0, 4));
 
 	osg::ref_ptr<osg::Texture2D> texture = new osg::Texture2D;
-	osg::ref_ptr<osg::Image> image = osgDB::readImageFile("C:\\ObjetosVarios\\field_negy.jpg");
-	texture->setImage(image.get());	
+	osg::ref_ptr<osg::Image> image = osgDB::readImageFile("C:\\ObjetosVarios\\grass-tile.jpg");
+	texture->setImage(image.get());
+	//texture->setWrap(osg::Texture::WRAP_T, osg::Texture::REPEAT);
+	//texture->setWrap(osg::Texture::WRAP_R, osg::Texture::REPEAT);
+	texture->setWrap(osg::Texture::WRAP_S, osg::Texture::REPEAT);
+	texture->setWrap(osg::Texture::WRAP_T, osg::Texture::REPEAT);
 
 	osg::ref_ptr<osg::Geode> floor = new osg::Geode;
 	floor->addDrawable(quad.get());
@@ -124,7 +128,7 @@ void GraphicManager::createScene(){
 	scene->addChild(rail);
 	scene->addChild(floor);
 	root->addChild(scene);
-	root->addChild(skybox);
+	//root->addChild(skybox);
 
 	//osg::Vec3 center = osg::Vec3(38.0f, -91.0f, 500.0f);
 	/*osg::Vec3 center = osg::Vec3(0.0f, 3.0f, 0.0f);
