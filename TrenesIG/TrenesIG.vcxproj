@@ -94,6 +94,7 @@
     <ClInclude Include="NetworkManager.h" />
     <ClInclude Include="RateEventProcessor.h" />
     <ClInclude Include="SceneData.h" />
+    <ClInclude Include="Sky.h" />
     <ClInclude Include="Skybox.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
@@ -110,6 +111,7 @@
     <ClCompile Include="NetworkManager.cpp" />
     <ClCompile Include="RateEventProcessor.cpp" />
     <ClCompile Include="SceneData.cpp" />
+    <ClCompile Include="Sky.cpp" />
     <ClCompile Include="Skybox.cpp" />
     <ClCompile Include="TrajectoryEventProcessor.cpp" />
     <ClCompile Include="TrenesIG.cpp" />

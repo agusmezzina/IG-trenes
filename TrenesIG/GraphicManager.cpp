@@ -1,6 +1,7 @@
 #include "GraphicManager.h"
 #include "UpdateTransformCallback.h"
 #include "Skybox.h"
+#include "Sky.h"
 #include <osg\Geode>
 #include <osg\ShapeDrawable>
 #include <osg\MatrixTransform>
@@ -42,13 +43,13 @@ osg::ref_ptr<osg::Camera> GraphicManager::createCamera(const osg::Vec3& eye, con
 osg::ref_ptr<osg::Geode> GraphicManager::createFloor()
 {
 	osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array;
-	vertices->push_back(osg::Vec3(-500.0f, 0.3f, -500.0f));
-	vertices->push_back(osg::Vec3(500.0f, 0.3f, -500.0f));
-	vertices->push_back(osg::Vec3(500.0f, 0.3f, 500.0f));
-	vertices->push_back(osg::Vec3(-500.0f, 0.3f, 500.0f));
+	vertices->push_back(osg::Vec3(-1000.0f, 0.3f, -1000.0f));
+	vertices->push_back(osg::Vec3(1000.0f, 0.3f, -1000.0f));
+	vertices->push_back(osg::Vec3(1000.0f, 0.3f, 1000.0f));
+	vertices->push_back(osg::Vec3(-1000.0f, 0.3f, 1000.0f));
 
 	osg::ref_ptr<osg::Vec3Array> normals = new osg::Vec3Array;
-	normals->push_back(osg::Vec3(0.0f, -1.0f, 0.0f));
+	normals->push_back(osg::Vec3(0.0f, 0.0f, 1.0f));
 
 	osg::ref_ptr<osg::Vec2Array> texcoords = new osg::Vec2Array;
 	texcoords->push_back(osg::Vec2(0.0f, 0.0f));
@@ -66,8 +67,6 @@ osg::ref_ptr<osg::Geode> GraphicManager::createFloor()
 	osg::ref_ptr<osg::Texture2D> texture = new osg::Texture2D;
 	osg::ref_ptr<osg::Image> image = osgDB::readImageFile("C:\\ObjetosVarios\\grass-tile.jpg");
 	texture->setImage(image.get());
-	//texture->setWrap(osg::Texture::WRAP_T, osg::Texture::REPEAT);
-	//texture->setWrap(osg::Texture::WRAP_R, osg::Texture::REPEAT);
 	texture->setWrap(osg::Texture::WRAP_S, osg::Texture::REPEAT);
 	texture->setWrap(osg::Texture::WRAP_T, osg::Texture::REPEAT);
 
@@ -78,24 +77,43 @@ osg::ref_ptr<osg::Geode> GraphicManager::createFloor()
 	return floor.release();
 }
 
+osg::Node* GraphicManager::createLightSource(unsigned int num,
+	const osg::Vec3& trans,
+	const osg::Vec4& color)
+{
+	osg::ref_ptr<osg::Light> light = new osg::Light;
+	light->setLightNum(num);
+	light->setDiffuse(color);
+	light->setPosition(osg::Vec4(0.0f, 0.0f, 0.0f, 1.0f));
+	osg::ref_ptr<osg::LightSource> lightSource = new
+		osg::LightSource;
+	lightSource->setLight(light);
+	osg::ref_ptr<osg::MatrixTransform> sourceTrans =
+		new osg::MatrixTransform;
+	sourceTrans->setMatrix(osg::Matrix::translate(trans));
+	sourceTrans->addChild(lightSource.get());
+	return sourceTrans.release();
+}
+
 void GraphicManager::createScene(){
-	osg::ref_ptr<osg::Group> root = new osg::Group;
+	//osg::ref_ptr<osg::Group> root = new osg::Group;
 	osg::ref_ptr<osg::Group> scene = new osg::Group;
 
-	osg::ref_ptr<osg::LightSource> light = new osg::LightSource;
+	/*osg::ref_ptr<osg::LightSource> light = new osg::LightSource;
 	light->getLight()->setPosition(osg::Vec4(4.0, 4.0, 10.0,
 		0.0));
 	light->getLight()->setAmbient(osg::Vec4(0.2, 0.2, 0.2, 1.0)
 		);
 	light->getLight()->setDiffuse(osg::Vec4(0.8, 0.8, 0.8, 1.0)
-		);
+		);*/
 
+	osg::ref_ptr<osg::Node> light = createLightSource(0, osg::Vec3(30.0f, -10.0f, -20.0f), osg::Vec4(1.0f, 1.0f, 1.0f, 1.0f));
 	osg::ref_ptr<osg::Node> model = osgDB::readNodeFile("C:\\ObjetosVarios\\EstacionDemo\\vagon.flt.90,270,0.rot");
 	osg::ref_ptr<osg::Node> rail = osgDB::readNodeFile("C:\\ObjetosVarios\\EstacionDemo\\tramo_vias2.flt.90,90,0.rot");
-
+	osg::ref_ptr<osg::Node> sky = osgDB::readNodeFile("skydome.osgt.90,0,0.rot");
 	osg::ref_ptr<osg::Geode> floor = createFloor();
 
-	osg::ref_ptr<osg::Geode> geode = new osg::Geode;
+	/*osg::ref_ptr<osg::Geode> geode = new osg::Geode;
 	geode->addDrawable(new osg::ShapeDrawable(new osg::Sphere(osg::Vec3(), scene->getBound().radius())));
 	osg::ref_ptr<Skybox> skybox = new Skybox;
 	skybox->getOrCreateStateSet()->setTextureAttributeAndModes(
@@ -107,8 +125,11 @@ void GraphicManager::createScene(){
 		osgDB::readImageFile("C:\\ObjetosVarios\\field_negy.jpg"),
 		osgDB::readImageFile("C:\\ObjetosVarios\\field_posz.jpg"),
 		osgDB::readImageFile("C:\\ObjetosVarios\\field_negz.jpg"));
-	skybox->addChild(geode.get());
+	skybox->addChild(geode.get());*/
 
+	osg::ref_ptr<osg::MatrixTransform> transfSky = new osg::MatrixTransform;
+	transfSky->setMatrix(osg::Matrix::scale(osg::Vec3f(0.035f, 0.035f, 0.035f)) * osg::Matrix::translate(osg::Vec3f(-950.0f, 0.0f, -1300.0f)));
+	transfSky->addChild(sky.get());
 
 	osg::ref_ptr<osg::MatrixTransform> transf = new osg::MatrixTransform;
 	transf->setMatrix(osg::Matrix::translate(osg::Vec3f()));
@@ -127,8 +148,7 @@ void GraphicManager::createScene(){
 	scene->addChild(transf);
 	scene->addChild(rail);
 	scene->addChild(floor);
-	root->addChild(scene);
-	//root->addChild(skybox);
+	scene->addChild(transfSky);
 
 	//osg::Vec3 center = osg::Vec3(38.0f, -91.0f, 500.0f);
 	/*osg::Vec3 center = osg::Vec3(0.0f, 3.0f, 0.0f);
@@ -145,7 +165,7 @@ void GraphicManager::createScene(){
 
 	_cameraCtrl = new CameraController(cameras.get());*/
 	//_sceneRoot = cameras;
-	_sceneRoot = root;
+	_sceneRoot = scene;
 }
 
 int GraphicManager::runViewer(){
