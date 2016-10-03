@@ -41,10 +41,13 @@ void CigiManager::packData(const Entity& entity, float simulationTime, unsigned 
 
 	entityData.SetLat(p.x());
 	entityData.SetLon(p.y());
+	entityData.SetAlt(p.z());
 	rateData.SetXRate(v.x());
 	rateData.SetYRate(v.y());
+	rateData.SetZRate(v.z());
 	trajectoryData.SetAccelX(a.x());
 	trajectoryData.SetAccelY(a.y());
+	trajectoryData.SetAccelZ(a.z());
 
 	*outMsg << igControl;
 	*outMsg << entityData;
