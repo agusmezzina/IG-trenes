@@ -33,8 +33,8 @@ int main(int argc, char* argv[])
 	//}
 	//return graphmng.runScene();
 
-	//CigiNetworkManager mng(&data);
-	//mng.startThread();
+	CigiNetworkManager mng(&data);
+	mng.startThread();
 	graphmng.runScene();
 	//mng.cancel();
 	return 0;
