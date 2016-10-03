@@ -3,6 +3,8 @@
 #include <iostream>
 #include <boost\bind.hpp>
 
+using namespace osgCigi;
+
 CigiNetworkManager::CigiNetworkManager(World* data) : data(data), inBufferSize(0), outBufferSize(0)
 {
 	socket = std::make_unique<udp::socket>(io_service, udp::endpoint(udp::v4(), 8888));

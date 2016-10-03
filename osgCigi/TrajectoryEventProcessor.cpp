@@ -1,5 +1,6 @@
 #include "TrajectoryEventProcessor.h"
 
+using namespace osgCigi;
 
 TrajectoryEventProcessor::TrajectoryEventProcessor(World* data) : TPckt(nullptr), data(data)
 {

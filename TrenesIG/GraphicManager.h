@@ -10,7 +10,7 @@ class GraphicManager
 private:
 	//SceneData* _data;
 	//CigiNetworkManager netMgr;
-	std::unique_ptr<CigiSimulationEnvironment> env;
+	std::unique_ptr<osgCigi::CigiSimulationEnvironment> env;
 	osg::ref_ptr<osg::Node> _sceneRoot;
 	osg::ref_ptr<CameraController> _cameraCtrl;
 	osg::ref_ptr<osg::Geode> createBallNode(const osg::Vec3& center, float radius, const osg::Vec4& color);

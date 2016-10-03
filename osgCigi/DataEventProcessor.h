@@ -5,15 +5,18 @@
 #include "World.h"
 #include <osg\MatrixTransform>
 
-class DataEventProcessor : public CigiBaseEventProcessor
+namespace osgCigi
 {
-public:
-	DataEventProcessor(World* data);
-	virtual ~DataEventProcessor();
-	virtual void OnPacketReceived(CigiBasePacket *Packet);
-	void setOriginPacket(CigiEntityCtrlV3_3 *TPcktIn) { TPckt = TPcktIn; }
+	class DataEventProcessor : public CigiBaseEventProcessor
+	{
+	public:
+		DataEventProcessor(World* data);
+		virtual ~DataEventProcessor();
+		virtual void OnPacketReceived(CigiBasePacket *Packet);
+		void setOriginPacket(CigiEntityCtrlV3_3 *TPcktIn) { TPckt = TPcktIn; }
 
-protected:
-	CigiEntityCtrlV3_3 *TPckt;
-	World* data;
-};
+	protected:
+		CigiEntityCtrlV3_3 *TPckt;
+		World* data;
+	};
+}

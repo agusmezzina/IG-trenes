@@ -3,6 +3,8 @@
 #include <iostream>
 #include <cmath>
 
+using namespace osgCigi;
+
 UpdateTransformCallback::UpdateTransformCallback(World* data, World* ghost) : _data(data), _ghost(ghost)
 {
 	prevTime = std::chrono::high_resolution_clock::now();

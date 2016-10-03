@@ -2,6 +2,8 @@
 #include "UpdateTransformCallback.h"
 #include <osgDB\ReadFile>
 
+using namespace osgCigi;
+
 void CigiSimulationEnvironment::registerModel(const int& entityID, const std::string& path)
 {
 	osg::ref_ptr<osg::Node> model = osgDB::readNodeFile(path);

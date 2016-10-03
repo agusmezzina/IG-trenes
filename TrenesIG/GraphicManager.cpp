@@ -15,7 +15,7 @@
 
 GraphicManager::GraphicManager()
 {
-	env = std::make_unique<CigiSimulationEnvironment>();
+	env = std::make_unique<osgCigi::CigiSimulationEnvironment>();
 }
 
 osg::ref_ptr<osg::Geode> GraphicManager::createBallNode(const osg::Vec3& center, float radius, const osg::Vec4& color){
@@ -77,6 +77,7 @@ osg::Node* GraphicManager::createLightSource(unsigned int num,
 {
 	osg::ref_ptr<osg::Light> light = new osg::Light;
 	light->setLightNum(num);
+	light->setAmbient(osg::Vec4(0.5f, 0.5f, 0.5f, 1.0f));
 	light->setDiffuse(color);
 	light->setPosition(osg::Vec4(0.0f, 0.0f, 0.0f, 1.0f));
 	osg::ref_ptr<osg::LightSource> lightSource = new

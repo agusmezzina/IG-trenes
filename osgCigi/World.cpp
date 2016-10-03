@@ -1,6 +1,8 @@
 #include "World.h"
 #include <algorithm>
 
+using namespace osgCigi;
+
 void World::addEntity(Entity e)
 {
 	std::lock_guard<std::mutex> g(m);

@@ -2,6 +2,8 @@
 #include "ControlEventProcessor.h"
 #include <iostream>
 
+using namespace osgCigi;
+
 ControlEventProcessor::ControlEventProcessor(World* data) : TPckt(nullptr), data(data)
 {
 }

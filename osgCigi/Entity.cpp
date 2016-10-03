@@ -1,6 +1,8 @@
 #include "Entity.h"
 #include <cmath>
 
+using namespace osgCigi;
+
 osg::Vec3f Entity::getPosition() const
 {
 	return this->position;

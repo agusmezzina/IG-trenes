@@ -1,5 +1,6 @@
 #include "RateEventProcessor.h"
 
+using namespace osgCigi;
 
 RateEventProcessor::RateEventProcessor(World* data) : TPckt(nullptr), data(data)
 {

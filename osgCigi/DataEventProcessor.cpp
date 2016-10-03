@@ -2,6 +2,8 @@
 #include "DataEventProcessor.h"
 #include <iostream>
 
+using namespace osgCigi;
+
 DataEventProcessor::DataEventProcessor(World* data) : TPckt(nullptr), data(data)
 {
 }

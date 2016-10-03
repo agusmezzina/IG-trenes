@@ -15,42 +15,45 @@
 
 using boost::asio::ip::udp;
 
-class CigiNetworkManager : public OpenThreads::Thread
+namespace osgCigi
 {
-public:
-	CigiNetworkManager(World* data);
-	virtual int cancel();
-	virtual void run();
-	void sendSOF();
-	void recvPacket();
-	virtual ~CigiNetworkManager();
-private:
-	void handle_receive(const boost::system::error_code& error, std::size_t size);
-	void handle_send(const boost::system::error_code& error, std::size_t size);
+	class CigiNetworkManager : public OpenThreads::Thread
+	{
+	public:
+		CigiNetworkManager(World* data);
+		virtual int cancel();
+		virtual void run();
+		void sendSOF();
+		void recvPacket();
+		virtual ~CigiNetworkManager();
+	private:
+		void handle_receive(const boost::system::error_code& error, std::size_t size);
+		void handle_send(const boost::system::error_code& error, std::size_t size);
 
-	World* data;
+		World* data;
 
-	bool done;
+		bool done;
 
-	int inBufferSize;
-	int outBufferSize;
-	boost::array<unsigned char, RECV_BUFFER_SIZE> inBuffer;
-	unsigned char* outBuffer;
+		int inBufferSize;
+		int outBufferSize;
+		boost::array<unsigned char, RECV_BUFFER_SIZE> inBuffer;
+		unsigned char* outBuffer;
 
-	boost::asio::io_service io_service;
-	udp::endpoint receiver_endpoint;
-	udp::endpoint remote_endpoint;
-	std::unique_ptr<udp::socket> socket;
+		boost::asio::io_service io_service;
+		udp::endpoint receiver_endpoint;
+		udp::endpoint remote_endpoint;
+		std::unique_ptr<udp::socket> socket;
 
-	std::unique_ptr<CigiIGSession> cigiSession;
-	CigiOutgoingMsg* outMsg;
-	CigiIncomingMsg* inMsg;
-	std::unique_ptr<DataEventProcessor> dataProcessor;
-	std::unique_ptr<ControlEventProcessor> controlProcessor;
-	std::unique_ptr<RateEventProcessor> rateProcessor;
-	std::unique_ptr<TrajectoryEventProcessor> trajectoryProcessor;
-	std::unique_ptr<CigiSOFV3_2> startOfFrame;
+		std::unique_ptr<CigiIGSession> cigiSession;
+		CigiOutgoingMsg* outMsg;
+		CigiIncomingMsg* inMsg;
+		std::unique_ptr<DataEventProcessor> dataProcessor;
+		std::unique_ptr<ControlEventProcessor> controlProcessor;
+		std::unique_ptr<RateEventProcessor> rateProcessor;
+		std::unique_ptr<TrajectoryEventProcessor> trajectoryProcessor;
+		std::unique_ptr<CigiSOFV3_2> startOfFrame;
 
-	bool send = true;
-};
+		bool send = true;
+	};
+}
 

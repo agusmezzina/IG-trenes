@@ -1,6 +1,8 @@
 #include "DeadReckoning.h"
 #include <cmath>
 
+using namespace osgCigi;
+
 void DeadReckoning::firstOrderUpdateGhost(int entityID, float deltaT)
 {
 	//ghost->firstOrderPredictUpdate([deltaT](float p, float v) {return p + v * deltaT; });

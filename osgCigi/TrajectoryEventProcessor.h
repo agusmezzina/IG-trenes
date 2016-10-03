@@ -3,16 +3,19 @@
 #include "CigiTrajectoryDefV3.h"
 #include "World.h"
 
-class TrajectoryEventProcessor : public CigiBaseEventProcessor
+namespace osgCigi
 {
-public:
-	TrajectoryEventProcessor(World* data);
-	virtual ~TrajectoryEventProcessor();
-	virtual void OnPacketReceived(CigiBasePacket *Packet);
-	void setOriginPacket(CigiTrajectoryDefV3 *TPcktIn) { TPckt = TPcktIn; }
+	class TrajectoryEventProcessor : public CigiBaseEventProcessor
+	{
+	public:
+		TrajectoryEventProcessor(World* data);
+		virtual ~TrajectoryEventProcessor();
+		virtual void OnPacketReceived(CigiBasePacket *Packet);
+		void setOriginPacket(CigiTrajectoryDefV3 *TPcktIn) { TPckt = TPcktIn; }
 
-protected:
-	CigiTrajectoryDefV3 *TPckt;
-	World* data;
-};
+	protected:
+		CigiTrajectoryDefV3 *TPckt;
+		World* data;
+	};
+}
 
