@@ -1,5 +1,4 @@
 #include "GraphicManager.h"
-#include "UpdateTransformCallback.h"
 #include "Skybox.h"
 #include "Sky.h"
 #include <osg\Geode>
@@ -14,14 +13,9 @@
 #include <iostream>
 #include <chrono>
 
-GraphicManager::GraphicManager(World* data, World* ghost) : _data(data), _ghost(ghost), /*netMgr(data),*/ _path(nullptr), _sceneRoot(nullptr), _cameraCtrl(nullptr)
+GraphicManager::GraphicManager()
 {
-	_path = new osg::AnimationPath();
-	dr = std::make_unique<DeadReckoning>(data, ghost);
-}
-
-void GraphicManager::addKeyFrame(double x, double y, double z, double t){
-	_path->insert(t, osg::AnimationPath::ControlPoint(osg::Vec3(x, y, z)));
+	env = std::make_unique<CigiSimulationEnvironment>();
 }
 
 osg::ref_ptr<osg::Geode> GraphicManager::createBallNode(const osg::Vec3& center, float radius, const osg::Vec4& color){
@@ -109,30 +103,20 @@ osg::Node* GraphicManager::createSky()
 void GraphicManager::createScene(){
 	osg::ref_ptr<osg::Group> scene = new osg::Group;
 
+	env->registerModel(1, "C:\\ObjetosVarios\\EstacionDemo\\vagon.flt.90,270,0.rot");
+	osg::ref_ptr<osg::Group> sim = env->createSimulationScene();
+
 	osg::ref_ptr<osg::Node> light = createLightSource(0, osg::Vec3(10.0f, -10.0f, -20.0f), osg::Vec4(1.0f, 1.0f, 1.0f, 1.0f));
-	osg::ref_ptr<osg::Node> model = osgDB::readNodeFile("C:\\ObjetosVarios\\EstacionDemo\\vagon.flt.90,270,0.rot");
+	//osg::ref_ptr<osg::Node> model = osgDB::readNodeFile("C:\\ObjetosVarios\\EstacionDemo\\vagon.flt.90,270,0.rot");
 	osg::ref_ptr<osg::Node> rail = osgDB::readNodeFile("C:\\ObjetosVarios\\EstacionDemo\\tramo_vias2.flt.90,90,0.rot");
 	osg::ref_ptr<osg::Node> anden = osgDB::readNodeFile("C:\\ObjetosVarios\\EstacionDemo\\escenario_anden.flt.90,90,0.rot");
 	
 	osg::ref_ptr<osg::Geode> floor = createFloor();
 	osg::ref_ptr<osg::Node> skydome = createSky();
 
-	osg::ref_ptr<osg::MatrixTransform> transf = new osg::MatrixTransform;
-	transf->setMatrix(osg::Matrix::translate(osg::Vec3f()));
-	transf->addChild(model.get());
-	transf->setUpdateCallback(new UpdateTransformCallback(_data, _ghost));
-
 	osg::ref_ptr<osg::MatrixTransform> transfAnden1 = new osg::MatrixTransform;
 	transfAnden1->setMatrix(osg::Matrix::translate(osg::Vec3f(-5.0f, 0.0f, 0.0f)));
 	transfAnden1->addChild(anden);
-
-	/*osg::ref_ptr<osg::MatrixTransform> scaleModel = new osg::MatrixTransform;
-	scaleModel->setMatrix(osg::Matrix::scale(osg::Vec3f(0.1f, 0.1f, 0.1f)));
-	scaleModel->addChild(transf);
-
-	osg::ref_ptr<osg::MatrixTransform> scaleRail = new osg::MatrixTransform;
-	scaleRail->setMatrix(osg::Matrix::scale(osg::Vec3f(0.1f, 0.1f, 0.1f)));
-	scaleRail->addChild(transf);*/
 
 	for (int i = 0; i < 10; i++)
 	{
@@ -140,17 +124,14 @@ void GraphicManager::createScene(){
 		railTransf->setMatrix(osg::Matrix::translate(osg::Vec3f(26.0f * i, 0.0f, 0.0f)));
 		railTransf->addChild(rail);
 		scene->addChild(railTransf);
-		//scaleRail->addChild(railTransf);
 	}
 
 	scene->addChild(light);
-	scene->addChild(transf);
 	scene->addChild(rail);
 	scene->addChild(transfAnden1);
-	/*scene->addChild(scaleRail);
-	scene->addChild(scaleModel);*/	
 	scene->addChild(floor);
 	scene->addChild(skydome);
+	scene->addChild(sim);
 	_sceneRoot = scene;
 }
 
@@ -168,6 +149,7 @@ int GraphicManager::runViewer(){
 	//	viewer.frame();
 	//}
 	//netMgr.cancel();
+	env->start();
 	return viewer.run();
 	//return 0;
 }
