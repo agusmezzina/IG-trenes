@@ -1,13 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.40629.0
+VisualStudioVersion = 12.0.30723.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TrenesIG", "TrenesIG\TrenesIG.vcxproj", "{57EB97C4-9A4D-4714-A8EC-90392CAE3340}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CIGIHostAdapter", "CIGIHostAdapter\CIGIHostAdapter.vcxproj", "{AC7D6A4D-EF43-41C8-8A63-2EF0B3316B51}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VirtualSimulationEnvironment", "VirtualSimulationEnvironment\VirtualSimulationEnvironment.vcxproj", "{3EED43E4-B351-4D57-A7C1-E41C79976629}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "osgCigi", "osgCigi\osgCigi.vcxproj", "{598659C9-77EE-4884-8E83-7D6DECCAF1F5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{3EED43E4-B351-4D57-A7C1-E41C79976629}.Debug|Win32.Build.0 = Debug|Win32
 		{3EED43E4-B351-4D57-A7C1-E41C79976629}.Release|Win32.ActiveCfg = Release|Win32
 		{3EED43E4-B351-4D57-A7C1-E41C79976629}.Release|Win32.Build.0 = Release|Win32
+		{598659C9-77EE-4884-8E83-7D6DECCAF1F5}.Debug|Win32.ActiveCfg = Debug|Win32
+		{598659C9-77EE-4884-8E83-7D6DECCAF1F5}.Debug|Win32.Build.0 = Debug|Win32
+		{598659C9-77EE-4884-8E83-7D6DECCAF1F5}.Release|Win32.ActiveCfg = Release|Win32
+		{598659C9-77EE-4884-8E83-7D6DECCAF1F5}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
