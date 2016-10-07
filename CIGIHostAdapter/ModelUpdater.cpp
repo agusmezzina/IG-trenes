@@ -13,6 +13,39 @@ ModelUpdater::ModelUpdater(Semaphore* sem, std::queue<DataPacket>* data)
 	this->s = sem;
 }
 
+DataPacket ModelUpdater::readData(std::string message)
+{
+	int id{ 0 };
+	float x{ 0 }, y{ 0 }, z{ 0 }, vx{ 0 }, vy{ 0 }, vz{ 0 }, ax{ 0 }, ay{ 0 }, az{ 0 }, t{ 0 };
+
+	if (message.back() == '\f'){
+		message.pop_back();
+		std::vector<std::string> fields;
+		boost::split(fields, message, boost::is_any_of(";"));
+		if (fields.size() == 11)
+		{
+			id = std::stoi(fields[0]);
+			x = std::stod(fields[1]);
+			y = std::stod(fields[2]);
+			z = std::stod(fields[3]);
+			vx = std::stod(fields[4]);
+			vy = std::stod(fields[5]);
+			vz = std::stod(fields[6]);
+			ax = std::stod(fields[7]);
+			ay = std::stod(fields[8]);
+			az = std::stod(fields[9]);
+			t = std::stod(fields[10]);
+		}
+	}
+	return DataPacket(id, x, y, z, vx, vy, vz, ax, ay, az, t);
+}
+
+void ModelUpdater::enqueueData(DataPacket p)
+{
+	data->push(p);
+	s->notify();
+}
+
 void ModelUpdater::run()
 {
 	boost::asio::io_service io_service;
@@ -31,35 +64,9 @@ void ModelUpdater::run()
 		if (error && error != boost::asio::error::message_size)
 			throw boost::system::system_error(error);
 
-		int id{ 0 };
-		float x{ 0 }, y{ 0 }, z{ 0 }, vx{ 0 }, vy{ 0 }, vz{ 0 }, ax{ 0 }, ay{ 0 }, az{ 0 }, t{ 0 };
-
 		std::string msg(reinterpret_cast<char*>(recv_buf.c_array()), len);
-		if (msg.back() == '\f'){
-			msg.pop_back();
-			std::vector<std::string> fields;
-			boost::split(fields, msg, boost::is_any_of(";"));
-			if (fields.size() == 11)
-			{
-				id = std::stoi(fields[0]);
-				x = std::stod(fields[1]);
-				y = std::stod(fields[2]);
-				z = std::stod(fields[3]);
-				vx = std::stod(fields[4]);
-				vy = std::stod(fields[5]);
-				vz = std::stod(fields[6]);
-				ax = std::stod(fields[7]);
-				ay = std::stod(fields[8]);
-				az = std::stod(fields[9]);
-				t = std::stod(fields[10]);
-			}
-			DataPacket state(id, x, y, z, vx, vy, vz, ax, ay, az, t);
-			data->push(state);
-			s->notify();
-		}
-		//std::cout << x << std::endl;
-		//std::cout << y << std::endl;
-		//std::cout << z << std::endl;
+		auto data = readData(msg);
+		enqueueData(data);
 	}
 	socket.close();
 }

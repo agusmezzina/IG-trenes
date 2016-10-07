@@ -60,13 +60,16 @@ void UpdateTransformCallback::operator()(osg::Node* node, osg::NodeVisitor* nv){
 	if (usingDR)
 	{
 		if (changed)
+		{
 			correcting = true;
+			dr->setConvergencePoint(1, dr->getSmoothness() * deltaT.count());
+		}
 		else
 			correcting = false;
 
 		if (correcting)
 		{
-			dr->correctGhost(1, correctionStep, deltaT.count());
+			dr->correctGhost(1, correctionStep);
 			correctionStep++;
 			if (correctionStep > dr->getSmoothness())
 			{

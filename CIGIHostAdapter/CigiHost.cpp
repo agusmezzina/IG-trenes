@@ -11,7 +11,7 @@ CigiHost::CigiHost(World* data, World* ghost, Semaphore* sem, std::queue<DataPac
 	this->ghost = ghost;
 	this->s = sem;
 	this->rawData = rawData;
-	cigi = std::make_unique<CigiManager>();
+	cigi = std::make_unique<CigiPacker>();
 	dr = std::make_unique<DeadReckoning>(data, ghost);
 	clock = std::make_unique<RealTimeClock>();
 	log.open("logHost.txt");
@@ -87,10 +87,10 @@ void CigiHost::run()
 				dr->correctGhost(1);
 				cigi->packData(entity, simulationTime, &outBuffer, outBufferSize);
 
-				auto p = entity.getPosition();
+				/*auto p = entity.getPosition();
 				auto v = entity.getVelocity();
 				auto a = entity.getAcceleration();
-				auto pg = ghost->getEntity(1).getPosition();
+				auto pg = ghost->getEntity(1).getPosition();*/
 				//log << "Correcting Time = " << simulationTime << "; ghost = " << pg.x() << "; model = " << p.x() << "; " << v.x() << ";" << a.x() << std::endl;
 				clock->sync(simulationTime);
 
@@ -100,7 +100,7 @@ void CigiHost::run()
 					0,
 					ignored_error);
 
-				cigi->freeMessage();
+				cigi->freePacket();
 			}
 			else
 				clock->sync(simulationTime);

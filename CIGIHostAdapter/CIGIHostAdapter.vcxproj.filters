@@ -42,13 +42,13 @@
     <ClInclude Include="EntityState.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
-    <ClInclude Include="CigiManager.h">
-      <Filter>Archivos de encabezado</Filter>
-    </ClInclude>
     <ClInclude Include="Semaphore.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
     <ClInclude Include="RealTimeClock.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="CigiPacker.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
   </ItemGroup>
@@ -77,10 +77,10 @@
     <ClCompile Include="EntityState.cpp">
       <Filter>Archivos de código fuente</Filter>
     </ClCompile>
-    <ClCompile Include="CigiManager.cpp">
+    <ClCompile Include="RealTimeClock.cpp">
       <Filter>Archivos de código fuente</Filter>
     </ClCompile>
-    <ClCompile Include="RealTimeClock.cpp">
+    <ClCompile Include="CigiPacker.cpp">
       <Filter>Archivos de código fuente</Filter>
     </ClCompile>
   </ItemGroup>

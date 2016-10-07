@@ -8,16 +8,15 @@
 #include "IGControlProcessor.h"
 #include "Entity.h"
 
-class CigiManager
+class CigiPacker
 {
 public:
-	CigiManager();
-	virtual ~CigiManager();
+	CigiPacker();
+	virtual ~CigiPacker();
 	void packData(const Entity& entity, float simulationTime, unsigned char** buffer, int& bufferSize);
-	void freeMessage();
+	void freePacket();
 private:
 	std::unique_ptr<CigiHostSession> cigiSession;
-	std::unique_ptr<IGControlProcessor> ctrlProcessor;
 	CigiOutgoingMsg* outMsg;
 	CigiIncomingMsg* inMsg;
 	/*CigiIGCtrlV3_2 igControl;
