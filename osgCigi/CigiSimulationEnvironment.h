@@ -1,7 +1,7 @@
 #pragma once
 #include <osg\Group>
 #include <memory>
-#include "CigiNetworkManager.h"
+#include "CigiIG.h"
 #include "World.h"
 
 namespace osgCigi
@@ -18,7 +18,7 @@ namespace osgCigi
 		osg::ref_ptr<osg::Group> simSubtree;
 		std::unique_ptr<World> world;
 		std::unique_ptr<World> ghost;
-		std::unique_ptr<CigiNetworkManager> network;
+		std::unique_ptr<CigiIG> network;
 	};
 }
 

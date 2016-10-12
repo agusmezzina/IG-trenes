@@ -27,9 +27,6 @@
     <ClInclude Include="IGControlProcessor.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
-    <ClInclude Include="CigiHost.h">
-      <Filter>Archivos de encabezado</Filter>
-    </ClInclude>
     <ClInclude Include="SceneData.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
@@ -49,6 +46,9 @@
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
     <ClInclude Include="CigiPacker.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="CigiHost.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
   </ItemGroup>

@@ -36,7 +36,7 @@ CigiSimulationEnvironment::CigiSimulationEnvironment()
 	simSubtree = new osg::Group;
 	world = std::make_unique<World>();
 	ghost = std::make_unique<World>();
-	network = std::make_unique<CigiNetworkManager>(world.get());
+	network = std::make_unique<CigiIG>(world.get());
 }
 
 
