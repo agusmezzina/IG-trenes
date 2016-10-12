@@ -16,6 +16,7 @@ private:
 	osg::ref_ptr<osg::Geode> createBallNode(const osg::Vec3& center, float radius, const osg::Vec4& color);
 	osg::ref_ptr<osg::Camera> createCamera(const osg::Vec3& eye, const osg::Vec3& center, const osg::Vec3& up, osg::Node* scene);
 	osg::ref_ptr<osg::Geode> createFloor();
+	osg::ref_ptr<osg::Geode> createPath();
 	osg::Node* createLightSource(unsigned int num, const osg::Vec3& trans, const osg::Vec4& color);
 	osg::Node* createSky();
 	void createScene();

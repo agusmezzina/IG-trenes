@@ -16,6 +16,8 @@ namespace osgCigi
 		void processIncomingMessage(unsigned char* buffer, size_t bufferSize);
 		virtual ~CigiSessionHandler();
 	private:
+		void registerEventHandlers();
+
 		std::unique_ptr<CigiIGSession> cigiSession;
 		CigiIncomingMsg* inMsg;
 		std::unique_ptr<DataEventProcessor> dataProcessor;

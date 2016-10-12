@@ -71,13 +71,54 @@ osg::ref_ptr<osg::Geode> GraphicManager::createFloor()
 	return floor.release();
 }
 
+osg::ref_ptr<osg::Geode> GraphicManager::createPath()
+{
+	osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array;
+	/*vertices->push_back(osg::Vec3(-1000.0f, 0.3f, -1000.0f));
+	vertices->push_back(osg::Vec3(1000.0f, 0.3f, -1000.0f));
+	vertices->push_back(osg::Vec3(1000.0f, 0.3f, 1000.0f));
+	vertices->push_back(osg::Vec3(-1000.0f, 0.3f, 1000.0f));*/
+	vertices->push_back(osg::Vec3(-1000.0f, 0.299f, -2.0f));
+	vertices->push_back(osg::Vec3(1000.0f, 0.299f, -2.0f));
+	vertices->push_back(osg::Vec3(1000.0f, 0.299f, 2.0f));
+	vertices->push_back(osg::Vec3(-1000.0f, 0.299f, 2.0f));
+
+	osg::ref_ptr<osg::Vec3Array> normals = new osg::Vec3Array;
+	normals->push_back(osg::Vec3(0.0f, 0.0f, 1.0f));
+
+	osg::ref_ptr<osg::Vec2Array> texcoords = new osg::Vec2Array;
+	texcoords->push_back(osg::Vec2(0.0f, 0.0f));
+	texcoords->push_back(osg::Vec2(500.0f, 0.0f));
+	texcoords->push_back(osg::Vec2(500.0f, 1.0f));
+	texcoords->push_back(osg::Vec2(0.0f, 1.0f));
+
+	osg::ref_ptr<osg::Geometry> quad = new osg::Geometry;
+	quad->setVertexArray(vertices.get());
+	quad->setNormalArray(normals.get());
+	quad->setNormalBinding(osg::Geometry::BIND_OVERALL);
+	quad->setTexCoordArray(0, texcoords.get());
+	quad->addPrimitiveSet(new osg::DrawArrays(GL_QUADS, 0, 4));
+
+	osg::ref_ptr<osg::Texture2D> texture = new osg::Texture2D;
+	osg::ref_ptr<osg::Image> image = osgDB::readImageFile("C:\\ObjetosVarios\\road-with-gravel.jpg");
+	texture->setImage(image.get());
+	texture->setWrap(osg::Texture::WRAP_S, osg::Texture::REPEAT);
+	texture->setWrap(osg::Texture::WRAP_T, osg::Texture::REPEAT);
+
+	osg::ref_ptr<osg::Geode> floor = new osg::Geode;
+	floor->addDrawable(quad.get());
+	floor->getOrCreateStateSet()->setTextureAttributeAndModes(
+		0, texture.get());
+	return floor.release();
+}
+
 osg::Node* GraphicManager::createLightSource(unsigned int num,
 	const osg::Vec3& trans,
 	const osg::Vec4& color)
 {
 	osg::ref_ptr<osg::Light> light = new osg::Light;
 	light->setLightNum(num);
-	light->setAmbient(osg::Vec4(0.5f, 0.5f, 0.5f, 1.0f));
+	light->setAmbient(osg::Vec4(0.7f, 0.7f, 0.7f, 1.0f));
 	light->setDiffuse(color);
 	light->setPosition(osg::Vec4(0.0f, 0.0f, 0.0f, 1.0f));
 	osg::ref_ptr<osg::LightSource> lightSource = new
@@ -104,33 +145,32 @@ osg::Node* GraphicManager::createSky()
 void GraphicManager::createScene(){
 	osg::ref_ptr<osg::Group> scene = new osg::Group;
 
-	env->registerModel(1, "C:\\ObjetosVarios\\EstacionDemo\\vagon.flt.90,270,0.rot");
+	env->registerModel(1, "C:\\ObjetosVarios\\EstacionDemo\\vagon.flt.90,270,0.rot.[0,0.2,0].trans");
 	osg::ref_ptr<osg::Group> sim = env->createSimulationScene();
 
-	osg::ref_ptr<osg::Node> light = createLightSource(0, osg::Vec3(10.0f, -10.0f, -20.0f), osg::Vec4(1.0f, 1.0f, 1.0f, 1.0f));
-	//osg::ref_ptr<osg::Node> model = osgDB::readNodeFile("C:\\ObjetosVarios\\EstacionDemo\\vagon.flt.90,270,0.rot");
+	osg::ref_ptr<osg::Node> light = createLightSource(0, osg::Vec3(10.0f, -10.0f, -20.0f), osg::Vec4(0.5f, 0.5f, 0.5f, 1.0f));
 	osg::ref_ptr<osg::Node> rail = osgDB::readNodeFile("C:\\ObjetosVarios\\EstacionDemo\\tramo_vias2.flt.90,90,0.rot");
-	osg::ref_ptr<osg::Node> anden = osgDB::readNodeFile("C:\\ObjetosVarios\\EstacionDemo\\escenario_anden.flt.90,90,0.rot");
-	
+	osg::ref_ptr<osg::Node> anden = osgDB::readNodeFile("C:\\ObjetosVarios\\EstacionDemo\\anden_con_techo\\anden_con_techo.flt.90,90,0.rot.[6,0.85,-3.5].trans");	
 	osg::ref_ptr<osg::Geode> floor = createFloor();
+	osg::ref_ptr<osg::Geode> path = createPath();
 	osg::ref_ptr<osg::Node> skydome = createSky();
 
 	osg::ref_ptr<osg::MatrixTransform> transfAnden1 = new osg::MatrixTransform;
 	transfAnden1->setMatrix(osg::Matrix::translate(osg::Vec3f(-5.0f, 0.0f, 0.0f)));
 	transfAnden1->addChild(anden);
 
-	for (int i = 0; i < 10; i++)
+	for (int i = -30; i < 30; i++)
 	{
 		osg::ref_ptr<osg::MatrixTransform> railTransf = new osg::MatrixTransform;
-		railTransf->setMatrix(osg::Matrix::translate(osg::Vec3f(26.0f * i, 0.0f, 0.0f)));
+		railTransf->setMatrix(osg::Matrix::translate(osg::Vec3f(26.0f * i, 0.2f, 0.0f)));
 		railTransf->addChild(rail);
 		scene->addChild(railTransf);
 	}
 
 	scene->addChild(light);
-	scene->addChild(rail);
 	scene->addChild(transfAnden1);
 	scene->addChild(floor);
+	scene->addChild(path);
 	scene->addChild(skydome);
 	scene->addChild(sim);
 	_sceneRoot = scene;
@@ -142,17 +182,8 @@ int GraphicManager::runViewer(){
 	viewer.setSceneData(_sceneRoot.get());
 	viewer.addEventHandler(new osgViewer::StatsHandler);
 	viewer.apply(new osgViewer::SingleWindow(10, 10, 800, 600));
-	//netMgr.startThread();
-	//while (!viewer.done())
-	//{
-
-	//	//netMgr.sendSOF();
-	//	viewer.frame();
-	//}
-	//netMgr.cancel();
 	env->start();
 	return viewer.run();
-	//return 0;
 }
 
 int GraphicManager::runScene(){

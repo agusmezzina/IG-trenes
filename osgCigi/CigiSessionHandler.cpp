@@ -17,17 +17,21 @@ CigiSessionHandler::CigiSessionHandler(World* data, int bufferSize)
 
 	inMsg->SetReaderCigiVersion(3, 3);
 	inMsg->UsingIteration(false);
-
-	//Agregar handlers
-	inMsg->RegisterEventProcessor(CIGI_IG_CTRL_PACKET_ID_V3_2, controlProcessor.get());
-	inMsg->RegisterEventProcessor(CIGI_ENTITY_CTRL_PACKET_ID_V3_3, dataProcessor.get());
-	inMsg->RegisterEventProcessor(CIGI_RATE_CTRL_PACKET_ID_V3_2, rateProcessor.get());
-	inMsg->RegisterEventProcessor(CIGI_TRAJECTORY_DEF_PACKET_ID_V3, trajectoryProcessor.get());
+	registerEventHandlers();
+	
 }
 
 void CigiSessionHandler::processIncomingMessage(unsigned char* buffer, size_t bufferSize)
 {
 	inMsg->ProcessIncomingMsg(buffer, bufferSize);
+}
+
+void CigiSessionHandler::registerEventHandlers()
+{
+	inMsg->RegisterEventProcessor(CIGI_IG_CTRL_PACKET_ID_V3_2, controlProcessor.get());
+	inMsg->RegisterEventProcessor(CIGI_ENTITY_CTRL_PACKET_ID_V3_3, dataProcessor.get());
+	inMsg->RegisterEventProcessor(CIGI_RATE_CTRL_PACKET_ID_V3_2, rateProcessor.get());
+	inMsg->RegisterEventProcessor(CIGI_TRAJECTORY_DEF_PACKET_ID_V3, trajectoryProcessor.get());
 }
 
 CigiSessionHandler::~CigiSessionHandler()
