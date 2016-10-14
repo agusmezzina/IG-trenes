@@ -1,10 +1,9 @@
-#include "CigiManager.h"
+#include "CigiPacker.h"
 
 
-CigiManager::CigiManager()
+CigiPacker::CigiPacker()
 {
 	cigiSession = std::make_unique<CigiHostSession>(1, 32768, 2, 32768);
-	ctrlProcessor = std::make_unique<IGControlProcessor>();
 	CigiOutgoingMsg &Omsg = cigiSession->GetOutgoingMsgMgr();
 	CigiIncomingMsg &Imsg = cigiSession->GetIncomingMsgMgr();
 	outMsg = &Omsg;
@@ -13,11 +12,9 @@ CigiManager::CigiManager()
 	cigiSession->SetSynchronous(false);
 	inMsg->SetReaderCigiVersion(3, 3);
 	inMsg->UsingIteration(false);
-	// register SOF
-	Imsg.RegisterEventProcessor(CIGI_SOF_PACKET_ID_V3_2, ctrlProcessor.get());	
 }
 
-void CigiManager::packData(const Entity& entity, float simulationTime, unsigned char** buffer, int& bufferSize)
+void CigiPacker::packData(const Entity& entity, float simulationTime, unsigned char** buffer, int& bufferSize)
 {
 	outMsg->BeginMsg();
 
@@ -56,11 +53,11 @@ void CigiManager::packData(const Entity& entity, float simulationTime, unsigned 
 	outMsg->PackageMsg(buffer, bufferSize);
 }
 
-void CigiManager::freeMessage()
+void CigiPacker::freePacket()
 {
 	outMsg->FreeMsg();
 }
 
-CigiManager::~CigiManager()
+CigiPacker::~CigiPacker()
 {
 }

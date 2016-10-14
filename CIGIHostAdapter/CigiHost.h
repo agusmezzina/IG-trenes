@@ -8,7 +8,7 @@
 #include "SceneData.h"
 #include "World.h"
 #include "DeadReckoning.h"
-#include "CigiManager.h"
+#include "CigiPacker.h"
 #include "Semaphore.h"
 #include "RealTimeClock.h"
 
@@ -32,7 +32,7 @@ private:
 	udp::socket socket;
 	udp::endpoint receiver_endpoint;
 
-	std::unique_ptr<CigiManager> cigi;
+	std::unique_ptr<CigiPacker> cigi;
 	std::unique_ptr<DeadReckoning> dr;
 	std::unique_ptr<RealTimeClock> clock;
 	World* data;

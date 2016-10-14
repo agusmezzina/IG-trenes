@@ -81,7 +81,8 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="CigiNetworkManager.h" />
+    <ClInclude Include="CigiIG.h" />
+    <ClInclude Include="CigiSessionHandler.h" />
     <ClInclude Include="CigiSimulationEnvironment.h" />
     <ClInclude Include="ControlEventProcessor.h" />
     <ClInclude Include="DataEventProcessor.h" />
@@ -93,7 +94,8 @@
     <ClInclude Include="World.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="CigiNetworkManager.cpp" />
+    <ClCompile Include="CigiIG.cpp" />
+    <ClCompile Include="CigiSessionHandler.cpp" />
     <ClCompile Include="CigiSimulationEnvironment.cpp" />
     <ClCompile Include="ControlEventProcessor.cpp" />
     <ClCompile Include="DataEventProcessor.cpp" />

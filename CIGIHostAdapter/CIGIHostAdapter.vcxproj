@@ -83,7 +83,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CigiHost.h" />
-    <ClInclude Include="CigiManager.h" />
+    <ClInclude Include="CigiPacker.h" />
     <ClInclude Include="DataPacket.h" />
     <ClInclude Include="EntityState.h" />
     <ClInclude Include="IGControlProcessor.h" />
@@ -97,7 +97,7 @@
   <ItemGroup>
     <ClCompile Include="CigiHost.cpp" />
     <ClCompile Include="CIGIHostAdapter.cpp" />
-    <ClCompile Include="CigiManager.cpp" />
+    <ClCompile Include="CigiPacker.cpp" />
     <ClCompile Include="DataPacket.cpp" />
     <ClCompile Include="EntityState.cpp" />
     <ClCompile Include="IGControlProcessor.cpp" />

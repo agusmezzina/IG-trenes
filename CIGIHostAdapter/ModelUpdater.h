@@ -11,6 +11,8 @@ public:
 	void run();
 	virtual ~ModelUpdater();
 private:
+	DataPacket readData(std::string message);
+	void enqueueData(DataPacket p);
 	std::queue<DataPacket>* data;
 	Semaphore* s;
 };
