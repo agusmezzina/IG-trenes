@@ -1,11 +1,12 @@
 //#include "stdafx.h"
-#include "UpdateTransformCallback.h"
+#include "CigiUpdateCallback.h"
 #include <iostream>
 #include <cmath>
+# define PI 3.14159265358979323846
 
 using namespace osgCigi;
 
-UpdateTransformCallback::UpdateTransformCallback(World* data, World* ghost) : _data(data), _ghost(ghost)
+CigiUpdateCallback::CigiUpdateCallback(World* data, World* ghost) : _data(data), _ghost(ghost)
 {
 	prevTime = std::chrono::high_resolution_clock::now();
 	startTime = std::chrono::high_resolution_clock::now();
@@ -24,7 +25,7 @@ UpdateTransformCallback::UpdateTransformCallback(World* data, World* ghost) : _d
 	x_2 = x;
 }
 
-bool UpdateTransformCallback::modelChanged()
+bool CigiUpdateCallback::modelChanged()
 {
 	auto p = _data->getEntity(1).getPosition();
 	auto v = _data->getEntity(1).getAcceleration();
@@ -37,7 +38,7 @@ bool UpdateTransformCallback::modelChanged()
 	return result;
 }
 
-void UpdateTransformCallback::operator()(osg::Node* node, osg::NodeVisitor* nv){
+void CigiUpdateCallback::operator()(osg::Node* node, osg::NodeVisitor* nv){
 	osg::MatrixTransform* transformNode = static_cast<osg::MatrixTransform*>(node);
 	bool quadratic = true;
 
@@ -46,7 +47,9 @@ void UpdateTransformCallback::operator()(osg::Node* node, osg::NodeVisitor* nv){
 	prevTime = currentTime;
 	std::chrono::duration<float> elapsed = currentTime - startTime;
 	auto p = _data->getEntity(1).getPosition();
+	auto alpha = _data->getEntity(1).getOrientation();
 	osg::Vec3f pDraw;
+	osg::Vec3f alphaDraw;
 	bool changed = modelChanged();
 	//logFile << a.x() << std::endl;
 
@@ -82,9 +85,12 @@ void UpdateTransformCallback::operator()(osg::Node* node, osg::NodeVisitor* nv){
 			if (quadratic)
 			{
 				auto entity = _ghost->getEntity(1);
-				auto pg = entity.getPosition();
+				/*auto pg = entity.getPosition();
 				auto vg = entity.getVelocity();
-				auto ag = entity.getAcceleration();
+				auto ag = entity.getAcceleration();*/
+				auto ag = entity.getOrientation();
+				auto avg = entity.getAngularVelocity();
+				logFile << ag.x() << ";" << avg.x() << std::endl;
 				//logFile << pg.x() << "; " << vg.x() << "; " << ag.x() << "; " << deltaT.count() << "; " << elapsed.count() << std::endl;
 				dr->secondOrderUpdateGhost(1, deltaT.count());
 			}
@@ -93,21 +99,26 @@ void UpdateTransformCallback::operator()(osg::Node* node, osg::NodeVisitor* nv){
 		}
 
 		pDraw = _ghost->getEntity(1).getPosition();
+		alphaDraw = _ghost->getEntity(1).getOrientation();
 	}
 	else
+	{
 		pDraw = p;
+		alphaDraw = alpha;
+	}
 
 	if (started)
 	{
 		//std::chrono::duration<float> elapsed = actualTime - startTime;
-		dataFile << pDraw.x() << ";" << elapsed.count() << /*";" << calculateAngleOfEmbrace() << ";" << */std::endl;
+		dataFile << alphaDraw.x() << ";" << pDraw.x() << "; " << elapsed.count() << /*"; " << calculateAngleOfEmbrace() << "; " << */std::endl;
+		//logFile << alphaDraw.x() << ";" << pDraw.x() << "; " << elapsed.count() << /*"; " << calculateAngleOfEmbrace() << "; " << */std::endl;
 	}
 	
-	transformNode->setMatrix(osg::Matrix::translate(pDraw));
+	transformNode->setMatrix(osg::Matrix::rotate(alphaDraw.x() * PI / 180.0f, osg::Vec3f(0.0f, 1.0f, 0.0f)) * osg::Matrix::translate(pDraw));
 	traverse(node, nv);
 }
 
-float UpdateTransformCallback::calculateAngleOfEmbrace() const
+float CigiUpdateCallback::calculateAngleOfEmbrace() const
 {
 	auto pi = atan(1) * 4;
 	auto a = x_2 - x_1;
@@ -116,7 +127,7 @@ float UpdateTransformCallback::calculateAngleOfEmbrace() const
 	return angleRad * 180 / pi;
 }
 
-UpdateTransformCallback::~UpdateTransformCallback()
+CigiUpdateCallback::~CigiUpdateCallback()
 {
 	dataFile.close();
 	logFile.close();

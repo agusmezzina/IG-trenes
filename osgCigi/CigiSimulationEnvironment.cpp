@@ -1,5 +1,5 @@
 #include "CigiSimulationEnvironment.h"
-#include "UpdateTransformCallback.h"
+#include "CigiUpdateCallback.h"
 #include <osgDB\ReadFile>
 
 using namespace osgCigi;
@@ -13,7 +13,7 @@ void CigiSimulationEnvironment::registerModel(const int& entityID, const std::st
 	osg::ref_ptr<osg::MatrixTransform> transf = new osg::MatrixTransform;
 	transf->setMatrix(osg::Matrix::translate(osg::Vec3f()));
 	
-	osg::ref_ptr<UpdateTransformCallback> cb = new UpdateTransformCallback(world.get(), ghost.get());
+	osg::ref_ptr<CigiUpdateCallback> cb = new CigiUpdateCallback(world.get(), ghost.get());
 
 	transf->setUpdateCallback(cb);
 

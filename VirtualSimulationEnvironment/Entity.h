@@ -10,6 +10,10 @@ public:
 	void setVelocity(osg::Vec3f newVelocity);
 	osg::Vec3f getAcceleration() const;
 	void setAcceleration(osg::Vec3f newAcceleration);
+	osg::Vec3f getOrientation() const;
+	void setOrientation(osg::Vec3f newOrientation);
+	osg::Vec3f getAngularVelocity() const;
+	void setAngularVelocity(osg::Vec3f newVelocity);
 	int getID() const;
 	float getSR() const;
 	float getAOI() const;
@@ -21,6 +25,7 @@ private:
 	osg::Vec3f orientation;
 	osg::Vec3f velocity;
 	osg::Vec3f acceleration;
+	osg::Vec3f angularVelocity;
 	int id;
 	bool updated;
 	float aoi;

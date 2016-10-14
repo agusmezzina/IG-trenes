@@ -14,6 +14,7 @@ void DataEventProcessor::OnPacketReceived(CigiBasePacket *Packet)
 	setOriginPacket(InPckt);
 
 	data->updateEntityPosition(InPckt->GetEntityID(), osg::Vec3f(InPckt->GetXoff(), InPckt->GetYoff(), InPckt->GetZoff()));
+	data->updateEntityOrientation(InPckt->GetEntityID(), osg::Vec3f(InPckt->GetYaw(), InPckt->GetRoll(), InPckt->GetPitch()));
 
 	/*std::cout << "===>EntityCtrl <===" << std::endl;
 	std::cout << "EntityID ==> " << InPckt->GetEntityID() << std::endl;

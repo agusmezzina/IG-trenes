@@ -90,7 +90,7 @@
     <ClInclude Include="Entity.h" />
     <ClInclude Include="RateEventProcessor.h" />
     <ClInclude Include="TrajectoryEventProcessor.h" />
-    <ClInclude Include="UpdateTransformCallback.h" />
+    <ClInclude Include="CigiUpdateCallback.h" />
     <ClInclude Include="World.h" />
   </ItemGroup>
   <ItemGroup>
@@ -103,7 +103,7 @@
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="RateEventProcessor.cpp" />
     <ClCompile Include="TrajectoryEventProcessor.cpp" />
-    <ClCompile Include="UpdateTransformCallback.cpp" />
+    <ClCompile Include="CigiUpdateCallback.cpp" />
     <ClCompile Include="World.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -16,13 +16,13 @@ ModelUpdater::ModelUpdater(Semaphore* sem, std::queue<DataPacket>* data)
 DataPacket ModelUpdater::readData(std::string message)
 {
 	int id{ 0 };
-	float x{ 0 }, y{ 0 }, z{ 0 }, vx{ 0 }, vy{ 0 }, vz{ 0 }, ax{ 0 }, ay{ 0 }, az{ 0 }, t{ 0 };
+	float x{ 0 }, y{ 0 }, z{ 0 }, vx{ 0 }, vy{ 0 }, vz{ 0 }, ax{ 0 }, ay{ 0 }, az{ 0 }, alpha{ 0 }, alphaV{ 0 }, t{ 0 };
 
 	if (message.back() == '\f'){
 		message.pop_back();
 		std::vector<std::string> fields;
 		boost::split(fields, message, boost::is_any_of(";"));
-		if (fields.size() == 11)
+		if (fields.size() == 13)
 		{
 			id = std::stoi(fields[0]);
 			x = std::stod(fields[1]);
@@ -34,10 +34,12 @@ DataPacket ModelUpdater::readData(std::string message)
 			ax = std::stod(fields[7]);
 			ay = std::stod(fields[8]);
 			az = std::stod(fields[9]);
-			t = std::stod(fields[10]);
+			alpha = std::stod(fields[10]);
+			alphaV = std::stod(fields[11]);
+			t = std::stod(fields[12]);
 		}
 	}
-	return DataPacket(id, x, y, z, vx, vy, vz, ax, ay, az, t);
+	return DataPacket(id, x, y, z, vx, vy, vz, ax, ay, az, alpha, alphaV, t);
 }
 
 void ModelUpdater::enqueueData(DataPacket p)
