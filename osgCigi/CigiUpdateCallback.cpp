@@ -28,7 +28,7 @@ CigiUpdateCallback::CigiUpdateCallback(World* data, World* ghost) : _data(data),
 bool CigiUpdateCallback::modelChanged()
 {
 	auto p = _data->getEntity(1).getPosition();
-	auto v = _data->getEntity(1).getAcceleration();
+	auto v = _data->getEntity(1).getVelocity();
 	auto a = _data->getEntity(1).getAcceleration();
 	bool result = (p != p_1) || (v != v_1) || (a != a_1);
 	if (result)
