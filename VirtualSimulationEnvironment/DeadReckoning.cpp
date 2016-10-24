@@ -81,8 +81,11 @@ bool DeadReckoning::isThresholdViolated(int entityID)
 	auto ghostEntity = ghost->getEntity(entityID);
 	auto p0 = entity.getPosition();
 	auto p1 = ghostEntity.getPosition();
+	auto o1 = entity.getOrientation();
+	auto o2 = ghostEntity.getOrientation();
 
-	if (sqrt(pow(p0.x() - p1.x(), 2) + pow(p0.y() - p1.y(), 2) + pow(p0.z() - p1.z(), 2)) > rThreshold)
+	if ((sqrt(pow(p0.x() - p1.x(), 2) + pow(p0.y() - p1.y(), 2) + pow(p0.z() - p1.z(), 2)) > rThreshold)
+		|| (abs(o2.x() - o1.x()) > 3.0f))
 	{
 		return true;
 	}

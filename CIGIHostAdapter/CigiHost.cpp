@@ -89,11 +89,11 @@ void CigiHost::run()
 				dr->correctGhost(1);
 				cigi->packData(entity, simulationTime, &outBuffer, outBufferSize);
 
-				/*auto p = entity.getPosition();
+				auto p = entity.getPosition();
 				auto v = entity.getVelocity();
 				auto a = entity.getAcceleration();
-				auto pg = ghost->getEntity(1).getPosition();*/
-				//log << "Correcting Time = " << simulationTime << "; ghost = " << pg.x() << "; model = " << p.x() << "; " << v.x() << ";" << a.x() << std::endl;
+				auto pg = ghost->getEntity(1).getPosition();
+				log << "Correcting Time = " << simulationTime << "; ghost = " << pg.x() << "; model = " << p.x() << "; " << v.x() << ";" << a.x() << std::endl;
 				clock->sync(simulationTime);
 
 				boost::system::error_code ignored_error;
