@@ -1,7 +1,6 @@
+#include "stdafx.h"
 #include "DeadReckoning.h"
 #include <cmath>
-
-using namespace osgCigi;
 
 void DeadReckoning::firstOrderUpdateGhost(int entityID, float deltaT)
 {
@@ -36,11 +35,6 @@ void DeadReckoning::setConvergencePoint(int entityID, float deltaT)
 	auto v = entity.getVelocity();
 	auto a = entity.getAcceleration();
 	convergencePoint = p + v * deltaT + a * 0.5f * pow(deltaT, 2);
-}
-
-osg::Vec3f DeadReckoning::getConvergencePoint()
-{
-	return convergencePoint;
 }
 
 void DeadReckoning::correctGhost(int entityID, int step)
@@ -89,7 +83,7 @@ bool DeadReckoning::isThresholdViolated(int entityID)
 	auto p1 = ghostEntity.getPosition();
 	auto o1 = entity.getOrientation();
 	auto o2 = ghostEntity.getOrientation();
-	
+
 	if ((sqrt(pow(p0.x() - p1.x(), 2) + pow(p0.y() - p1.y(), 2) + pow(p0.z() - p1.z(), 2)) > rThreshold)
 		|| (abs(o2.x() - o1.x()) > 3.0f))
 	{

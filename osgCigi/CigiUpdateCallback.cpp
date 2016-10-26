@@ -66,12 +66,15 @@ void CigiUpdateCallback::operator()(osg::Node* node, osg::NodeVisitor* nv){
 		{
 			correcting = true;
 			dr->setConvergencePoint(1, dr->getSmoothness() * deltaT.count());
+			auto cp = dr->getConvergencePoint();
+			logFile << "Delta T = " << dr->getSmoothness() * deltaT.count() << "; " << "Conv. Point = (" << cp.x() << "; " << cp.y() << "; " << cp.z() << ")" << std::endl;
+			correctionStep = 1;
 		}
-		else
-			correcting = false;
 
 		if (correcting)
 		{
+			//dr->correctGhost(1);
+			//correcting = false;
 			dr->correctGhost(1, correctionStep);
 			correctionStep++;
 			if (correctionStep > dr->getSmoothness())
@@ -83,17 +86,7 @@ void CigiUpdateCallback::operator()(osg::Node* node, osg::NodeVisitor* nv){
 		else
 		{
 			if (quadratic)
-			{
-				auto entity = _ghost->getEntity(1);
-				/*auto pg = entity.getPosition();
-				auto vg = entity.getVelocity();
-				auto ag = entity.getAcceleration();*/
-				auto ag = entity.getOrientation();
-				auto avg = entity.getAngularVelocity();
-				logFile << ag.x() << ";" << avg.x() << std::endl;
-				//logFile << pg.x() << "; " << vg.x() << "; " << ag.x() << "; " << deltaT.count() << "; " << elapsed.count() << std::endl;
-				dr->secondOrderUpdateGhost(1, deltaT.count());
-			}
+				dr->secondOrderUpdateGhost(1, deltaT.count());			
 			else
 				dr->firstOrderUpdateGhost(1, deltaT.count());
 		}
@@ -110,8 +103,8 @@ void CigiUpdateCallback::operator()(osg::Node* node, osg::NodeVisitor* nv){
 	if (started)
 	{
 		//std::chrono::duration<float> elapsed = actualTime - startTime;
-		dataFile << alphaDraw.x() << ";" << pDraw.x() << "; " << elapsed.count() << /*"; " << calculateAngleOfEmbrace() << "; " << */std::endl;
-		//logFile << alphaDraw.x() << ";" << pDraw.x() << "; " << elapsed.count() << /*"; " << calculateAngleOfEmbrace() << "; " << */std::endl;
+		//dataFile << alphaDraw.x() << ";" << pDraw.x() << "; " << elapsed.count() << /*"; " << calculateAngleOfEmbrace() << "; " << */std::endl;
+		dataFile << elapsed.count() << ";" << pDraw.x() << "; " << pDraw.z() << std::endl;
 	}
 	float factor = 1;
 	if (_ghost->getEntity(1).getVelocity().z() > 0)

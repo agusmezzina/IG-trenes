@@ -52,13 +52,13 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(BOOST_ROOT);$(CCL_SOURCE)\include;$(OSG_ROOT)\include;$(OSG_SOURCE)\include;C:\Tesis\Proyectos\SimulacionFerroviaria\VirtualSimulationEnvironment;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(BOOST_ROOT);$(CCL_SOURCE)\include;$(OSG_ROOT)\include;$(OSG_SOURCE)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(BOOST_ROOT)\stage\lib;$(CCL_ROOT)\lib\debug;$(OSG_ROOT)\lib;C:\Tesis\Proyectos\SimulacionFerroviaria\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>cigicl_debug.lib;osgd.lib;VirtualSimulationEnvironment.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(BOOST_ROOT)\stage\lib;$(CCL_ROOT)\lib\debug;$(OSG_ROOT)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>cigicl_debug.lib;osgd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -85,6 +85,8 @@
     <ClInclude Include="CigiHost.h" />
     <ClInclude Include="CigiPacker.h" />
     <ClInclude Include="DataPacket.h" />
+    <ClInclude Include="DeadReckoning.h" />
+    <ClInclude Include="Entity.h" />
     <ClInclude Include="EntityState.h" />
     <ClInclude Include="IGControlProcessor.h" />
     <ClInclude Include="ModelUpdater.h" />
@@ -93,18 +95,22 @@
     <ClInclude Include="Semaphore.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="World.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CigiHost.cpp" />
     <ClCompile Include="CIGIHostAdapter.cpp" />
     <ClCompile Include="CigiPacker.cpp" />
     <ClCompile Include="DataPacket.cpp" />
+    <ClCompile Include="DeadReckoning.cpp" />
+    <ClCompile Include="Entity.cpp" />
     <ClCompile Include="EntityState.cpp" />
     <ClCompile Include="IGControlProcessor.cpp" />
     <ClCompile Include="ModelUpdater.cpp" />
     <ClCompile Include="RealTimeClock.cpp" />
     <ClCompile Include="SceneData.cpp" />
     <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="World.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

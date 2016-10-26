@@ -13,6 +13,7 @@ namespace osgCigi
 		void setConvergencePoint(int entityID, float deltaT);
 		bool isThresholdViolated(int entityID);
 		int getSmoothness() const;
+		osg::Vec3f getConvergencePoint();
 		DeadReckoning(World* model, World* ghost);
 		virtual ~DeadReckoning();
 	private:
