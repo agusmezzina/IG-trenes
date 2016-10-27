@@ -8,7 +8,7 @@ namespace osgCigi
 	public:
 		void firstOrderUpdateGhost(int entityID, float deltaT);
 		void secondOrderUpdateGhost(int entityID, float deltaT);
-		void correctGhost(int entityID, float deltaT);
+		void correctGhost(int entityID, int step);
 		void correctGhost(int entityID);
 		void setConvergencePoint(int entityID, float deltaT);
 		bool isThresholdViolated(int entityID);
@@ -21,6 +21,7 @@ namespace osgCigi
 		int smoothness;
 		World* model;
 		World* ghost;
+		osg::Vec3f startPoint;
 		osg::Vec3f convergencePoint;
 		osg::Vec3f convergenceVelocity;
 	};

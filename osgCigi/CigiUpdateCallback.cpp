@@ -77,7 +77,7 @@ void CigiUpdateCallback::operator()(osg::Node* node, osg::NodeVisitor* nv){
 			{
 				/*dr->correctGhost(1);
 				correcting = false;*/
-				dr->correctGhost(1, deltaT.count());
+				dr->correctGhost(1, correctionStep);
 				correctionStep++;
 				if (correctionStep > dr->getSmoothness())
 				{

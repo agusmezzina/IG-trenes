@@ -35,6 +35,9 @@ void DeadReckoning::setConvergencePoint(int entityID, float deltaT)
 	auto p = entity.getPosition();
 	auto v = entity.getVelocity();
 	auto a = entity.getAcceleration();
+	auto ghostEntity = ghost->getEntity(entityID);
+	auto pg = ghostEntity.getPosition();
+	startPoint = pg;
 	convergencePoint = p + v * deltaT + a * 0.5f * pow(deltaT, 2);
 	convergenceVelocity = v + a * deltaT;
 }
@@ -44,7 +47,7 @@ osg::Vec3f DeadReckoning::getConvergencePoint()
 	return convergencePoint;
 }
 
-void DeadReckoning::correctGhost(int entityID, float deltaT)
+void DeadReckoning::correctGhost(int entityID, int step)
 {
 	auto entity = model->getEntity(entityID);
 	auto p = entity.getPosition();
@@ -58,7 +61,7 @@ void DeadReckoning::correctGhost(int entityID, float deltaT)
 	auto vg = ghostEntity.getVelocity();
 	auto ag = ghostEntity.getAcceleration();
 
-	ghost->updateEntityPosition(entityID, pg + (convergencePoint - pg) * 1 / smoothness);
+	ghost->updateEntityPosition(entityID, startPoint + (convergencePoint - startPoint) * step / smoothness);
 	ghost->updateEntityVelocity(entityID, convergenceVelocity);
 	ghost->updateEntityAcceleration(entityID, a);
 	ghost->updateEntityOrientation(entityID, alpha);
