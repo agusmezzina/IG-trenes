@@ -58,46 +58,49 @@ void CigiUpdateCallback::operator()(osg::Node* node, osg::NodeVisitor* nv){
 		logFile << "Started" << std::endl;
 		started = true;
 		startTime = std::chrono::high_resolution_clock::now();
-	}
-
-	if (usingDR)
-	{
-		if (changed)
-		{
-			correcting = true;
-			dr->setConvergencePoint(1, dr->getSmoothness() * deltaT.count());
-			auto cp = dr->getConvergencePoint();
-			logFile << "Delta T = " << dr->getSmoothness() * deltaT.count() << "; " << "Conv. Point = (" << cp.x() << "; " << cp.y() << "; " << cp.z() << ")" << std::endl;
-			correctionStep = 1;
-		}
-
-		if (correcting)
-		{
-			//dr->correctGhost(1);
-			//correcting = false;
-			dr->correctGhost(1, correctionStep);
-			correctionStep++;
-			if (correctionStep > dr->getSmoothness())
-			{
-				correcting = false;
-				correctionStep = 0;
-			}
-		}
-		else
-		{
-			if (quadratic)
-				dr->secondOrderUpdateGhost(1, deltaT.count());			
-			else
-				dr->firstOrderUpdateGhost(1, deltaT.count());
-		}
-
-		pDraw = _ghost->getEntity(1).getPosition();
-		alphaDraw = _ghost->getEntity(1).getOrientation();
+		dr->correctGhost(1);
 	}
 	else
 	{
-		pDraw = p;
-		alphaDraw = alpha;
+		if (usingDR)
+		{
+			if (changed)
+			{
+				correcting = true;
+				dr->setConvergencePoint(1, dr->getSmoothness() * deltaT.count());
+				auto cp = dr->getConvergencePoint();
+				logFile << "Delta T = " << dr->getSmoothness() * deltaT.count() << "; " << "Conv. Point = (" << cp.x() << "; " << cp.y() << "; " << cp.z() << ")" << std::endl;
+				correctionStep = 1;
+			}
+
+			if (correcting)
+			{
+				/*dr->correctGhost(1);
+				correcting = false;*/
+				dr->correctGhost(1, deltaT.count());
+				correctionStep++;
+				if (correctionStep > dr->getSmoothness())
+				{
+					correcting = false;
+					correctionStep = 0;
+				}
+			}
+			else
+			{
+				if (quadratic)
+					dr->secondOrderUpdateGhost(1, deltaT.count());
+				else
+					dr->firstOrderUpdateGhost(1, deltaT.count());
+			}
+
+			pDraw = _ghost->getEntity(1).getPosition();
+			alphaDraw = _ghost->getEntity(1).getOrientation();
+		}
+		else
+		{
+			pDraw = p;
+			alphaDraw = alpha;
+		}
 	}
 
 	if (started)
