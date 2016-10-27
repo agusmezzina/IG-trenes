@@ -36,6 +36,7 @@ void DeadReckoning::setConvergencePoint(int entityID, float deltaT)
 	auto v = entity.getVelocity();
 	auto a = entity.getAcceleration();
 	convergencePoint = p + v * deltaT + a * 0.5f * pow(deltaT, 2);
+	convergenceVelocity = v + a * deltaT;
 }
 
 osg::Vec3f DeadReckoning::getConvergencePoint()
@@ -43,7 +44,7 @@ osg::Vec3f DeadReckoning::getConvergencePoint()
 	return convergencePoint;
 }
 
-void DeadReckoning::correctGhost(int entityID, int step)
+void DeadReckoning::correctGhost(int entityID, float deltaT)
 {
 	auto entity = model->getEntity(entityID);
 	auto p = entity.getPosition();
@@ -51,19 +52,20 @@ void DeadReckoning::correctGhost(int entityID, int step)
 	auto a = entity.getAcceleration();
 	auto alpha = entity.getOrientation();
 	auto alphaV = entity.getAngularVelocity();
-	auto pg = ghost->getEntity(entityID).getPosition();
 
-	/*if (step == 1)
-	{
-	auto convergenceTime = smoothness * deltaT;
-	convergencePoint = p + v * convergenceTime + a * 0.5f * pow(convergenceTime, 2);
-	}*/
+	auto ghostEntity = ghost->getEntity(entityID);
+	auto pg = ghostEntity.getPosition();
+	auto vg = ghostEntity.getVelocity();
+	auto ag = ghostEntity.getAcceleration();
 
-	ghost->updateEntityPosition(entityID, pg + (convergencePoint - pg) * step / smoothness);
-	ghost->updateEntityVelocity(entityID, v);
+	ghost->updateEntityPosition(entityID, pg + (convergencePoint - pg) * 1 / smoothness);
+	ghost->updateEntityVelocity(entityID, convergenceVelocity);
 	ghost->updateEntityAcceleration(entityID, a);
 	ghost->updateEntityOrientation(entityID, alpha);
 	ghost->updateEntityAngularVelocity(entityID, alphaV);
+
+	//ghost->updateEntityPosition(entityID, pg + (convergencePoint - pg) * step / smoothness);
+	//ghost->updateEntityVelocity(entityID, v);
 }
 
 void DeadReckoning::correctGhost(int entityID)
@@ -106,7 +108,7 @@ int DeadReckoning::getSmoothness() const
 DeadReckoning::DeadReckoning(World* model, World* ghost) : model(model), ghost(ghost)
 {
 	rThreshold = 1.0f;
-	smoothness = 10;
+	smoothness = 20;
 }
 
 
