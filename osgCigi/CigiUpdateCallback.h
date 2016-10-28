@@ -9,11 +9,11 @@
 
 namespace osgCigi
 {
-	class UpdateTransformCallback : public osg::NodeCallback
+	class CigiUpdateCallback : public osg::NodeCallback
 	{
 	public:
-		UpdateTransformCallback(World* data, World* ghost);
-		virtual ~UpdateTransformCallback();
+		CigiUpdateCallback(World* data, World* ghost);
+		virtual ~CigiUpdateCallback();
 		virtual void operator()(osg::Node* node, osg::NodeVisitor* nv);
 		float calculateAngleOfEmbrace() const;
 	protected:

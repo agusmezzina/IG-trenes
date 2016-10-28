@@ -33,6 +33,26 @@ void Entity::setAcceleration(osg::Vec3f newAcceleration)
 	this->acceleration = newAcceleration;
 }
 
+osg::Vec3f Entity::getOrientation() const
+{
+	return this->orientation;
+}
+
+void Entity::setOrientation(osg::Vec3f newOrientation)
+{
+	this->orientation = newOrientation;
+}
+
+osg::Vec3f Entity::getAngularVelocity() const
+{
+	return this->angularVelocity;
+}
+
+void Entity::setAngularVelocity(osg::Vec3f newVelocity)
+{
+	this->angularVelocity = newVelocity;
+}
+
 int Entity::getID() const
 {
 	return this->id;

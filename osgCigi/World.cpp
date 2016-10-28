@@ -35,6 +35,24 @@ void World::updateEntityVelocity(int id, osg::Vec3f velocity)
 		(*it).setVelocity(velocity);
 }
 
+void World::updateEntityOrientation(int id, osg::Vec3f orientation)
+{
+	std::lock_guard<std::mutex> g(m);
+	auto it = std::find_if(std::begin(entities), std::end(entities),
+		[&](Entity const& e) { return e.getID() == id; });
+	if ((*it).getID() == id)
+		(*it).setOrientation(orientation);
+}
+
+void World::updateEntityAngularVelocity(int id, osg::Vec3f velocity)
+{
+	std::lock_guard<std::mutex> g(m);
+	auto it = std::find_if(std::begin(entities), std::end(entities),
+		[&](Entity const& e) { return e.getID() == id; });
+	if ((*it).getID() == id)
+		(*it).setAngularVelocity(velocity);
+}
+
 void World::updateEntityAcceleration(int id, osg::Vec3f acceleration)
 {
 	std::lock_guard<std::mutex> g(m);

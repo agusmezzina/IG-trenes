@@ -39,6 +39,8 @@ void CigiHost::updateModelFromNetwork()
 	auto lastData = rawData->front();
 	data->updateEntityPosition(lastData.getID(), osg::Vec3f(lastData.getX(), lastData.getY(), lastData.getZ()));
 	data->updateEntityVelocity(lastData.getID(), osg::Vec3f(lastData.getVx(), lastData.getVy(), lastData.getVz()));
+	data->updateEntityOrientation(lastData.getID(), osg::Vec3f(lastData.getAlpha(), 0.0f, 0.0f));
+	data->updateEntityAngularVelocity(lastData.getID(), osg::Vec3f(lastData.getAlphaV(), 0.0f, 0.0f));
 	data->updateEntityAcceleration(lastData.getID(), osg::Vec3f(lastData.getAx(), lastData.getAy(), lastData.getAz()));
 	simulationTime = lastData.getTime();
 	rawData->pop();
@@ -83,15 +85,20 @@ void CigiHost::run()
 				first = false;
 
 			if (sendUpdate){
-				auto entity = data->getEntity(1);				
-				dr->correctGhost(1);
-				cigi->packData(entity, simulationTime, &outBuffer, outBufferSize);
+				auto entity = data->getEntity(1);
 
-				/*auto p = entity.getPosition();
+				auto p = entity.getPosition();
 				auto v = entity.getVelocity();
 				auto a = entity.getAcceleration();
-				auto pg = ghost->getEntity(1).getPosition();*/
-				//log << "Correcting Time = " << simulationTime << "; ghost = " << pg.x() << "; model = " << p.x() << "; " << v.x() << ";" << a.x() << std::endl;
+				auto pg = ghost->getEntity(1).getPosition();
+				log << "Correcting Time = " << simulationTime <<
+					"; ghost = " << "(" << pg.x() << "; " << pg.y() << "; " << pg.z() << ") " <<
+					"; model = P=(" << p.x() << "; " << p.y() << +"; " << p.z() << ") " <<
+					"V=(" << v.x() << "; " << v.y() << +"; " << v.z() << ") " <<
+					"A=(" << a.x() << "; " << a.y() << +"; " << a.z() << ") " << std::endl;
+				
+				dr->correctGhost(1);
+				cigi->packData(entity, simulationTime, &outBuffer, outBufferSize);
 				clock->sync(simulationTime);
 
 				boost::system::error_code ignored_error;

@@ -12,7 +12,7 @@ void RateEventProcessor::OnPacketReceived(CigiBasePacket *Packet)
 	setOriginPacket(InPckt);
 
 	data->updateEntityVelocity(InPckt->GetEntityID(), osg::Vec3f(InPckt->GetXRate(), InPckt->GetYRate(), InPckt->GetZRate()));
-
+	data->updateEntityAngularVelocity(InPckt->GetEntityID(), osg::Vec3f(InPckt->GetYawRate(), InPckt->GetRollRate(), InPckt->GetPitchRate()));
 }
 
 RateEventProcessor::~RateEventProcessor()
