@@ -78,12 +78,12 @@ void World::firstOrderPredictUpdate(
 	}
 }
 
-void World::setTimestamp(float t)
+void World::setTimestamp(long t)
 {
 	this->timestamp = t;
 }
 
-float World::getTimestamp() const
+long World::getTimestamp() const
 {
 	return this->timestamp;
 }
@@ -104,7 +104,6 @@ World::World()
 {
 	Entity ownship(1);
 	entities.push_back(ownship);
-	timestamp = 0.0f;
 }
 
 

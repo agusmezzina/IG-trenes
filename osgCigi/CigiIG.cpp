@@ -2,6 +2,7 @@
 #include "CigiIG.h"
 #include <iostream>
 #include <boost\bind.hpp>
+#include <thread>
 
 using namespace osgCigi;
 
@@ -24,15 +25,15 @@ void CigiIG::recvPacket()
 
 void CigiIG::handle_receive(const boost::system::error_code& error, std::size_t size)
 {
+	recvPacket();
+	std::this_thread::sleep_for(std::chrono::milliseconds(300));
 	if (error && error != boost::asio::error::message_size)
 		throw boost::system::system_error(error);
 
 	if (size > 0)
 	{
 		cigi->processIncomingMessage(inBuffer.c_array(), size);
-	}
-
-	recvPacket();
+	}	
 }
 
 int CigiIG::cancel(){

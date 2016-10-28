@@ -14,7 +14,7 @@ CigiPacker::CigiPacker()
 	inMsg->UsingIteration(false);
 }
 
-void CigiPacker::packData(const Entity& entity, float simulationTime, unsigned char** buffer, int& bufferSize)
+void CigiPacker::packData(const Entity& entity, long simulationTime, unsigned char** buffer, int& bufferSize)
 {
 	outMsg->BeginMsg();
 

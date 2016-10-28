@@ -16,7 +16,7 @@ CigiUpdateCallback::CigiUpdateCallback(World* data, World* ghost) : _data(data),
 	v_1 = _data->getEntity(1).getVelocity();
 	a_1 = _data->getEntity(1).getAcceleration();
 	correcting = false;
-	dataFile.open("data.csv");
+	dataFile.open("dataIG.csv");
 	logFile.open("logIG.txt");
 	started = false;
 	usingDR = true;
@@ -41,7 +41,6 @@ bool CigiUpdateCallback::modelChanged()
 void CigiUpdateCallback::operator()(osg::Node* node, osg::NodeVisitor* nv){
 	osg::MatrixTransform* transformNode = static_cast<osg::MatrixTransform*>(node);
 	bool quadratic = true;
-
 	auto currentTime = std::chrono::high_resolution_clock::now();
 	std::chrono::duration<float> deltaT = currentTime - prevTime;
 	prevTime = currentTime;
@@ -51,14 +50,13 @@ void CigiUpdateCallback::operator()(osg::Node* node, osg::NodeVisitor* nv){
 	osg::Vec3f pDraw;
 	osg::Vec3f alphaDraw;
 	bool changed = modelChanged();
-	//logFile << a.x() << std::endl;
 
 	if (changed && !started)
 	{
 		logFile << "Started" << std::endl;
 		started = true;
-		startTime = std::chrono::high_resolution_clock::now();
-		dr->correctGhost(1);
+		//dr->correctGhost(1);
+		dr->compensateAndCorrectGhost(1);
 	}
 	else
 	{
@@ -67,23 +65,31 @@ void CigiUpdateCallback::operator()(osg::Node* node, osg::NodeVisitor* nv){
 			if (changed)
 			{
 				correcting = true;
-				dr->setConvergencePoint(1, dr->getSmoothness() * deltaT.count());
+				/*dr->setConvergencePoint(1, dr->getSmoothness() * deltaT.count());
 				auto cp = dr->getConvergencePoint();
 				logFile << "Delta T = " << dr->getSmoothness() * deltaT.count() << "; " << "Conv. Point = (" << cp.x() << "; " << cp.y() << "; " << cp.z() << ")" << std::endl;
-				correctionStep = 1;
+				correctionStep = 1;*/
 			}
 
 			if (correcting)
 			{
-				/*dr->correctGhost(1);
-				correcting = false;*/
-				dr->correctGhost(1, correctionStep);
+				//dr->correctGhost(1);
+				dr->compensateAndCorrectGhost(1);
+				auto p = _ghost->getEntity(1).getPosition();
+				auto v = _ghost->getEntity(1).getVelocity();
+				auto a = _ghost->getEntity(1).getAcceleration();
+				logFile << "Correcting Time = " << elapsed.count() <<
+					"; model = P=(" << p.x() << "; " << p.y() << "; " << p.z() << ") " <<
+					"V=(" << v.x() << "; " << v.y() << +"; " << v.z() << ") " <<
+					"A=(" << a.x() << "; " << a.y() << +"; " << a.z() << ") " << std::endl;
+				correcting = false;
+				/*dr->correctGhost(1, correctionStep);
 				correctionStep++;
 				if (correctionStep > dr->getSmoothness())
 				{
 					correcting = false;
 					correctionStep = 0;
-				}
+				}*/
 			}
 			else
 			{
@@ -107,7 +113,9 @@ void CigiUpdateCallback::operator()(osg::Node* node, osg::NodeVisitor* nv){
 	{
 		//std::chrono::duration<float> elapsed = actualTime - startTime;
 		//dataFile << alphaDraw.x() << ";" << pDraw.x() << "; " << elapsed.count() << /*"; " << calculateAngleOfEmbrace() << "; " << */std::endl;
-		dataFile << elapsed.count() << ";" << pDraw.x() << "; " << pDraw.z() << std::endl;
+		auto duration = std::chrono::high_resolution_clock::now().time_since_epoch();
+		auto millis = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
+		dataFile << millis % 100000 << ";" << pDraw.x() << "; " << pDraw.z() << std::endl;
 	}
 	float factor = 1;
 	if (_ghost->getEntity(1).getVelocity().z() > 0)

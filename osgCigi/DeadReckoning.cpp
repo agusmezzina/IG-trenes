@@ -86,6 +86,25 @@ void DeadReckoning::correctGhost(int entityID)
 	ghost->updateEntityAngularVelocity(entityID, alphaV);
 }
 
+void DeadReckoning::compensateAndCorrectGhost(int entityID)
+{
+	auto t = std::chrono::high_resolution_clock::now().time_since_epoch();
+	long t1 = std::chrono::duration_cast<std::chrono::milliseconds>(t).count();
+	auto t0 = model->getTimestamp();
+	float deltaT = ((float)(t1 - t0)) / 1000;
+	auto entity = model->getEntity(entityID);
+	auto p = entity.getPosition();
+	auto v = entity.getVelocity();
+	auto a = entity.getAcceleration();
+	auto alpha = entity.getOrientation();
+	auto alphaV = entity.getAngularVelocity();
+	ghost->updateEntityPosition(entityID, p + v * deltaT + a * 0.5f * pow(deltaT, 2));
+	ghost->updateEntityVelocity(entityID, v + a * deltaT);
+	ghost->updateEntityAcceleration(entityID, a);
+	ghost->updateEntityOrientation(entityID, alpha);
+	ghost->updateEntityAngularVelocity(entityID, alphaV);
+}
+
 bool DeadReckoning::isThresholdViolated(int entityID)
 {
 	auto entity = model->getEntity(entityID);
@@ -111,7 +130,7 @@ int DeadReckoning::getSmoothness() const
 DeadReckoning::DeadReckoning(World* model, World* ghost) : model(model), ghost(ghost)
 {
 	rThreshold = 1.0f;
-	smoothness = 20;
+	smoothness = 10;
 }
 
 

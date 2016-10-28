@@ -23,7 +23,6 @@ public:
 private:
 	void setupNetwork(const std::string& ip, const std::string& port);
 	void syncWithRealTime();
-	void setupCigi();
 	//void initializeTimer();
 	void updateModelFromNetwork();
 	void sendCigiPacket();
@@ -41,7 +40,7 @@ private:
 	Semaphore* s;
 	float prevSimulationTime;
 	float simulationTime;
-
+	std::ofstream dataFile;
 	std::ofstream log;
 };
 

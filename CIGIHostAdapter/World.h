@@ -15,8 +15,8 @@ public:
 	void updateEntityOrientation(int id, osg::Vec3f orientation);
 	void updateEntityAngularVelocity(int id, osg::Vec3f velocity);
 	void updateEntityAcceleration(int id, osg::Vec3f acceleration);
-	void setTimestamp(float t);
-	float getTimestamp() const;
+	void setTimestamp(long t);
+	long getTimestamp() const;
 	void firstOrderPredictUpdate(
 		const std::function<float (float p, float v)>& predictionFunction);
 	//void instantCorrect(World* reference, double threshold);
@@ -24,7 +24,7 @@ public:
 	virtual ~World();
 private:
 	std::list<Entity> entities;
-	float timestamp;
+	long timestamp;
 	mutable std::mutex m;
 };
 
