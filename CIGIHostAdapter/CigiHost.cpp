@@ -85,18 +85,20 @@ void CigiHost::run()
 			if (first)
 				first = false;
 
-			if (sendUpdate){				
+			if (sendUpdate){
+				clock->sync(simulationTime);
 				auto v = entity.getVelocity();
 				auto a = entity.getAcceleration();
 				auto pg = ghost->getEntity(1).getPosition();
 				log << "Correcting Time = " << simulationTime <<
+					"; Real Time = " << millis << 
 					"; ghost = " << "(" << pg.x() << "; " << pg.y() << "; " << pg.z() << ") " <<
 					"; model = P=(" << p.x() << "; " << p.y() << +"; " << p.z() << ") " <<
 					"V=(" << v.x() << "; " << v.y() << +"; " << v.z() << ") " <<
 					"A=(" << a.x() << "; " << a.y() << +"; " << a.z() << ") " << std::endl;
 				
 				dr->correctGhost(1);
-				clock->sync(simulationTime);
+				//clock->sync(simulationTime);
 				auto t = std::chrono::high_resolution_clock::now().time_since_epoch();
 				long timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(t).count();
 				cigi->packData(entity, timestamp, &outBuffer, outBufferSize);

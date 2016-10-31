@@ -55,8 +55,11 @@ void CigiUpdateCallback::operator()(osg::Node* node, osg::NodeVisitor* nv){
 	{
 		logFile << "Started" << std::endl;
 		started = true;
+		startTime = std::chrono::high_resolution_clock::now();
 		//dr->correctGhost(1);
 		dr->compensateAndCorrectGhost(1);
+		auto pg = _ghost->getEntity(1).getPosition();
+		logFile << "Ghost Pos = (" << pg.x() << "; " << pg.y() << "; " << pg.z() << ")" << std::endl;
 	}
 	else
 	{
@@ -65,16 +68,18 @@ void CigiUpdateCallback::operator()(osg::Node* node, osg::NodeVisitor* nv){
 			if (changed)
 			{
 				correcting = true;
-				/*dr->setConvergencePoint(1, dr->getSmoothness() * deltaT.count());
+				dr->setConvergencePoint(1, dr->getSmoothness() * deltaT.count());
 				auto cp = dr->getConvergencePoint();
-				logFile << "Delta T = " << dr->getSmoothness() * deltaT.count() << "; " << "Conv. Point = (" << cp.x() << "; " << cp.y() << "; " << cp.z() << ")" << std::endl;
-				correctionStep = 1;*/
+				auto pg = _ghost->getEntity(1).getPosition();
+				logFile << "Time = " << elapsed.count() << 
+					"; " << "Ghost Pos = (" << pg.x() << "; " << pg.y() << "; " << pg.z() << ")" <<
+					"; " << "Conv. Point = (" << cp.x() << "; " << cp.y() << "; " << cp.z() << ")" << std::endl;
+				correctionStep = 1;
 			}
 
 			if (correcting)
 			{
-				//dr->correctGhost(1);
-				dr->compensateAndCorrectGhost(1);
+				/*dr->compensateAndCorrectGhost(1);
 				auto p = _ghost->getEntity(1).getPosition();
 				auto v = _ghost->getEntity(1).getVelocity();
 				auto a = _ghost->getEntity(1).getAcceleration();
@@ -82,14 +87,15 @@ void CigiUpdateCallback::operator()(osg::Node* node, osg::NodeVisitor* nv){
 					"; model = P=(" << p.x() << "; " << p.y() << "; " << p.z() << ") " <<
 					"V=(" << v.x() << "; " << v.y() << +"; " << v.z() << ") " <<
 					"A=(" << a.x() << "; " << a.y() << +"; " << a.z() << ") " << std::endl;
-				correcting = false;
-				/*dr->correctGhost(1, correctionStep);
+				correcting = false;*/
+
+				dr->correctGhost(1, correctionStep);
 				correctionStep++;
 				if (correctionStep > dr->getSmoothness())
 				{
 					correcting = false;
 					correctionStep = 0;
-				}*/
+				}
 			}
 			else
 			{
