@@ -3,7 +3,6 @@
 
 void RealTimeClock::sync(float simulationTime)
 {
-
 	auto deltaSimTime = simulationTime - prevSimulationTime;
 	auto realTime = std::chrono::high_resolution_clock::now();
 	std::chrono::duration<float> deltaRealTime = realTime - prevRealTime;

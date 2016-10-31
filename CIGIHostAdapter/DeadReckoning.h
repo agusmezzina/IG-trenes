@@ -8,9 +8,11 @@ public:
 	void secondOrderUpdateGhost(int entityID, float deltaT);
 	void correctGhost(int entityID, int step);
 	void correctGhost(int entityID);
+	void compensateAndCorrectGhost(int entityID);
 	void setConvergencePoint(int entityID, float deltaT);
 	bool isThresholdViolated(int entityID);
 	int getSmoothness() const;
+	osg::Vec3f getConvergencePoint();
 	DeadReckoning(World* model, World* ghost);
 	virtual ~DeadReckoning();
 private:
@@ -18,6 +20,8 @@ private:
 	int smoothness;
 	World* model;
 	World* ghost;
+	osg::Vec3f startPoint;
 	osg::Vec3f convergencePoint;
+	osg::Vec3f convergenceVelocity;
 };
 

@@ -30,34 +30,56 @@ void DeadReckoning::secondOrderUpdateGhost(int entityID, float deltaT)
 
 void DeadReckoning::setConvergencePoint(int entityID, float deltaT)
 {
+	auto t = std::chrono::high_resolution_clock::now().time_since_epoch();
+	long t1 = std::chrono::duration_cast<std::chrono::milliseconds>(t).count();
+	auto t0 = model->getTimestamp();
+	float compTime = ((float)(t1 - t0)) / 1000;
+
 	auto entity = model->getEntity(entityID);
 	auto p = entity.getPosition();
 	auto v = entity.getVelocity();
 	auto a = entity.getAcceleration();
-	convergencePoint = p + v * deltaT + a * 0.5f * pow(deltaT, 2);
+	auto ghostEntity = ghost->getEntity(entityID);
+	auto pg = ghostEntity.getPosition();
+
+	auto compP = p + v * compTime + a * 0.5f * pow(compTime, 2);
+	auto compV = v + a * compTime;
+
+	startPoint = pg;
+	convergencePoint = compP + v * deltaT + a * 0.5f * pow(deltaT, 2);
+	convergenceVelocity = compV + a * deltaT;
+}
+
+osg::Vec3f DeadReckoning::getConvergencePoint()
+{
+	return convergencePoint;
 }
 
 void DeadReckoning::correctGhost(int entityID, int step)
 {
+	/*if (step == 1)
+	this->compensateAndCorrectGhost(entityID);*/
+
 	auto entity = model->getEntity(entityID);
 	auto p = entity.getPosition();
 	auto v = entity.getVelocity();
 	auto a = entity.getAcceleration();
 	auto alpha = entity.getOrientation();
 	auto alphaV = entity.getAngularVelocity();
-	auto pg = ghost->getEntity(entityID).getPosition();
 
-	/*if (step == 1)
-	{
-	auto convergenceTime = smoothness * deltaT;
-	convergencePoint = p + v * convergenceTime + a * 0.5f * pow(convergenceTime, 2);
-	}*/
+	auto ghostEntity = ghost->getEntity(entityID);
+	auto pg = ghostEntity.getPosition();
+	auto vg = ghostEntity.getVelocity();
+	auto ag = ghostEntity.getAcceleration();
 
-	ghost->updateEntityPosition(entityID, pg + (convergencePoint - pg) * step / smoothness);
-	ghost->updateEntityVelocity(entityID, v);
+	ghost->updateEntityPosition(entityID, startPoint + (convergencePoint - startPoint) * step / smoothness);
+	ghost->updateEntityVelocity(entityID, convergenceVelocity);
 	ghost->updateEntityAcceleration(entityID, a);
 	ghost->updateEntityOrientation(entityID, alpha);
 	ghost->updateEntityAngularVelocity(entityID, alphaV);
+
+	//ghost->updateEntityPosition(entityID, pg + (convergencePoint - pg) * step / smoothness);
+	//ghost->updateEntityVelocity(entityID, v);
 }
 
 void DeadReckoning::correctGhost(int entityID)
@@ -70,6 +92,26 @@ void DeadReckoning::correctGhost(int entityID)
 	auto alphaV = entity.getAngularVelocity();
 	ghost->updateEntityPosition(entityID, p);
 	ghost->updateEntityVelocity(entityID, v);
+	ghost->updateEntityAcceleration(entityID, a);
+	ghost->updateEntityOrientation(entityID, alpha);
+	ghost->updateEntityAngularVelocity(entityID, alphaV);
+}
+
+
+void DeadReckoning::compensateAndCorrectGhost(int entityID)
+{
+	auto t = std::chrono::high_resolution_clock::now().time_since_epoch();
+	long t1 = std::chrono::duration_cast<std::chrono::milliseconds>(t).count();
+	auto t0 = model->getTimestamp();
+	float deltaT = ((float)(t1 - t0)) / 1000;
+	auto entity = model->getEntity(entityID);
+	auto p = entity.getPosition();
+	auto v = entity.getVelocity();
+	auto a = entity.getAcceleration();
+	auto alpha = entity.getOrientation();
+	auto alphaV = entity.getAngularVelocity();
+	ghost->updateEntityPosition(entityID, p + v * deltaT + a * 0.5f * pow(deltaT, 2));
+	ghost->updateEntityVelocity(entityID, v + a * deltaT);
 	ghost->updateEntityAcceleration(entityID, a);
 	ghost->updateEntityOrientation(entityID, alpha);
 	ghost->updateEntityAngularVelocity(entityID, alphaV);
@@ -99,7 +141,7 @@ int DeadReckoning::getSmoothness() const
 
 DeadReckoning::DeadReckoning(World* model, World* ghost) : model(model), ghost(ghost)
 {
-	rThreshold = 1.0f;
+	rThreshold = 0.1f;
 	smoothness = 10;
 }
 

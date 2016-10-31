@@ -10,6 +10,7 @@ namespace osgCigi
 		void secondOrderUpdateGhost(int entityID, float deltaT);
 		void correctGhost(int entityID, int step);
 		void correctGhost(int entityID);
+		void compensateAndCorrectGhost(int entityID);
 		void setConvergencePoint(int entityID, float deltaT);
 		bool isThresholdViolated(int entityID);
 		int getSmoothness() const;

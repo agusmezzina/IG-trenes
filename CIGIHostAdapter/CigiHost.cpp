@@ -14,6 +14,7 @@ CigiHost::CigiHost(World* data, World* ghost, Semaphore* sem, std::queue<DataPac
 	cigi = std::make_unique<CigiPacker>();
 	dr = std::make_unique<DeadReckoning>(data, ghost);
 	clock = std::make_unique<RealTimeClock>();
+	dataFile.open("dataHost.csv");
 	log.open("logHost.txt");
 	prevSimulationTime = 0;
 	//compensationTime = 0;
@@ -25,11 +26,6 @@ void CigiHost::setupNetwork(const std::string& ip, const std::string& port)
 	udp::resolver::query query(udp::v4(), ip, port);
 	receiver_endpoint = *resolver.resolve(query);
 	socket.open(udp::v4());
-}
-
-void CigiHost::setupCigi()
-{
-
 }
 
 void CigiHost::updateModelFromNetwork()
@@ -53,18 +49,15 @@ void CigiHost::sendCigiPacket()
 
 void CigiHost::run()
 {
+	float delay = 0.3f;
 	bool usingDR = true;
-	bool started = false;
 	bool quadratic = true;	
 	bool first = true;
 	try
 	{
-
 		unsigned char* outBuffer;
 		int outBufferSize = 0;
 		setupNetwork("127.0.0.1", "8888");
-		setupCigi();
-
 		for (;;)
 		{
 			updateModelFromNetwork();
@@ -72,6 +65,14 @@ void CigiHost::run()
 				clock->init();	 
 
 			auto deltaSimTime = simulationTime - prevSimulationTime;
+
+			auto entity = data->getEntity(1);
+			auto p = entity.getPosition();
+
+			auto duration = std::chrono::high_resolution_clock::now().time_since_epoch();
+			auto millis = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
+			dataFile << millis % 100000 << ";" << p.x() << "; " << p.z() << std::endl;
+
 			if (quadratic)
 				dr->secondOrderUpdateGhost(1, deltaSimTime);
 			else
@@ -85,21 +86,22 @@ void CigiHost::run()
 				first = false;
 
 			if (sendUpdate){
-				auto entity = data->getEntity(1);
-
-				auto p = entity.getPosition();
+				clock->sync(simulationTime);
 				auto v = entity.getVelocity();
 				auto a = entity.getAcceleration();
 				auto pg = ghost->getEntity(1).getPosition();
 				log << "Correcting Time = " << simulationTime <<
+					"; Real Time = " << millis << 
 					"; ghost = " << "(" << pg.x() << "; " << pg.y() << "; " << pg.z() << ") " <<
 					"; model = P=(" << p.x() << "; " << p.y() << +"; " << p.z() << ") " <<
 					"V=(" << v.x() << "; " << v.y() << +"; " << v.z() << ") " <<
 					"A=(" << a.x() << "; " << a.y() << +"; " << a.z() << ") " << std::endl;
 				
 				dr->correctGhost(1);
-				cigi->packData(entity, simulationTime, &outBuffer, outBufferSize);
-				clock->sync(simulationTime);
+				//clock->sync(simulationTime);
+				auto t = std::chrono::high_resolution_clock::now().time_since_epoch();
+				long timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(t).count();
+				cigi->packData(entity, timestamp, &outBuffer, outBufferSize);
 
 				boost::system::error_code ignored_error;
 				socket.send_to(boost::asio::buffer(outBuffer, outBufferSize),

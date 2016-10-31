@@ -13,7 +13,7 @@ class CigiPacker
 public:
 	CigiPacker();
 	virtual ~CigiPacker();
-	void packData(const Entity& entity, float simulationTime, unsigned char** buffer, int& bufferSize);
+	void packData(const Entity& entity, long simulationTime, unsigned char** buffer, int& bufferSize);
 	void freePacket();
 private:
 	std::unique_ptr<CigiHostSession> cigiSession;
