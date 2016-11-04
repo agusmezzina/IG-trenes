@@ -18,7 +18,21 @@ GraphicManager::GraphicManager()
 	env = std::make_unique<osgCigi::CigiSimulationEnvironment>();
 }
 
-osg::ref_ptr<osg::Geode> GraphicManager::createBallNode(const osg::Vec3& center, float radius, const osg::Vec4& color){
+//osg::Camera* GraphicManager::createHUDCamera(double left, double right, double bottom, double top)
+//{
+//	osg::ref_ptr<osg::Camera> camera = new osg::Camera;
+//	camera->setReferenceFrame(osg::Transform::ABSOLUTE_RF);
+//	camera->setClearMask(GL_DEPTH_BUFFER_BIT);
+//	camera->setRenderOrder(osg::Camera::POST_RENDER);
+//	camera->setAllowEventFocus(false);
+//	camera->setProjectionMatrix(
+//		osg::Matrix::ortho2D(left, right, bottom, top));
+//	camera->getOrCreateStateSet()->setMode(
+//		GL_LIGHTING, osg::StateAttribute::OFF);
+//	return camera.release();
+//}
+
+osg::Geode* GraphicManager::createBallNode(const osg::Vec3& center, float radius, const osg::Vec4& color){
 	osg::ref_ptr<osg::ShapeDrawable> sphereShape = new osg::ShapeDrawable;
 	sphereShape->setShape(new osg::Sphere(center, radius));
 	sphereShape->setColor(color);
@@ -27,14 +41,14 @@ osg::ref_ptr<osg::Geode> GraphicManager::createBallNode(const osg::Vec3& center,
 	return node.release();
 }
 
-osg::ref_ptr<osg::Camera> GraphicManager::createCamera(const osg::Vec3& eye, const osg::Vec3& center, const osg::Vec3& up, osg::Node* scene){
+osg::Camera* GraphicManager::createCamera(const osg::Vec3& eye, const osg::Vec3& center, const osg::Vec3& up, osg::Node* scene){
 	osg::ref_ptr<osg::Camera> camera = new osg::Camera;
 	camera->setViewMatrixAsLookAt(eye, center, up);
 	camera->addChild(scene);
 	return camera.release();
 }
 
-osg::ref_ptr<osg::Geode> GraphicManager::createFloor()
+osg::Geode* GraphicManager::createFloor()
 {
 	osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array;
 	vertices->push_back(osg::Vec3(-1000.0f, 0.3f, -1000.0f));
@@ -71,7 +85,7 @@ osg::ref_ptr<osg::Geode> GraphicManager::createFloor()
 	return floor.release();
 }
 
-osg::ref_ptr<osg::Geode> GraphicManager::createPath()
+osg::Geode* GraphicManager::createPath()
 {
 	osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array;
 	/*vertices->push_back(osg::Vec3(-1000.0f, 0.3f, -1000.0f));
@@ -145,7 +159,7 @@ osg::Node* GraphicManager::createSky()
 void GraphicManager::createScene(){
 	osg::ref_ptr<osg::Group> scene = new osg::Group;
 
-	env->registerModel(1, "C:\\ObjetosVarios\\EstacionDemo\\vagon.flt.90,270,0.rot.[0,0.2,0].trans");
+	env->registerModel(/*1, */"C:\\ObjetosVarios\\EstacionDemo\\vagon.flt.90,270,0.rot.[0,0.2,0].trans");
 	osg::ref_ptr<osg::Group> sim = env->createSimulationScene();
 
 	osg::ref_ptr<osg::Node> light = createLightSource(0, osg::Vec3(10.0f, -10.0f, -20.0f), osg::Vec4(0.5f, 0.5f, 0.5f, 1.0f));
@@ -178,8 +192,9 @@ void GraphicManager::createScene(){
 
 int GraphicManager::runViewer(){
 	osgViewer::Viewer viewer;
-	//viewer.addEventHandler(_cameraCtrl.get());
+	//osg::ref_ptr<CommandController> commCrtl = new CommandController(env.get());
 	viewer.setSceneData(_sceneRoot.get());
+	//viewer.addEventHandler(commCrtl.get());
 	viewer.addEventHandler(new osgViewer::StatsHandler);
 	viewer.apply(new osgViewer::SingleWindow(10, 10, 800, 600));
 	env->start();
