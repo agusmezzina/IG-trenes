@@ -12,34 +12,50 @@
 #include <queue>
 #include <atomic>
 #include <iostream>
+#include <boost\algorithm\string.hpp>
 
 int _tmain(int argc, _TCHAR* argv[])
 {
-	//UDPServer server;
-	//SceneData data;
 	std::atomic_bool quit;
 	quit = false;
 	Semaphore s;
 	std::queue<DataPacket> data;
 	World worldData;
 	World ghostData;
-	/*worldData.updateEntityPosition(1, osg::Vec3f(0.0f, 3.0f, 0.0f));
-	ghostData.updateEntityPosition(1, osg::Vec3f(0.0f, 3.0f, 0.0f));*/
 	CigiHost server(&worldData, &ghostData, &s, &data);
 	ModelUpdater model(&s, &data);
-	//SimulationTimer timer(&data, &worldData);
 
 	std::thread cigiThread(&CigiHost::run, &server, std::ref(quit));
 	std::thread modelThread(&ModelUpdater::run, &model, std::ref(quit));
-	//std::thread timerThread(&SimulationTimer::run, &timer);
-	char command = ' ';
-	while (command != 'q')
-		std::cin >> command;
+
+	std::string command = "";
+	do
+	{
+		std::getline(std::cin, command);
+		if (command.substr(0, 6) == "thresh")
+		{
+			float thresh = 0;
+			std::vector<std::string> fields;
+			boost::split(fields, command, boost::is_any_of("\t "), boost::token_compress_on);
+			if (fields.size() == 2)
+			{
+				try
+				{
+					thresh = std::stof(fields[1]);
+					server.changeThreshold(thresh);
+					std::cout << "Threshold cambiado a " << thresh << std::endl;
+				}
+				catch (...)
+				{
+				}
+			}
+		}
+	} while (command != "quit");
+
 	model.stop();
 	quit = true;
 	cigiThread.join();
 	modelThread.join();
-	//timerThread.join();
 
 	return 0;
 }

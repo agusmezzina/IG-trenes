@@ -29,6 +29,11 @@ void CigiHost::setupNetwork(const std::string& ip, const std::string& port)
 	socket.open(udp::v4());
 }
 
+void CigiHost::changeThreshold(float thresh)
+{
+	dr->setThreshold(thresh);
+}
+
 bool CigiHost::updateModelFromNetwork()
 {
 	s->wait();

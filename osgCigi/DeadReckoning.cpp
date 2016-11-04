@@ -140,6 +140,21 @@ int DeadReckoning::getSmoothness() const
 	return this->smoothness;
 }
 
+void DeadReckoning::setSmoothness(int smoothness)
+{
+	this->smoothness = smoothness;
+}
+
+float DeadReckoning::getThreshold() const
+{
+	return this->rThreshold;
+}
+
+void DeadReckoning::setThreshold(float thresh)
+{
+	this->rThreshold = thresh;
+}
+
 DeadReckoning::DeadReckoning(World* model, World* ghost) : model(model), ghost(ghost)
 {
 	rThreshold = 0.5f;

@@ -19,6 +19,7 @@ class CigiHost
 {
 public:
 	CigiHost(World* data, World* ghost, Semaphore* sem, std::queue<DataPacket>* rawData);
+	void changeThreshold(float thresh);
 	void run(std::atomic_bool& quit);
 	virtual ~CigiHost();
 private:
