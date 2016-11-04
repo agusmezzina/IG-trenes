@@ -1,6 +1,7 @@
 #pragma once
 #include <memory>
 #include <queue>
+#include <atomic>
 #include <fstream>
 #include <boost\array.hpp>
 #include <boost\asio.hpp>
@@ -18,13 +19,13 @@ class CigiHost
 {
 public:
 	CigiHost(World* data, World* ghost, Semaphore* sem, std::queue<DataPacket>* rawData);
-	void run();
+	void run(std::atomic_bool& quit);
 	virtual ~CigiHost();
 private:
 	void setupNetwork(const std::string& ip, const std::string& port);
 	void syncWithRealTime();
 	//void initializeTimer();
-	void updateModelFromNetwork();
+	bool updateModelFromNetwork();
 	void sendCigiPacket();
 
 	boost::asio::io_service io_service;
@@ -40,6 +41,7 @@ private:
 	Semaphore* s;
 	float prevSimulationTime;
 	float simulationTime;
+	bool last;
 	std::ofstream dataFile;
 	std::ofstream log;
 };

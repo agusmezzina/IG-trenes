@@ -1,28 +1,28 @@
 #include "ModelUpdater.h"
 #include "EntityState.h"
-#include <boost\array.hpp>
-#include <boost\asio.hpp>
 #include <boost\algorithm\string.hpp>
+#include <boost\bind.hpp>
 #include <iostream>
-
-using boost::asio::ip::udp;
 
 ModelUpdater::ModelUpdater(Semaphore* sem, std::queue<DataPacket>* data)
 {
 	this->data = data;
 	this->s = sem;
+	socket = std::make_unique<udp::socket>(io_service, udp::endpoint(udp::v4(), 8887));
+	recv_packet();
 }
 
 DataPacket ModelUpdater::readData(std::string message)
 {
-	int id{ 0 };
+	bool lastBit = false;
+	int id{ 0 }, last{ 0 };
 	float x{ 0 }, y{ 0 }, z{ 0 }, vx{ 0 }, vy{ 0 }, vz{ 0 }, ax{ 0 }, ay{ 0 }, az{ 0 }, alpha{ 0 }, alphaV{ 0 }, t{ 0 };
 
 	if (message.back() == '\f'){
 		message.pop_back();
 		std::vector<std::string> fields;
 		boost::split(fields, message, boost::is_any_of(";"));
-		if (fields.size() == 13)
+		if (fields.size() == 14)
 		{
 			id = std::stoi(fields[0]);
 			x = std::stod(fields[1]);
@@ -37,9 +37,12 @@ DataPacket ModelUpdater::readData(std::string message)
 			alpha = std::stod(fields[10]);
 			alphaV = std::stod(fields[11]);
 			t = std::stod(fields[12]);
+			last = std::stoi(fields[13]);
+			if (last == 1)
+				lastBit = true;
 		}
 	}
-	return DataPacket(id, x, y, z, vx, vy, vz, ax, ay, az, alpha, alphaV, t);
+	return DataPacket(id, x, y, z, vx, vy, vz, ax, ay, az, alpha, alphaV, t, lastBit);
 }
 
 void ModelUpdater::enqueueData(DataPacket p)
@@ -48,29 +51,43 @@ void ModelUpdater::enqueueData(DataPacket p)
 	s->notify();
 }
 
-void ModelUpdater::run()
+void ModelUpdater::handle_receive(const boost::system::error_code& error, std::size_t size)
 {
-	boost::asio::io_service io_service;
-	udp::socket socket(io_service, udp::endpoint(udp::v4(), 8887));
+	bool last = false;
 
-	while (true)
+	if (error && error != boost::asio::error::message_size)
+		throw boost::system::system_error(error);
+	if (size != 0)
 	{
-		boost::array<unsigned char, 32768> recv_buf;
-		udp::endpoint remote_endpoint;
-		boost::system::error_code error;
-
-		std::size_t len = socket.receive_from(boost::asio::buffer(recv_buf),
-			remote_endpoint,
-			0,
-			error);
-		if (error && error != boost::asio::error::message_size)
-			throw boost::system::system_error(error);
-
-		std::string msg(reinterpret_cast<char*>(recv_buf.c_array()), len);
+		std::string msg(reinterpret_cast<char*>(recv_buf.c_array()), size);
 		auto data = readData(msg);
+		last = data.getLast();
 		enqueueData(data);
 	}
-	socket.close();
+	recv_packet();
+}
+
+void ModelUpdater::recv_packet()
+{
+	socket->async_receive_from(boost::asio::buffer(recv_buf),
+		remote_endpoint,
+		boost::bind(&ModelUpdater::handle_receive,
+		this,
+		boost::asio::placeholders::error,
+		boost::asio::placeholders::bytes_transferred));
+}
+
+void ModelUpdater::run(std::atomic_bool& quit)
+{
+	//while (!quit)
+	io_service.run();
+	s->notify();
+	socket->close();
+}
+
+void ModelUpdater::stop()
+{
+	io_service.stop();
 }
 
 ModelUpdater::~ModelUpdater()

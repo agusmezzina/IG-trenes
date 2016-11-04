@@ -1,7 +1,7 @@
 #include "DataPacket.h"
 
 
-DataPacket::DataPacket(int id, float x, float y, float z, float vx, float vy, float vz, float ax, float ay, float az, float alpha, float alphaV, float t)
+DataPacket::DataPacket(int id, float x, float y, float z, float vx, float vy, float vz, float ax, float ay, float az, float alpha, float alphaV, float t, bool last)
 {
 	this->id = id;
 	this->x = x;
@@ -16,6 +16,7 @@ DataPacket::DataPacket(int id, float x, float y, float z, float vx, float vy, fl
 	this->alpha = alpha;
 	this->alphaV = alphaV;
 	this->t = t;
+	this->last = last;
 }
 
 int DataPacket::getID() const
@@ -81,6 +82,11 @@ float DataPacket::getAlphaV() const
 float DataPacket::getTime() const
 {
 	return this->t;
+}
+
+bool DataPacket::getLast() const
+{
+	return this->last;
 }
 
 DataPacket::~DataPacket()

@@ -141,7 +141,7 @@ int DeadReckoning::getSmoothness() const
 
 DeadReckoning::DeadReckoning(World* model, World* ghost) : model(model), ghost(ghost)
 {
-	rThreshold = 0.1f;
+	rThreshold = 0.5f;
 	smoothness = 10;
 }
 
