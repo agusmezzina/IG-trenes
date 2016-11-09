@@ -46,8 +46,6 @@ bool CigiHost::updateModelFromNetwork()
 		auto lastData = rawData->front();
 		data->updateEntityPosition(lastData.getID(), osg::Vec3f(lastData.getX(), lastData.getY(), lastData.getZ()));
 		data->updateEntityVelocity(lastData.getID(), osg::Vec3f(lastData.getVx(), lastData.getVy(), lastData.getVz()));
-		data->updateEntityOrientation(lastData.getID(), osg::Vec3f(lastData.getAlpha(), 0.0f, 0.0f));
-		data->updateEntityAngularVelocity(lastData.getID(), osg::Vec3f(lastData.getAlphaV(), 0.0f, 0.0f));
 		data->updateEntityAcceleration(lastData.getID(), osg::Vec3f(lastData.getAx(), lastData.getAy(), lastData.getAz()));
 		last = lastData.getLast();
 		simulationTime = lastData.getTime();

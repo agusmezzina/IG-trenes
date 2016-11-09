@@ -82,6 +82,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BezierCurve.h" />
     <ClInclude Include="CigiHost.h" />
     <ClInclude Include="CigiPacker.h" />
     <ClInclude Include="DataPacket.h" />
@@ -98,6 +99,7 @@
     <ClInclude Include="World.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="BezierCurve.cpp" />
     <ClCompile Include="CigiHost.cpp" />
     <ClCompile Include="CIGIHostAdapter.cpp" />
     <ClCompile Include="CigiPacker.cpp" />
