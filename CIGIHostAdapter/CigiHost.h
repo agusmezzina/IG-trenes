@@ -20,6 +20,9 @@ class CigiHost
 public:
 	CigiHost(World* data, World* ghost, Semaphore* sem, std::queue<DataPacket>* rawData);
 	void changeThreshold(float thresh);
+	bool toggleDR();
+	bool togglePredictionMethod();
+	void changeLatency(int latency);
 	void run(std::atomic_bool& quit);
 	virtual ~CigiHost();
 private:
@@ -43,6 +46,9 @@ private:
 	float prevSimulationTime;
 	float simulationTime;
 	bool last;
+	bool usingDR;
+	bool quadratic;
+	int latency;
 	std::ofstream dataFile;
 	std::ofstream log;
 };

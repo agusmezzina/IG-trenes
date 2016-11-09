@@ -192,9 +192,9 @@ void GraphicManager::createScene(){
 
 int GraphicManager::runViewer(){
 	osgViewer::Viewer viewer;
-	//osg::ref_ptr<CommandController> commCrtl = new CommandController(env.get());
+	osg::ref_ptr<CommandController> commCrtl = new CommandController(env.get());
 	viewer.setSceneData(_sceneRoot.get());
-	//viewer.addEventHandler(commCrtl.get());
+	viewer.addEventHandler(commCrtl.get());
 	viewer.addEventHandler(new osgViewer::StatsHandler);
 	viewer.apply(new osgViewer::SingleWindow(10, 10, 800, 600));
 	env->start();

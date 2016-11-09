@@ -26,7 +26,7 @@ void CigiIG::recvPacket()
 void CigiIG::handle_receive(const boost::system::error_code& error, std::size_t size)
 {
 	recvPacket();
-	std::this_thread::sleep_for(std::chrono::milliseconds(300)); //DELAY
+	//std::this_thread::sleep_for(std::chrono::milliseconds(300)); //DELAY
 	if (error && error != boost::asio::error::message_size)
 		throw boost::system::system_error(error);
 

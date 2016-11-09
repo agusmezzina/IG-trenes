@@ -18,6 +18,9 @@ CigiHost::CigiHost(World* data, World* ghost, Semaphore* sem, std::queue<DataPac
 	log.open("logHost.txt");
 	prevSimulationTime = 0;
 	last = false;
+	usingDR = true;
+	quadratic = true;
+	latency = 300;
 	//compensationTime = 0;
 }
 
@@ -59,11 +62,26 @@ void CigiHost::sendCigiPacket()
 
 }
 
+void CigiHost::changeLatency(int latency)
+{
+	if (latency >= 0)
+		this->latency = latency;
+}
+
+bool CigiHost::toggleDR()
+{
+	usingDR = !usingDR;
+	return usingDR;
+}
+
+bool CigiHost::togglePredictionMethod()
+{
+	quadratic = !quadratic;
+	return quadratic;
+}
+
 void CigiHost::run(std::atomic_bool& quit)
 {
-	float delay = 0.3f;
-	bool usingDR = true;
-	bool quadratic = true;	
 	bool first = true;
 	try
 	{

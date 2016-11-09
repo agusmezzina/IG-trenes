@@ -134,6 +134,8 @@ void CigiUpdateCallback::operator()(osg::Node* node, osg::NodeVisitor* nv){
 		}
 		else
 		{
+			logFile << "Time = " << elapsed.count() <<
+				"; " << "Pos = (" << p.x() << "; " << p.y() << "; " << p.z() << ")" << std::endl;
 			pDraw = p;
 			alphaDraw = alpha;
 		}

@@ -22,7 +22,7 @@ bool CommandController::handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActio
 			if (res)
 				std::cout << "Dead Reckoning = ON" << std::endl;
 			else
-				std::cout << "Dead Reckoning = OFF" << res << std::endl;
+				std::cout << "Dead Reckoning = OFF" << std::endl;
 			break;
 		case 'i':
 			res = env->togglePredictionMethod();
@@ -37,6 +37,8 @@ bool CommandController::handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActio
 	default:
 		break;
 	}
+
+	return false;
 }
 
 CommandController::CommandController(osgCigi::CigiSimulationEnvironment* environment)
