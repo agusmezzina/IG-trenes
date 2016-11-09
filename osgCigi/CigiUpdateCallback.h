@@ -6,6 +6,7 @@
 #include <fstream>
 #include "World.h"
 #include "DeadReckoning.h"
+#include "CubicBezier.h"
 
 namespace osgCigi
 {
@@ -31,6 +32,7 @@ namespace osgCigi
 		World* _ghost;
 		int correctionStep;
 		std::unique_ptr<DeadReckoning> dr;
+		std::unique_ptr<CubicBezier> trajectory;
 		osg::Vec3f p_1;
 		osg::Vec3f v_1;
 		osg::Vec3f a_1;

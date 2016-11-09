@@ -51,6 +51,9 @@
     <ClInclude Include="CigiUpdateCallback.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CubicBezier.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ControlEventProcessor.cpp">
@@ -84,6 +87,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="CigiUpdateCallback.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CubicBezier.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

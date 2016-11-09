@@ -19,7 +19,7 @@ CigiHost::CigiHost(World* data, World* ghost, Semaphore* sem, std::queue<DataPac
 	prevSimulationTime = 0;
 	last = false;
 	usingDR = true;
-	quadratic = true;
+	quadratic = false;
 	latency = 300;
 	//compensationTime = 0;
 }

@@ -5,7 +5,6 @@ using namespace osgCigi;
 
 void DeadReckoning::firstOrderUpdateGhost(int entityID, float deltaT)
 {
-	//ghost->firstOrderPredictUpdate([deltaT](float p, float v) {return p + v * deltaT; });
 	auto ghostEntity = ghost->getEntity(entityID);
 	auto p = ghostEntity.getPosition();
 	auto v = ghostEntity.getVelocity();
@@ -14,7 +13,6 @@ void DeadReckoning::firstOrderUpdateGhost(int entityID, float deltaT)
 
 void DeadReckoning::secondOrderUpdateGhost(int entityID, float deltaT)
 {
-	//ghost->firstOrderPredictUpdate([deltaT](float p, float v) {return p + v * deltaT; });
 	auto ghostEntity = ghost->getEntity(entityID);
 	auto p = ghostEntity.getPosition();
 	auto v = ghostEntity.getVelocity();
@@ -52,9 +50,6 @@ osg::Vec3f DeadReckoning::getConvergencePoint()
 
 void DeadReckoning::correctGhost(int entityID, int step)
 {
-	/*if (step == 1)
-		this->compensateAndCorrectGhost(entityID);*/
-
 	auto entity = model->getEntity(entityID);
 	auto p = entity.getPosition();
 	auto v = entity.getVelocity();
@@ -68,9 +63,6 @@ void DeadReckoning::correctGhost(int entityID, int step)
 	ghost->updateEntityPosition(entityID, startPoint + (convergencePoint - startPoint) * step / smoothness);
 	ghost->updateEntityVelocity(entityID, convergenceVelocity);
 	ghost->updateEntityAcceleration(entityID, a);
-
-	//ghost->updateEntityPosition(entityID, pg + (convergencePoint - pg) * step / smoothness);
-	//ghost->updateEntityVelocity(entityID, v);
 }
 
 void DeadReckoning::correctGhost(int entityID)
@@ -136,7 +128,7 @@ void DeadReckoning::setThreshold(float thresh)
 
 DeadReckoning::DeadReckoning(World* model, World* ghost) : model(model), ghost(ghost)
 {
-	rThreshold = 0.5f;
+	rThreshold = 0.2f;
 	smoothness = 10;
 }
 

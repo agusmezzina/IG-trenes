@@ -85,6 +85,7 @@
     <ClInclude Include="CigiSessionHandler.h" />
     <ClInclude Include="CigiSimulationEnvironment.h" />
     <ClInclude Include="ControlEventProcessor.h" />
+    <ClInclude Include="CubicBezier.h" />
     <ClInclude Include="DataEventProcessor.h" />
     <ClInclude Include="DeadReckoning.h" />
     <ClInclude Include="Entity.h" />
@@ -98,6 +99,7 @@
     <ClCompile Include="CigiSessionHandler.cpp" />
     <ClCompile Include="CigiSimulationEnvironment.cpp" />
     <ClCompile Include="ControlEventProcessor.cpp" />
+    <ClCompile Include="CubicBezier.cpp" />
     <ClCompile Include="DataEventProcessor.cpp" />
     <ClCompile Include="DeadReckoning.cpp" />
     <ClCompile Include="Entity.cpp" />
