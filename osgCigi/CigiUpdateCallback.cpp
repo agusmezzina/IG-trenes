@@ -20,9 +20,7 @@ CigiUpdateCallback::CigiUpdateCallback(World* data, World* ghost) : _data(data),
 	logFile.open("logIG.txt");
 	started = false;
 	usingDR = true;
-	x = osg::Vec2f(p_1.y(), 0.0f);
-	x_1 = x;
-	x_2 = x;
+	quadratic = true;
 }
 
 bool CigiUpdateCallback::modelChanged()
@@ -38,9 +36,35 @@ bool CigiUpdateCallback::modelChanged()
 	return result;
 }
 
+bool CigiUpdateCallback::toggleDR()
+{
+	usingDR = !usingDR;
+	return usingDR;
+}
+
+int CigiUpdateCallback::addSmoothness()
+{
+	int smooth = dr->getSmoothness();
+	dr->setSmoothness(smooth + 1);
+	return smooth + 1;
+}
+
+int CigiUpdateCallback::decreaseSmoothness()
+{
+	int smooth = dr->getSmoothness();
+	if (smooth > 1)
+		dr->setSmoothness(smooth - 1);
+	return dr->getSmoothness();
+}
+
+bool CigiUpdateCallback::togglePredictionMethod()
+{
+	quadratic = !quadratic;
+	return quadratic;
+}
+
 void CigiUpdateCallback::operator()(osg::Node* node, osg::NodeVisitor* nv){
 	osg::MatrixTransform* transformNode = static_cast<osg::MatrixTransform*>(node);
-	bool quadratic = true;
 	auto currentTime = std::chrono::high_resolution_clock::now();
 	std::chrono::duration<float> deltaT = currentTime - prevTime;
 	prevTime = currentTime;
@@ -110,6 +134,8 @@ void CigiUpdateCallback::operator()(osg::Node* node, osg::NodeVisitor* nv){
 		}
 		else
 		{
+			logFile << "Time = " << elapsed.count() <<
+				"; " << "Pos = (" << p.x() << "; " << p.y() << "; " << p.z() << ")" << std::endl;
 			pDraw = p;
 			alphaDraw = alpha;
 		}
@@ -129,15 +155,6 @@ void CigiUpdateCallback::operator()(osg::Node* node, osg::NodeVisitor* nv){
 
 	transformNode->setMatrix(osg::Matrix::rotate(factor * alphaDraw.x() * PI / 180.0f, osg::Vec3f(0.0f, 1.0f, 0.0f)) * osg::Matrix::translate(pDraw));
 	traverse(node, nv);
-}
-
-float CigiUpdateCallback::calculateAngleOfEmbrace() const
-{
-	auto pi = atan(1) * 4;
-	auto a = x_2 - x_1;
-	auto b = x - x_1;
-	auto angleRad = acosf((a * b) / (a.length() * b.length()));
-	return angleRad * 180 / pi;
 }
 
 CigiUpdateCallback::~CigiUpdateCallback()

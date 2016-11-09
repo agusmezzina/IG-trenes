@@ -86,6 +86,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CameraController.h" />
+    <ClInclude Include="CommandController.h" />
     <ClInclude Include="GraphicManager.h" />
     <ClInclude Include="Sky.h" />
     <ClInclude Include="Skybox.h" />
@@ -94,6 +95,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CameraController.cpp" />
+    <ClCompile Include="CommandController.cpp" />
     <ClCompile Include="GraphicManager.cpp" />
     <ClCompile Include="Sky.cpp" />
     <ClCompile Include="Skybox.cpp" />

@@ -10,28 +10,86 @@
 #include "DataPacket.h"
 #include <thread>
 #include <queue>
+#include <atomic>
+#include <iostream>
+#include <boost\algorithm\string.hpp>
 
 int _tmain(int argc, _TCHAR* argv[])
 {
-	//UDPServer server;
-	//SceneData data;
+	std::atomic_bool quit;
+	quit = false;
 	Semaphore s;
 	std::queue<DataPacket> data;
 	World worldData;
 	World ghostData;
-	/*worldData.updateEntityPosition(1, osg::Vec3f(0.0f, 3.0f, 0.0f));
-	ghostData.updateEntityPosition(1, osg::Vec3f(0.0f, 3.0f, 0.0f));*/
 	CigiHost server(&worldData, &ghostData, &s, &data);
 	ModelUpdater model(&s, &data);
-	//SimulationTimer timer(&data, &worldData);
 
-	std::thread cigiThread(&CigiHost::run, &server);
-	std::thread modelThread(&ModelUpdater::run, &model);
-	//std::thread timerThread(&SimulationTimer::run, &timer);
+	std::thread cigiThread(&CigiHost::run, &server, std::ref(quit));
+	std::thread modelThread(&ModelUpdater::run, &model, std::ref(quit));
 
+	std::string command = "";
+	do
+	{
+		std::getline(std::cin, command);
+		if (command.substr(0, 6) == "thresh")
+		{
+			float thresh = 0;
+			std::vector<std::string> fields;
+			boost::split(fields, command, boost::is_any_of("\t "), boost::token_compress_on);
+			if (fields.size() == 2)
+			{
+				try
+				{
+					thresh = std::stof(fields[1]);
+					server.changeThreshold(thresh);
+					std::cout << "Threshold changed to " << thresh << std::endl;
+				}
+				catch (...)
+				{
+				}
+			}
+		}
+		if (command.substr(0, 7) == "latency")
+		{
+			int latency = 0;
+			std::vector<std::string> fields;
+			boost::split(fields, command, boost::is_any_of("\t "), boost::token_compress_on);
+			if (fields.size() == 2)
+			{
+				try
+				{
+					latency = std::stoi(fields[1]);
+					server.changeLatency(latency);
+					std::cout << "Latency changed to " << latency << " milliseconds" << std::endl;
+				}
+				catch (...)
+				{
+				}
+			}
+		}
+		if (command == "dr")
+		{
+			bool value = server.toggleDR();
+			if (value)
+				std::cout << "Dead Reckoning ON" << std::endl;
+			else
+				std::cout << "Dead Reckoning OFF" << std::endl;
+		}
+		if (command == "predict")
+		{
+			bool value = server.togglePredictionMethod();
+			if (value)
+				std::cout << "Prediction Method = QUADRATIC" << std::endl;
+			else
+				std::cout << "Prediction Method = LINEAR" << std::endl;
+		}
+	} while (command != "quit");
+
+	model.stop();
+	quit = true;
 	cigiThread.join();
 	modelThread.join();
-	//timerThread.join();
 
 	return 0;
 }

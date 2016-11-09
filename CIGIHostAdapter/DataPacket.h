@@ -2,7 +2,7 @@
 class DataPacket
 {
 public:
-	DataPacket(int id, float x, float y, float z, float vx, float vy, float vz, float ax, float ay, float az, float alpha, float alphaV, float t);
+	DataPacket(int id, float x, float y, float z, float vx, float vy, float vz, float ax, float ay, float az, float alpha, float alphaV, float t, bool last);
 	int getID() const;
 	float getX() const;
 	float getY() const;
@@ -16,9 +16,11 @@ public:
 	float getAlpha() const;
 	float getAlphaV() const;
 	float getTime() const;
+	bool getLast() const;
 	~DataPacket();
 private:
 	int id;
 	float x, y, z, vx, vy, vz, ax, ay, az, alpha, alphaV, t;
+	bool last;
 };
 

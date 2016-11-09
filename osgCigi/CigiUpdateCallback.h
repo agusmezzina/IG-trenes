@@ -12,10 +12,14 @@ namespace osgCigi
 	class CigiUpdateCallback : public osg::NodeCallback
 	{
 	public:
+
+		bool toggleDR();
+		int addSmoothness();
+		int decreaseSmoothness();
+		bool togglePredictionMethod();
+		virtual void operator()(osg::Node* node, osg::NodeVisitor* nv);
 		CigiUpdateCallback(World* data, World* ghost);
 		virtual ~CigiUpdateCallback();
-		virtual void operator()(osg::Node* node, osg::NodeVisitor* nv);
-		float calculateAngleOfEmbrace() const;
 	protected:
 		bool modelChanged();
 
@@ -33,9 +37,7 @@ namespace osgCigi
 		bool correcting;
 		bool started;
 		bool usingDR;
-		osg::Vec2f x_2;
-		osg::Vec2f x_1;
-		osg::Vec2f x;
+		bool quadratic;
 	};
 }
 

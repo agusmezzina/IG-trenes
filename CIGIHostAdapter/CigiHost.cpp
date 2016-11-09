@@ -17,6 +17,10 @@ CigiHost::CigiHost(World* data, World* ghost, Semaphore* sem, std::queue<DataPac
 	dataFile.open("dataHost.csv");
 	log.open("logHost.txt");
 	prevSimulationTime = 0;
+	last = false;
+	usingDR = true;
+	quadratic = true;
+	latency = 300;
 	//compensationTime = 0;
 }
 
@@ -28,18 +32,29 @@ void CigiHost::setupNetwork(const std::string& ip, const std::string& port)
 	socket.open(udp::v4());
 }
 
-void CigiHost::updateModelFromNetwork()
+void CigiHost::changeThreshold(float thresh)
+{
+	dr->setThreshold(thresh);
+}
+
+bool CigiHost::updateModelFromNetwork()
 {
 	s->wait();
 	prevSimulationTime = simulationTime;
-	auto lastData = rawData->front();
-	data->updateEntityPosition(lastData.getID(), osg::Vec3f(lastData.getX(), lastData.getY(), lastData.getZ()));
-	data->updateEntityVelocity(lastData.getID(), osg::Vec3f(lastData.getVx(), lastData.getVy(), lastData.getVz()));
-	data->updateEntityOrientation(lastData.getID(), osg::Vec3f(lastData.getAlpha(), 0.0f, 0.0f));
-	data->updateEntityAngularVelocity(lastData.getID(), osg::Vec3f(lastData.getAlphaV(), 0.0f, 0.0f));
-	data->updateEntityAcceleration(lastData.getID(), osg::Vec3f(lastData.getAx(), lastData.getAy(), lastData.getAz()));
-	simulationTime = lastData.getTime();
-	rawData->pop();
+	if (!rawData->empty())
+	{
+		auto lastData = rawData->front();
+		data->updateEntityPosition(lastData.getID(), osg::Vec3f(lastData.getX(), lastData.getY(), lastData.getZ()));
+		data->updateEntityVelocity(lastData.getID(), osg::Vec3f(lastData.getVx(), lastData.getVy(), lastData.getVz()));
+		data->updateEntityOrientation(lastData.getID(), osg::Vec3f(lastData.getAlpha(), 0.0f, 0.0f));
+		data->updateEntityAngularVelocity(lastData.getID(), osg::Vec3f(lastData.getAlphaV(), 0.0f, 0.0f));
+		data->updateEntityAcceleration(lastData.getID(), osg::Vec3f(lastData.getAx(), lastData.getAy(), lastData.getAz()));
+		last = lastData.getLast();
+		simulationTime = lastData.getTime();
+		rawData->pop();
+		return true;
+	}
+	return false;
 }
 
 void CigiHost::sendCigiPacket()
@@ -47,72 +62,92 @@ void CigiHost::sendCigiPacket()
 
 }
 
-void CigiHost::run()
+void CigiHost::changeLatency(int latency)
 {
-	float delay = 0.3f;
-	bool usingDR = true;
-	bool quadratic = true;	
+	if (latency >= 0)
+		this->latency = latency;
+}
+
+bool CigiHost::toggleDR()
+{
+	usingDR = !usingDR;
+	return usingDR;
+}
+
+bool CigiHost::togglePredictionMethod()
+{
+	quadratic = !quadratic;
+	return quadratic;
+}
+
+void CigiHost::run(std::atomic_bool& quit)
+{
 	bool first = true;
 	try
 	{
 		unsigned char* outBuffer;
 		int outBufferSize = 0;
 		setupNetwork("127.0.0.1", "8888");
-		for (;;)
+		while (!quit)
 		{
-			updateModelFromNetwork();
-			if (first)
-				clock->init();	 
+			if (updateModelFromNetwork())
+			{
+				if (first)
+					clock->init();
 
-			auto deltaSimTime = simulationTime - prevSimulationTime;
+				auto deltaSimTime = simulationTime - prevSimulationTime;
 
-			auto entity = data->getEntity(1);
-			auto p = entity.getPosition();
+				auto entity = data->getEntity(1);
+				auto p = entity.getPosition();
 
-			auto duration = std::chrono::high_resolution_clock::now().time_since_epoch();
-			auto millis = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
-			dataFile << millis % 100000 << ";" << p.x() << "; " << p.z() << std::endl;
+				auto duration = std::chrono::high_resolution_clock::now().time_since_epoch();
+				auto millis = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
+				dataFile << millis % 100000 << ";" << p.x() << "; " << p.z() << std::endl;
 
-			if (quadratic)
-				dr->secondOrderUpdateGhost(1, deltaSimTime);
-			else
-				dr->firstOrderUpdateGhost(1, deltaSimTime);
+				if (quadratic)
+					dr->secondOrderUpdateGhost(1, deltaSimTime);
+				else
+					dr->firstOrderUpdateGhost(1, deltaSimTime);
 
-			bool sendUpdate = true;
-			if (usingDR)
-				sendUpdate = dr->isThresholdViolated(1) || first;
+				bool sendUpdate = true;
+				if (usingDR)
+					sendUpdate = dr->isThresholdViolated(1) || first || last;
 
-			if (first)
-				first = false;
+				if (first)
+					first = false;
 
-			if (sendUpdate){
-				clock->sync(simulationTime);
-				auto v = entity.getVelocity();
-				auto a = entity.getAcceleration();
-				auto pg = ghost->getEntity(1).getPosition();
-				log << "Correcting Time = " << simulationTime <<
-					"; Real Time = " << millis << 
-					"; ghost = " << "(" << pg.x() << "; " << pg.y() << "; " << pg.z() << ") " <<
-					"; model = P=(" << p.x() << "; " << p.y() << +"; " << p.z() << ") " <<
-					"V=(" << v.x() << "; " << v.y() << +"; " << v.z() << ") " <<
-					"A=(" << a.x() << "; " << a.y() << +"; " << a.z() << ") " << std::endl;
-				
-				dr->correctGhost(1);
-				//clock->sync(simulationTime);
-				auto t = std::chrono::high_resolution_clock::now().time_since_epoch();
-				long timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(t).count();
-				cigi->packData(entity, timestamp, &outBuffer, outBufferSize);
+				if (last)
+					first = true;
 
-				boost::system::error_code ignored_error;
-				socket.send_to(boost::asio::buffer(outBuffer, outBufferSize),
-					receiver_endpoint,
-					0,
-					ignored_error);
+				if (sendUpdate){
+					clock->sync(simulationTime);
+					auto v = entity.getVelocity();
+					auto a = entity.getAcceleration();
+					auto pg = ghost->getEntity(1).getPosition();
+					log << "Correcting Time = " << simulationTime <<
+						"; Real Time = " << millis <<
+						"; ghost = " << "(" << pg.x() << "; " << pg.y() << "; " << pg.z() << ") " <<
+						"; model = P=(" << p.x() << "; " << p.y() << +"; " << p.z() << ") " <<
+						"V=(" << v.x() << "; " << v.y() << +"; " << v.z() << ") " <<
+						"A=(" << a.x() << "; " << a.y() << +"; " << a.z() << ") " << std::endl;
 
-				cigi->freePacket();
+					dr->correctGhost(1);
+					//clock->sync(simulationTime);
+					auto t = std::chrono::high_resolution_clock::now().time_since_epoch();
+					long timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(t).count();
+					cigi->packData(entity, timestamp, &outBuffer, outBufferSize);
+
+					boost::system::error_code ignored_error;
+					socket.send_to(boost::asio::buffer(outBuffer, outBufferSize),
+						receiver_endpoint,
+						0,
+						ignored_error);
+
+					cigi->freePacket();
+				}
+				else
+					clock->sync(simulationTime);
 			}
-			else
-				clock->sync(simulationTime);
 		}
 		socket.close();
 		log.close();
