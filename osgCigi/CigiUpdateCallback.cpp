@@ -14,9 +14,9 @@ CigiUpdateCallback::CigiUpdateCallback(World* data, World* ghost) : _data(data),
 	dr = std::make_unique<DeadReckoning>(data, ghost);
 	trajectory = std::make_unique<CubicBezier>(
 		osg::Vec3f(0.0f, 0.0f, 0.0f),
-		osg::Vec3f(25.0f, 0.0f, 50.0f),
-		osg::Vec3f(50.0f, 0.0f, -60.0f),
-		osg::Vec3f(75.0f, 0.0f, 0.0f));
+		osg::Vec3f(0.0f, 0.0f, 100.0f),
+		osg::Vec3f(50.0f, 0.0f, 100.0f),
+		osg::Vec3f(100.0f, 0.0f, 100.0f));
 	p_1 = _data->getEntity(1).getPosition();
 	v_1 = _data->getEntity(1).getVelocity();
 	a_1 = _data->getEntity(1).getAcceleration();
@@ -76,7 +76,8 @@ void CigiUpdateCallback::operator()(osg::Node* node, osg::NodeVisitor* nv){
 	std::chrono::duration<float> elapsed = currentTime - startTime;
 	auto p = _data->getEntity(1).getPosition();
 	osg::Vec3f pDraw;
-	osg::Matrix alphaDraw;
+	osg::Quat alphaDraw;
+	float uDraw = 0;
 	bool changed = modelChanged();
 
 	if (changed && !started)
@@ -85,8 +86,8 @@ void CigiUpdateCallback::operator()(osg::Node* node, osg::NodeVisitor* nv){
 		started = true;
 		startTime = std::chrono::high_resolution_clock::now();
 		dr->compensateAndCorrectGhost(1);
-		auto pg = _ghost->getEntity(1).getPosition();
-		logFile << "Ghost Pos = (" << pg.x() << "; " << pg.y() << "; " << pg.z() << ")" << std::endl;
+		/*auto pg = _ghost->getEntity(1).getPosition();
+		logFile << "Ghost Pos = (" << pg.x() << "; " << pg.y() << "; " << pg.z() << ")" << std::endl;*/
 	}
 	else
 	{
@@ -96,11 +97,11 @@ void CigiUpdateCallback::operator()(osg::Node* node, osg::NodeVisitor* nv){
 			{
 				correcting = true;
 				dr->setConvergencePoint(1, dr->getSmoothness() * deltaT.count());
-				auto cp = dr->getConvergencePoint();
+				/*auto cp = dr->getConvergencePoint();
 				auto pg = _ghost->getEntity(1).getPosition();
 				logFile << "Time = " << elapsed.count() << 
 					"; " << "Ghost Pos = (" << pg.x() << "; " << pg.y() << "; " << pg.z() << ")" <<
-					"; " << "Conv. Point = (" << cp.x() << "; " << cp.y() << "; " << cp.z() << ")" << std::endl;
+					"; " << "Conv. Point = (" << cp.x() << "; " << cp.y() << "; " << cp.z() << ")" << std::endl;*/
 				correctionStep = 1;
 			}
 
@@ -133,17 +134,15 @@ void CigiUpdateCallback::operator()(osg::Node* node, osg::NodeVisitor* nv){
 			}
 
 			//pDraw = _ghost->getEntity(1).getPosition();
-			auto u = _ghost->getEntity(1).getPosition().x();
-			pDraw = trajectory->getPosition(u);
-			alphaDraw = trajectory->getMOrientation(u);
+			uDraw = _ghost->getEntity(1).getPosition().x();
 		}
 		else
 		{
 			logFile << "Time = " << elapsed.count() <<
 				"; " << "Pos = (" << p.x() << "; " << p.y() << "; " << p.z() << ")" << std::endl;
 			//pDraw = p;
-			pDraw = trajectory->getPosition(p.x());
-			alphaDraw = trajectory->getMOrientation(p.x());
+			uDraw = p.x();
+			
 		}
 	}
 
@@ -151,17 +150,14 @@ void CigiUpdateCallback::operator()(osg::Node* node, osg::NodeVisitor* nv){
 	{
 		auto duration = std::chrono::high_resolution_clock::now().time_since_epoch();
 		auto millis = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
-		dataFile << millis % 100000 << ";" << pDraw.x() << "; " << pDraw.z() << std::endl;
+		dataFile << millis % 100000 << ";" << uDraw << ";" << pDraw.x() << "; " << pDraw.z() << std::endl;
 	}
-	/*float factor = 1;
-	if (_ghost->getEntity(1).getVelocity().z() > 0)
-		factor = -1;*/
-
-	//transformNode->setMatrix(osg::Matrix::rotate(factor * alphaDraw.x() * PI / 180.0f, osg::Vec3f(0.0f, 1.0f, 0.0f)) * osg::Matrix::translate(pDraw));
-	//osg::Matrix mat;
-	//mat.setTrans(pDraw);
-	//mat.setRotate(alphaDraw);
-	transformNode->setMatrix(alphaDraw);
+	pDraw = trajectory->getPosition(uDraw);
+	alphaDraw = trajectory->getOrientation(uDraw);
+	osg::Matrix mat;
+	mat.setTrans(pDraw);
+	mat.setRotate(alphaDraw);
+	transformNode->setMatrix(mat);
 	//transformNode->setMatrix(osg::Matrix::rotate(alphaDraw, osg::Vec3f(0.0f, 1.0f, 0.0f)) * osg::Matrix::translate(pDraw));
 	traverse(node, nv);
 }
