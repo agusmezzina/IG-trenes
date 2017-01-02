@@ -26,8 +26,6 @@ void CigiPacker::packData(const Entity& entity, long simulationTime, unsigned ch
 	auto p = entity.getPosition();
 	auto v = entity.getVelocity();
 	auto a = entity.getAcceleration();
-	auto alpha = entity.getOrientation();
-	auto alphaV = entity.getAngularVelocity();
 
 	igControl.SetIGMode(CigiBaseIGCtrl::Operate);
 	igControl.SetTimeStampValid(true);
@@ -41,11 +39,11 @@ void CigiPacker::packData(const Entity& entity, long simulationTime, unsigned ch
 	entityData.SetLat(p.x());
 	entityData.SetLon(p.y());
 	entityData.SetAlt(p.z());
-	entityData.SetYaw(alpha.x());
+	//entityData.SetYaw(alpha.x());
 	rateData.SetXRate(v.x());
 	rateData.SetYRate(v.y());
 	rateData.SetZRate(v.z());
-	rateData.SetYawRate(alphaV.x());
+	//rateData.SetYawRate(alphaV.x());
 	trajectoryData.SetAccelX(a.x());
 	trajectoryData.SetAccelY(a.y());
 	trajectoryData.SetAccelZ(a.z());

@@ -12,6 +12,11 @@ CigiUpdateCallback::CigiUpdateCallback(World* data, World* ghost) : _data(data),
 	startTime = std::chrono::high_resolution_clock::now();
 	correctionStep = 0;
 	dr = std::make_unique<DeadReckoning>(data, ghost);
+	trajectory = std::make_unique<CubicBezier>(
+		osg::Vec3f(0.0f, 0.0f, 0.0f),
+		osg::Vec3f(25.0f, 0.0f, 50.0f),
+		osg::Vec3f(50.0f, 0.0f, -60.0f),
+		osg::Vec3f(75.0f, 0.0f, 0.0f));
 	p_1 = _data->getEntity(1).getPosition();
 	v_1 = _data->getEntity(1).getVelocity();
 	a_1 = _data->getEntity(1).getAcceleration();
@@ -20,7 +25,7 @@ CigiUpdateCallback::CigiUpdateCallback(World* data, World* ghost) : _data(data),
 	logFile.open("logIG.txt");
 	started = false;
 	usingDR = true;
-	quadratic = true;
+	quadratic = false;
 }
 
 bool CigiUpdateCallback::modelChanged()
@@ -70,9 +75,8 @@ void CigiUpdateCallback::operator()(osg::Node* node, osg::NodeVisitor* nv){
 	prevTime = currentTime;
 	std::chrono::duration<float> elapsed = currentTime - startTime;
 	auto p = _data->getEntity(1).getPosition();
-	auto alpha = _data->getEntity(1).getOrientation();
 	osg::Vec3f pDraw;
-	osg::Vec3f alphaDraw;
+	osg::Matrix alphaDraw;
 	bool changed = modelChanged();
 
 	if (changed && !started)
@@ -80,7 +84,6 @@ void CigiUpdateCallback::operator()(osg::Node* node, osg::NodeVisitor* nv){
 		logFile << "Started" << std::endl;
 		started = true;
 		startTime = std::chrono::high_resolution_clock::now();
-		//dr->correctGhost(1);
 		dr->compensateAndCorrectGhost(1);
 		auto pg = _ghost->getEntity(1).getPosition();
 		logFile << "Ghost Pos = (" << pg.x() << "; " << pg.y() << "; " << pg.z() << ")" << std::endl;
@@ -129,31 +132,37 @@ void CigiUpdateCallback::operator()(osg::Node* node, osg::NodeVisitor* nv){
 					dr->firstOrderUpdateGhost(1, deltaT.count());
 			}
 
-			pDraw = _ghost->getEntity(1).getPosition();
-			alphaDraw = _ghost->getEntity(1).getOrientation();
+			//pDraw = _ghost->getEntity(1).getPosition();
+			auto u = _ghost->getEntity(1).getPosition().x();
+			pDraw = trajectory->getPosition(u);
+			alphaDraw = trajectory->getMOrientation(u);
 		}
 		else
 		{
 			logFile << "Time = " << elapsed.count() <<
 				"; " << "Pos = (" << p.x() << "; " << p.y() << "; " << p.z() << ")" << std::endl;
-			pDraw = p;
-			alphaDraw = alpha;
+			//pDraw = p;
+			pDraw = trajectory->getPosition(p.x());
+			alphaDraw = trajectory->getMOrientation(p.x());
 		}
 	}
 
 	if (started)
 	{
-		//std::chrono::duration<float> elapsed = actualTime - startTime;
-		//dataFile << alphaDraw.x() << ";" << pDraw.x() << "; " << elapsed.count() << /*"; " << calculateAngleOfEmbrace() << "; " << */std::endl;
 		auto duration = std::chrono::high_resolution_clock::now().time_since_epoch();
 		auto millis = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
 		dataFile << millis % 100000 << ";" << pDraw.x() << "; " << pDraw.z() << std::endl;
 	}
-	float factor = 1;
+	/*float factor = 1;
 	if (_ghost->getEntity(1).getVelocity().z() > 0)
-		factor = -1;
+		factor = -1;*/
 
-	transformNode->setMatrix(osg::Matrix::rotate(factor * alphaDraw.x() * PI / 180.0f, osg::Vec3f(0.0f, 1.0f, 0.0f)) * osg::Matrix::translate(pDraw));
+	//transformNode->setMatrix(osg::Matrix::rotate(factor * alphaDraw.x() * PI / 180.0f, osg::Vec3f(0.0f, 1.0f, 0.0f)) * osg::Matrix::translate(pDraw));
+	//osg::Matrix mat;
+	//mat.setTrans(pDraw);
+	//mat.setRotate(alphaDraw);
+	transformNode->setMatrix(alphaDraw);
+	//transformNode->setMatrix(osg::Matrix::rotate(alphaDraw, osg::Vec3f(0.0f, 1.0f, 0.0f)) * osg::Matrix::translate(pDraw));
 	traverse(node, nv);
 }
 
