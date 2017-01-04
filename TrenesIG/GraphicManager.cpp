@@ -18,6 +18,11 @@
 GraphicManager::GraphicManager()
 {
 	env = std::make_unique<osgCigi::CigiSimulationEnvironment>();
+	trackCurve = std::make_unique<osgCigi::CubicBezier>(
+		osg::Vec3f(0.0f, 0.0f, 0.0f),
+		osg::Vec3f(0.0f, 0.0f, 100.0f),
+		osg::Vec3f(50.0f, 0.0f, 100.0f),
+		osg::Vec3f(100.0f, 0.0f, 100.0f));
 }
 
 //osg::Camera* GraphicManager::createHUDCamera(double left, double right, double bottom, double top)
@@ -90,30 +95,40 @@ osg::Geode* GraphicManager::createFloor()
 osg::Geode* GraphicManager::createPath()
 {
 	osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array;
-	/*vertices->push_back(osg::Vec3(-1000.0f, 0.3f, -1000.0f));
-	vertices->push_back(osg::Vec3(1000.0f, 0.3f, -1000.0f));
-	vertices->push_back(osg::Vec3(1000.0f, 0.3f, 1000.0f));
-	vertices->push_back(osg::Vec3(-1000.0f, 0.3f, 1000.0f));*/
-	vertices->push_back(osg::Vec3(-1000.0f, 0.299f, -2.0f));
+	/*vertices->push_back(osg::Vec3(-1000.0f, 0.299f, -2.0f));
 	vertices->push_back(osg::Vec3(1000.0f, 0.299f, -2.0f));
 	vertices->push_back(osg::Vec3(1000.0f, 0.299f, 2.0f));
-	vertices->push_back(osg::Vec3(-1000.0f, 0.299f, 2.0f));
+	vertices->push_back(osg::Vec3(-1000.0f, 0.299f, 2.0f));*/
 
 	osg::ref_ptr<osg::Vec3Array> normals = new osg::Vec3Array;
 	normals->push_back(osg::Vec3(0.0f, 0.0f, 1.0f));
 
 	osg::ref_ptr<osg::Vec2Array> texcoords = new osg::Vec2Array;
-	texcoords->push_back(osg::Vec2(0.0f, 0.0f));
+	/*texcoords->push_back(osg::Vec2(0.0f, 0.0f));
 	texcoords->push_back(osg::Vec2(500.0f, 0.0f));
 	texcoords->push_back(osg::Vec2(500.0f, 1.0f));
-	texcoords->push_back(osg::Vec2(0.0f, 1.0f));
+	texcoords->push_back(osg::Vec2(0.0f, 1.0f));*/
+
+	for (float t = 0; t <= 1; t += 0.01)
+	{
+		auto pos = trackCurve->getPositionByArcLength(t);
+		auto rot = trackCurve->getOrientationByArcLength(t);
+		double angle = 0, x = 0, y = 0, z = 0;
+		rot.getRotate(angle, x, y, z);
+		auto vert1 = osg::Vec3(pos.x() + /*pos.x() * */2*cos(angle + osg::DegreesToRadians(90.0)), -0.05f, pos.z() + /*pos.z() * */2*sin(angle + osg::DegreesToRadians(90.0)));
+		auto vert2 = osg::Vec3(pos.x() + /*pos.x() * */2*cos(angle - osg::DegreesToRadians(90.0)), -0.05f, pos.z() + /*pos.z() * */2*sin(angle - osg::DegreesToRadians(90.0)));
+		vertices->push_back(vert1);
+		vertices->push_back(vert2);
+		texcoords->push_back(osg::Vec2(0.0f, t * 100));
+		texcoords->push_back(osg::Vec2(1.0f, t * 100));
+	}
 
 	osg::ref_ptr<osg::Geometry> quad = new osg::Geometry;
 	quad->setVertexArray(vertices.get());
 	quad->setNormalArray(normals.get());
 	quad->setNormalBinding(osg::Geometry::BIND_OVERALL);
 	quad->setTexCoordArray(0, texcoords.get());
-	quad->addPrimitiveSet(new osg::DrawArrays(GL_QUADS, 0, 4));
+	quad->addPrimitiveSet(new osg::DrawArrays(GL_TRIANGLE_STRIP, 0, 200));
 
 	osg::ref_ptr<osg::Texture2D> texture = new osg::Texture2D;
 	osg::ref_ptr<osg::Image> image = osgDB::readImageFile("C:\\ObjetosVarios\\road-with-gravel.jpg");
@@ -163,16 +178,10 @@ osg::Node* GraphicManager::createTrack()
 	osg::ref_ptr<osg::Group> track = new osg::Group;
 	osg::ref_ptr<osg::Node> model = osgDB::readNodeFile("C:\\ObjetosVarios\\EstacionDemo\\durmienteSolo.flt.90,0,0.rot");
 
-	auto curve = std::make_unique<osgCigi::CubicBezier>(
-		osg::Vec3f(0.0f, 0.0f, 0.0f),
-		osg::Vec3f(0.0f, 0.0f, 100.0f),
-		osg::Vec3f(50.0f, 0.0f, 100.0f),
-		osg::Vec3f(100.0f, 0.0f, 100.0f));
-
 	for (float t = 0; t <= 1; t += 0.01)
 	{
-		auto pos = curve->getPositionByArcLength(t);
-		auto rot = curve->getOrientationByArcLength(t);
+		auto pos = trackCurve->getPositionByArcLength(t);
+		auto rot = trackCurve->getOrientationByArcLength(t);
 		osg::ref_ptr<osg::PositionAttitudeTransform> transf = new osg::PositionAttitudeTransform;
 		transf->setPosition(pos);
 		transf->setAttitude(rot);
@@ -191,15 +200,15 @@ void GraphicManager::createScene(){
 
 	osg::ref_ptr<osg::Node> light = createLightSource(0, osg::Vec3(10.0f, -10.0f, -20.0f), osg::Vec4(0.5f, 0.5f, 0.5f, 1.0f));
 	//osg::ref_ptr<osg::Node> rail = osgDB::readNodeFile("C:\\ObjetosVarios\\EstacionDemo\\tramo_vias2.flt.90,90,0.rot");
-	osg::ref_ptr<osg::Node> anden = osgDB::readNodeFile("C:\\ObjetosVarios\\EstacionDemo\\anden_con_techo\\anden_con_techo.flt.90,90,0.rot.[6,0.85,-3.5].trans");	
+	//osg::ref_ptr<osg::Node> anden = osgDB::readNodeFile("C:\\ObjetosVarios\\EstacionDemo\\anden_con_techo\\anden_con_techo.flt.90,90,0.rot.[6,0.85,-3.5].trans");	
 	osg::ref_ptr<osg::Geode> floor = createFloor();
 	osg::ref_ptr<osg::Geode> path = createPath();
 	osg::ref_ptr<osg::Node> skydome = createSky();
 	osg::ref_ptr<osg::Node> track = createTrack();
 
-	osg::ref_ptr<osg::MatrixTransform> transfAnden1 = new osg::MatrixTransform;
-	transfAnden1->setMatrix(osg::Matrix::translate(osg::Vec3f(-5.0f, 0.0f, 0.0f)));
-	transfAnden1->addChild(anden);
+	//osg::ref_ptr<osg::MatrixTransform> transfAnden1 = new osg::MatrixTransform;
+	//transfAnden1->setMatrix(osg::Matrix::translate(osg::Vec3f(-5.0f, 0.0f, 0.0f)));
+	//transfAnden1->addChild(anden);
 
 	/*for (int i = -30; i < 30; i++)
 	{
@@ -212,7 +221,7 @@ void GraphicManager::createScene(){
 	scene->addChild(track);
 
 	scene->addChild(light);
-	scene->addChild(transfAnden1);
+	//scene->addChild(transfAnden1);
 	scene->addChild(floor);
 	scene->addChild(path);
 	scene->addChild(skydome);

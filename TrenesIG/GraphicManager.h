@@ -5,6 +5,7 @@
 #include "CommandController.h"
 #include <osgViewer/Viewer>
 #include "CigiSimulationEnvironment.h"
+#include "CubicBezier.h"
 
 class GraphicManager
 {
@@ -12,6 +13,7 @@ private:
 	//SceneData* _data;
 	//CigiNetworkManager netMgr;
 	std::unique_ptr<osgCigi::CigiSimulationEnvironment> env;
+	std::unique_ptr<osgCigi::CubicBezier> trackCurve;
 	osg::ref_ptr<osg::Node> _sceneRoot;
 	//osg::ref_ptr<CameraController> _cameraCtrl;
 	//osg::Camera* createHUDCamera(double left, double right, double bottom, double top);
