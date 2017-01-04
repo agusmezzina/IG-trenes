@@ -21,6 +21,7 @@ private:
 	osg::Geode* createPath();
 	osg::Node* createLightSource(unsigned int num, const osg::Vec3& trans, const osg::Vec4& color);
 	osg::Node* createSky();
+	osg::Node* createTrack();
 	void createScene();
 	int runViewer();
 public:

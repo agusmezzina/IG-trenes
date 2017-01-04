@@ -4,6 +4,7 @@
 #include <osg\Geode>
 #include <osg\ShapeDrawable>
 #include <osg\MatrixTransform>
+#include <osg\PositionAttitudeTransform>
 #include <osg\Switch>
 #include <osg\TexGen>
 #include <osgDB\ReadFile>
@@ -12,6 +13,7 @@
 #include <osgViewer\config\SingleWindow>
 #include <iostream>
 #include <chrono>
+#include <vector>
 
 GraphicManager::GraphicManager()
 {
@@ -156,6 +158,31 @@ osg::Node* GraphicManager::createSky()
 	return skydome.release();
 }
 
+osg::Node* GraphicManager::createTrack()
+{
+	osg::ref_ptr<osg::Group> track = new osg::Group;
+	osg::ref_ptr<osg::Node> model = osgDB::readNodeFile("C:\\ObjetosVarios\\EstacionDemo\\durmienteSolo.flt.90,0,0.rot");
+
+	auto curve = std::make_unique<osgCigi::CubicBezier>(
+		osg::Vec3f(0.0f, 0.0f, 0.0f),
+		osg::Vec3f(0.0f, 0.0f, 100.0f),
+		osg::Vec3f(50.0f, 0.0f, 100.0f),
+		osg::Vec3f(100.0f, 0.0f, 100.0f));
+
+	for (float t = 0; t <= 1; t += 0.01)
+	{
+		auto pos = curve->getPositionByArcLength(t);
+		auto rot = curve->getOrientationByArcLength(t);
+		osg::ref_ptr<osg::PositionAttitudeTransform> transf = new osg::PositionAttitudeTransform;
+		transf->setPosition(pos);
+		transf->setAttitude(rot);
+		transf->addChild(model);
+		track->addChild(transf);
+	}
+	return track.release();
+	
+}
+
 void GraphicManager::createScene(){
 	osg::ref_ptr<osg::Group> scene = new osg::Group;
 
@@ -163,23 +190,26 @@ void GraphicManager::createScene(){
 	osg::ref_ptr<osg::Group> sim = env->createSimulationScene();
 
 	osg::ref_ptr<osg::Node> light = createLightSource(0, osg::Vec3(10.0f, -10.0f, -20.0f), osg::Vec4(0.5f, 0.5f, 0.5f, 1.0f));
-	osg::ref_ptr<osg::Node> rail = osgDB::readNodeFile("C:\\ObjetosVarios\\EstacionDemo\\tramo_vias2.flt.90,90,0.rot");
+	//osg::ref_ptr<osg::Node> rail = osgDB::readNodeFile("C:\\ObjetosVarios\\EstacionDemo\\tramo_vias2.flt.90,90,0.rot");
 	osg::ref_ptr<osg::Node> anden = osgDB::readNodeFile("C:\\ObjetosVarios\\EstacionDemo\\anden_con_techo\\anden_con_techo.flt.90,90,0.rot.[6,0.85,-3.5].trans");	
 	osg::ref_ptr<osg::Geode> floor = createFloor();
 	osg::ref_ptr<osg::Geode> path = createPath();
 	osg::ref_ptr<osg::Node> skydome = createSky();
+	osg::ref_ptr<osg::Node> track = createTrack();
 
 	osg::ref_ptr<osg::MatrixTransform> transfAnden1 = new osg::MatrixTransform;
 	transfAnden1->setMatrix(osg::Matrix::translate(osg::Vec3f(-5.0f, 0.0f, 0.0f)));
 	transfAnden1->addChild(anden);
 
-	for (int i = -30; i < 30; i++)
+	/*for (int i = -30; i < 30; i++)
 	{
 		osg::ref_ptr<osg::MatrixTransform> railTransf = new osg::MatrixTransform;
 		railTransf->setMatrix(osg::Matrix::translate(osg::Vec3f(26.0f * i, 0.2f, 0.0f)));
 		railTransf->addChild(rail);
 		scene->addChild(railTransf);
-	}
+	}*/
+	
+	scene->addChild(track);
 
 	scene->addChild(light);
 	scene->addChild(transfAnden1);
