@@ -21,6 +21,10 @@ private:
 	osg::Camera* createCamera(const osg::Vec3& eye, const osg::Vec3& center, const osg::Vec3& up, osg::Node* scene);
 	osg::Geode* createFloor();
 	osg::Geode* createPath();
+	osg::Geode* createProfile1();
+	osg::Geode* createProfile2();
+	osg::Geode* createProfile3();
+	osg::Geode* createProfile4();
 	osg::Node* createLightSource(unsigned int num, const osg::Vec3& trans, const osg::Vec4& color);
 	osg::Node* createSky();
 	osg::Node* createTrack();

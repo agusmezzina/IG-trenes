@@ -61,7 +61,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(BOOST_ROOT)\stage\lib;$(OSG_ROOT)\lib;$(CCL_ROOT)\lib\debug;C:\Tesis\Proyectos\SimulacionFerroviaria\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>osgd.lib;osgDBd.lib;osgViewerd.lib;osgGAd.lib;OpenThreadsd.lib;cigicl_debug.lib;osgCigi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>osgd.lib;osgDBd.lib;osgViewerd.lib;osgGAd.lib;osgUtild.lib;OpenThreadsd.lib;cigicl_debug.lib;osgCigi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
