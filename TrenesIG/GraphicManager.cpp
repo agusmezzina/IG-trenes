@@ -97,8 +97,21 @@ osg::Geode* GraphicManager::createProfile1()
 {
 	osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array;
 	osg::ref_ptr<osg::Vec2Array> texcoords = new osg::Vec2Array;
-	/*osg::ref_ptr<osg::Vec3Array> normals = new osg::Vec3Array;
-	normals->push_back(osg::Vec3(0.0f, 0.0f, 1.0f));*/
+
+	//Negative Extension
+	double af = 0, xf = 0, yf = 0, zf = 0;
+	auto rotFinal = trackCurve->getOrientation(0);
+	rotFinal.getRotate(af, xf, yf, zf);
+	int numberDurms = trackCurve->getTotalLength() / 2.0f;
+	auto extPos = trackCurve->getNegativeExtension(numberDurms);
+	vertices->push_back(osg::Vec3(extPos.x() + /*pos.x() * */1.1 * cos(af + osg::DegreesToRadians(90.0)), -0.15f, extPos.z() + /*pos.z() * */1.1 * sin(af + osg::DegreesToRadians(90.0))));
+	vertices->push_back(osg::Vec3(extPos.x() + /*pos.x() * */0.9 * cos(af + osg::DegreesToRadians(90.0)), -0.15f, extPos.z() + /*pos.z() * */0.9 * sin(af + osg::DegreesToRadians(90.0))));
+	vertices->push_back(osg::Vec3(extPos.x() + /*pos.x() * */1.1 * cos(af + osg::DegreesToRadians(90.0)), 0.3f, extPos.z() + /*pos.z() * */1.1 * sin(af + osg::DegreesToRadians(90.0))));
+	vertices->push_back(osg::Vec3(extPos.x() + /*pos.x() * */0.9 * cos(af + osg::DegreesToRadians(90.0)), 0.3f, extPos.z() + /*pos.z() * */0.9 * sin(af + osg::DegreesToRadians(90.0))));
+	texcoords->push_back(osg::Vec2(0.0f, 50.0f));
+	texcoords->push_back(osg::Vec2(1.0f, 50.0f));
+	texcoords->push_back(osg::Vec2(1.0f, 50.0f));
+	texcoords->push_back(osg::Vec2(0.0f, 50.0f));
 
 	for (float t = 0; t <= 1; t += 0.01)
 	{
@@ -120,8 +133,21 @@ osg::Geode* GraphicManager::createProfile1()
 		texcoords->push_back(osg::Vec2(0.0f, t * 100));
 	}
 
-	osg::ref_ptr<osg::DrawElementsUInt> indices = new osg::DrawElementsUInt(GL_QUADS, 1584);
-	for (int i = 0; i < 99; i++)
+	//Positive extension
+	rotFinal = trackCurve->getOrientation(1);
+	rotFinal.getRotate(af, xf, yf, zf);
+	extPos = trackCurve->getPositiveExtension(numberDurms);
+	vertices->push_back(osg::Vec3(extPos.x() + /*pos.x() * */1.1 * cos(af + osg::DegreesToRadians(90.0)), -0.15f, extPos.z() + /*pos.z() * */1.1 * sin(af + osg::DegreesToRadians(90.0))));
+	vertices->push_back(osg::Vec3(extPos.x() + /*pos.x() * */0.9 * cos(af + osg::DegreesToRadians(90.0)), -0.15f, extPos.z() + /*pos.z() * */0.9 * sin(af + osg::DegreesToRadians(90.0))));
+	vertices->push_back(osg::Vec3(extPos.x() + /*pos.x() * */1.1 * cos(af + osg::DegreesToRadians(90.0)), 0.3f, extPos.z() + /*pos.z() * */1.1 * sin(af + osg::DegreesToRadians(90.0))));
+	vertices->push_back(osg::Vec3(extPos.x() + /*pos.x() * */0.9 * cos(af + osg::DegreesToRadians(90.0)), 0.3f, extPos.z() + /*pos.z() * */0.9 * sin(af + osg::DegreesToRadians(90.0))));
+	texcoords->push_back(osg::Vec2(0.0f, 50.0f));
+	texcoords->push_back(osg::Vec2(1.0f, 50.0f));
+	texcoords->push_back(osg::Vec2(1.0f, 50.0f));
+	texcoords->push_back(osg::Vec2(0.0f, 50.0f));
+
+	osg::ref_ptr<osg::DrawElementsUInt> indices = new osg::DrawElementsUInt(GL_QUADS, 1632);
+	for (int i = 0; i < 102; i++)
 	{
 		(*indices)[0 + 16 * i] = 0 + 4 * i; (*indices)[1 + 16 * i] = 4 + 4 * i; (*indices)[2 + 16 * i] = 5 + 4 * i; (*indices)[3 + 16 * i] = 1 + 4 * i;
 		(*indices)[4 + 16 * i] = 1 + 4 * i; (*indices)[5 + 16 * i] = 5 + 4 * i; (*indices)[6 + 16 * i] = 7 + 4 * i; (*indices)[7 + 16 * i] = 3 + 4 * i;
@@ -132,10 +158,6 @@ osg::Geode* GraphicManager::createProfile1()
 	osg::ref_ptr<osg::Geometry> quad = new osg::Geometry;
 	quad->setVertexArray(vertices.get());
 	quad->setTexCoordArray(0, texcoords.get());
-	/*quad->setNormalArray(normals.get());
-	quad->setNormalBinding(osg::Geometry::BIND_OVERALL);*/
-	//quad->setTexCoordArray(0, texcoords.get());
-	//quad->addPrimitiveSet(new osg::DrawArrays(GL_TRIANGLE_STRIP, 0, 200));
 	quad->addPrimitiveSet(indices.get());
 	osgUtil::SmoothingVisitor::smooth(*quad);
 
@@ -157,6 +179,21 @@ osg::Geode* GraphicManager::createProfile2()
 	osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array;
 	osg::ref_ptr<osg::Vec2Array> texcoords = new osg::Vec2Array;
 
+	//Negative Extension
+	double af = 0, xf = 0, yf = 0, zf = 0;
+	auto rotFinal = trackCurve->getOrientation(0);
+	rotFinal.getRotate(af, xf, yf, zf);
+	int numberDurms = trackCurve->getTotalLength() / 2.0f;
+	auto extPos = trackCurve->getNegativeExtension(numberDurms);
+	vertices->push_back(osg::Vec3(extPos.x() + /*pos.x() * */1.1 * cos(af - osg::DegreesToRadians(90.0)), -0.15f, extPos.z() + /*pos.z() * */1.1 * sin(af - osg::DegreesToRadians(90.0))));
+	vertices->push_back(osg::Vec3(extPos.x() + /*pos.x() * */0.9 * cos(af - osg::DegreesToRadians(90.0)), -0.15f, extPos.z() + /*pos.z() * */0.9 * sin(af - osg::DegreesToRadians(90.0))));
+	vertices->push_back(osg::Vec3(extPos.x() + /*pos.x() * */1.1 * cos(af - osg::DegreesToRadians(90.0)), 0.3f, extPos.z() + /*pos.z() * */1.1 * sin(af - osg::DegreesToRadians(90.0))));
+	vertices->push_back(osg::Vec3(extPos.x() + /*pos.x() * */0.9 * cos(af - osg::DegreesToRadians(90.0)), 0.3f, extPos.z() + /*pos.z() * */0.9 * sin(af - osg::DegreesToRadians(90.0))));
+	texcoords->push_back(osg::Vec2(0.0f, 50.0f));
+	texcoords->push_back(osg::Vec2(1.0f, 50.0f));
+	texcoords->push_back(osg::Vec2(1.0f, 50.0f));
+	texcoords->push_back(osg::Vec2(0.0f, 50.0f));
+
 	for (float t = 0; t <= 1; t += 0.01)
 	{
 		auto pos = trackCurve->getPositionByArcLength(t);
@@ -177,8 +214,21 @@ osg::Geode* GraphicManager::createProfile2()
 		texcoords->push_back(osg::Vec2(0.0f, t * 100));
 	}
 
-	osg::ref_ptr<osg::DrawElementsUInt> indices = new osg::DrawElementsUInt(GL_QUADS, 1584);
-	for (int i = 0; i < 99; i++)
+	//Positive extension
+	rotFinal = trackCurve->getOrientation(1);
+	rotFinal.getRotate(af, xf, yf, zf);
+	extPos = trackCurve->getPositiveExtension(numberDurms);
+	vertices->push_back(osg::Vec3(extPos.x() + /*pos.x() * */1.1 * cos(af - osg::DegreesToRadians(90.0)), -0.15f, extPos.z() + /*pos.z() * */1.1 * sin(af - osg::DegreesToRadians(90.0))));
+	vertices->push_back(osg::Vec3(extPos.x() + /*pos.x() * */0.9 * cos(af - osg::DegreesToRadians(90.0)), -0.15f, extPos.z() + /*pos.z() * */0.9 * sin(af - osg::DegreesToRadians(90.0))));
+	vertices->push_back(osg::Vec3(extPos.x() + /*pos.x() * */1.1 * cos(af - osg::DegreesToRadians(90.0)), 0.3f, extPos.z() + /*pos.z() * */1.1 * sin(af - osg::DegreesToRadians(90.0))));
+	vertices->push_back(osg::Vec3(extPos.x() + /*pos.x() * */0.9 * cos(af - osg::DegreesToRadians(90.0)), 0.3f, extPos.z() + /*pos.z() * */0.9 * sin(af - osg::DegreesToRadians(90.0))));
+	texcoords->push_back(osg::Vec2(0.0f, 50.0f));
+	texcoords->push_back(osg::Vec2(1.0f, 50.0f));
+	texcoords->push_back(osg::Vec2(1.0f, 50.0f));
+	texcoords->push_back(osg::Vec2(0.0f, 50.0f));
+
+	osg::ref_ptr<osg::DrawElementsUInt> indices = new osg::DrawElementsUInt(GL_QUADS, 1632);
+	for (int i = 0; i < 102; i++)
 	{
 		(*indices)[0 + 16 * i] = 0 + 4 * i; (*indices)[1 + 16 * i] = 4 + 4 * i; (*indices)[2 + 16 * i] = 5 + 4 * i; (*indices)[3 + 16 * i] = 1 + 4 * i;
 		(*indices)[4 + 16 * i] = 1 + 4 * i; (*indices)[5 + 16 * i] = 5 + 4 * i; (*indices)[6 + 16 * i] = 7 + 4 * i; (*indices)[7 + 16 * i] = 3 + 4 * i;
@@ -190,8 +240,6 @@ osg::Geode* GraphicManager::createProfile2()
 	quad->setVertexArray(vertices.get());
 	quad->setTexCoordArray(0, texcoords.get());
 	quad->setNormalBinding(osg::Geometry::BIND_OVERALL);
-	//quad->setTexCoordArray(0, texcoords.get());
-	//quad->addPrimitiveSet(new osg::DrawArrays(GL_TRIANGLE_STRIP, 0, 200));
 	quad->addPrimitiveSet(indices.get());
 	osgUtil::SmoothingVisitor::smooth(*quad);
 
@@ -210,21 +258,28 @@ osg::Geode* GraphicManager::createProfile2()
 
 osg::Geode* GraphicManager::createPath()
 {
+	int vcount = 0;
 	osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array;
-	/*vertices->push_back(osg::Vec3(-1000.0f, 0.299f, -2.0f));
-	vertices->push_back(osg::Vec3(1000.0f, 0.299f, -2.0f));
-	vertices->push_back(osg::Vec3(1000.0f, 0.299f, 2.0f));
-	vertices->push_back(osg::Vec3(-1000.0f, 0.299f, 2.0f));*/
 
 	osg::ref_ptr<osg::Vec3Array> normals = new osg::Vec3Array;
 	normals->push_back(osg::Vec3(0.0f, 0.0f, 1.0f));
 
 	osg::ref_ptr<osg::Vec2Array> texcoords = new osg::Vec2Array;
-	/*texcoords->push_back(osg::Vec2(0.0f, 0.0f));
-	texcoords->push_back(osg::Vec2(500.0f, 0.0f));
-	texcoords->push_back(osg::Vec2(500.0f, 1.0f));
-	texcoords->push_back(osg::Vec2(0.0f, 1.0f));*/
 
+	//Negative extension path
+	double af = 0, xf = 0, yf = 0, zf = 0;
+	auto rotFinal = trackCurve->getOrientationByArcLength(0);
+	rotFinal.getRotate(af, xf, yf, zf);
+	int numberDurms = trackCurve->getTotalLength() / 2.0f;
+	auto extPos = trackCurve->getNegativeExtension(numberDurms);
+	vertices->push_back(osg::Vec3(extPos.x() + 2 * cos(af + osg::DegreesToRadians(90.0)), 0.2f, extPos.z() + 2 * sin(af + osg::DegreesToRadians(90.0))));
+	vertices->push_back(osg::Vec3(extPos.x() + 2 * cos(af - osg::DegreesToRadians(90.0)), 0.2f, extPos.z() + 2 * sin(af - osg::DegreesToRadians(90.0))));
+	texcoords->push_back(osg::Vec2(0.0f, 50.0f));
+	texcoords->push_back(osg::Vec2(1.0f, 50.0f));
+	vcount += 2;
+	
+
+	//Curve path
 	for (float t = 0; t <= 1; t += 0.01)
 	{
 		auto pos = trackCurve->getPositionByArcLength(t);
@@ -237,14 +292,26 @@ osg::Geode* GraphicManager::createPath()
 		vertices->push_back(vert2);
 		texcoords->push_back(osg::Vec2(0.0f, t * 100));
 		texcoords->push_back(osg::Vec2(1.0f, t * 100));
+		vcount += 2;
 	}
+
+	//Positive extension path
+	rotFinal = trackCurve->getOrientationByArcLength(1);
+	rotFinal.getRotate(af, xf, yf, zf);
+	extPos = trackCurve->getPositiveExtension(numberDurms);
+	vertices->push_back(osg::Vec3(extPos.x() + 2 * cos(af + osg::DegreesToRadians(90.0)), 0.2f, extPos.z() + 2 * sin(af + osg::DegreesToRadians(90.0))));
+	vertices->push_back(osg::Vec3(extPos.x() + 2 * cos(af - osg::DegreesToRadians(90.0)), 0.2f, extPos.z() + 2 * sin(af - osg::DegreesToRadians(90.0))));
+	texcoords->push_back(osg::Vec2(0.0f, 50.0f));
+	texcoords->push_back(osg::Vec2(1.0f, 50.0f));
+	vcount += 2;
+
 
 	osg::ref_ptr<osg::Geometry> quad = new osg::Geometry;
 	quad->setVertexArray(vertices.get());
 	quad->setNormalArray(normals.get());
 	quad->setNormalBinding(osg::Geometry::BIND_OVERALL);
 	quad->setTexCoordArray(0, texcoords.get());
-	quad->addPrimitiveSet(new osg::DrawArrays(GL_TRIANGLE_STRIP, 0, 200));
+	quad->addPrimitiveSet(new osg::DrawArrays(GL_TRIANGLE_STRIP, 0, vcount));
 
 	osg::ref_ptr<osg::Texture2D> texture = new osg::Texture2D;
 	osg::ref_ptr<osg::Image> image = osgDB::readImageFile("C:\\ObjetosVarios\\road-with-gravel.jpg");
@@ -293,8 +360,10 @@ osg::Node* GraphicManager::createTrack()
 {
 	osg::ref_ptr<osg::Group> track = new osg::Group;
 	osg::ref_ptr<osg::Node> model = osgDB::readNodeFile("C:\\ObjetosVarios\\EstacionDemo\\durmienteSolo.flt.90,0,0.rot.[0,0.3,0].trans");
+	int numberDurms = trackCurve->getTotalLength() / 2.0f;
+	float deltaT = 1.0f / numberDurms;
 
-	for (float t = 0; t <= 1; t += 0.01)
+	for (float t = 0; t <= 1; t += deltaT)
 	{
 		auto pos = trackCurve->getPositionByArcLength(t);
 		auto rot = trackCurve->getOrientationByArcLength(t);
@@ -306,6 +375,44 @@ osg::Node* GraphicManager::createTrack()
 	}
 	return track.release();
 	
+}
+
+osg::Node* GraphicManager::createTrackPositiveExtension()
+{
+	osg::ref_ptr<osg::Group> track = new osg::Group;
+	osg::ref_ptr<osg::Node> model = osgDB::readNodeFile("C:\\ObjetosVarios\\EstacionDemo\\durmienteSolo.flt.90,0,0.rot.[0,0.3,0].trans");
+	
+	int numberDurms = trackCurve->getTotalLength() / 2.0f;
+	for (float t = 0; t <= numberDurms; t += 2)
+	{
+		auto pos = trackCurve->getPositiveExtension(t);
+		auto rot = trackCurve->getOrientation(1);
+		osg::ref_ptr<osg::PositionAttitudeTransform> transf = new osg::PositionAttitudeTransform;
+		transf->setPosition(pos);
+		transf->setAttitude(rot);
+		transf->addChild(model);
+		track->addChild(transf);
+	}
+	return track.release();
+}
+
+osg::Node* GraphicManager::createTrackNegativeExtension()
+{
+	osg::ref_ptr<osg::Group> track = new osg::Group;
+	osg::ref_ptr<osg::Node> model = osgDB::readNodeFile("C:\\ObjetosVarios\\EstacionDemo\\durmienteSolo.flt.90,0,0.rot.[0,0.3,0].trans");
+
+	int numberDurms = trackCurve->getTotalLength() / 2.0f;
+	for (float t = 0; t <= numberDurms; t += 2)
+	{
+		auto pos = trackCurve->getNegativeExtension(t);
+		auto rot = trackCurve->getOrientation(0);
+		osg::ref_ptr<osg::PositionAttitudeTransform> transf = new osg::PositionAttitudeTransform;
+		transf->setPosition(pos);
+		transf->setAttitude(rot);
+		transf->addChild(model);
+		track->addChild(transf);
+	}
+	return track.release();
 }
 
 void GraphicManager::createScene(){
@@ -321,28 +428,17 @@ void GraphicManager::createScene(){
 	osg::ref_ptr<osg::Geode> path = createPath();
 	osg::ref_ptr<osg::Node> skydome = createSky();
 	osg::ref_ptr<osg::Node> track = createTrack();
-
+	osg::ref_ptr<osg::Node> trackExtPos = createTrackPositiveExtension();
+	osg::ref_ptr<osg::Node> trackExtNeg = createTrackNegativeExtension();
 	osg::ref_ptr<osg::Geode> profile1 = createProfile1();
 	osg::ref_ptr<osg::Geode> profile2 = createProfile2();
-
-	//osg::ref_ptr<osg::MatrixTransform> transfAnden1 = new osg::MatrixTransform;
-	//transfAnden1->setMatrix(osg::Matrix::translate(osg::Vec3f(-5.0f, 0.0f, 0.0f)));
-	//transfAnden1->addChild(anden);
-
-	/*for (int i = -30; i < 30; i++)
-	{
-		osg::ref_ptr<osg::MatrixTransform> railTransf = new osg::MatrixTransform;
-		railTransf->setMatrix(osg::Matrix::translate(osg::Vec3f(26.0f * i, 0.2f, 0.0f)));
-		railTransf->addChild(rail);
-		scene->addChild(railTransf);
-	}*/
 	
 	scene->addChild(profile1);
 	scene->addChild(profile2);
-
+	scene->addChild(trackExtPos);
+	scene->addChild(trackExtNeg);
 	scene->addChild(track);
 	scene->addChild(light);
-	//scene->addChild(transfAnden1);
 	scene->addChild(floor);
 	scene->addChild(path);
 	scene->addChild(skydome);

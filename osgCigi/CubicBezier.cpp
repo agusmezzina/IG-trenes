@@ -7,7 +7,7 @@ using namespace osgCigi;
 
 osg::Vec3f CubicBezier::getPosition(float u) const
 {
-	u = u - floorf(u);
+	//u = u - floorf(u);
 	return p0 * powf(1 - u, 3) + p1 * 3 * powf(1 - u, 2) * u + p2 * 3 * (1 - u) * powf(u, 2) + p3 * powf(u, 3);
 }
 
@@ -37,7 +37,7 @@ osg::Vec3f CubicBezier::getPositionByArcLength(float t) const
 
 osg::Quat CubicBezier::getOrientation(float u) const
 {
-	u = u - floorf(u);
+	//u = u - floorf(u);
 	osg::Vec3f p(1.0f, 0.0f, 0.0f); /*= p0 * powf(1 - u, 3) + p1 * 3 * powf(1 - u, 2) * u + p2 * 3 * (1 - u) * powf(u, 2) + p3 * powf(u, 3);*/
 	osg::Vec3f v = (p1 - p0) * 3 * powf(1 - u, 2) + (p2 - p1) * 6 * (1 - u) * u + (p3 - p2) * 3 * powf(u, 2);
 	
@@ -82,6 +82,25 @@ osg::Matrix CubicBezier::getMOrientation(float u) const
 
 	matrix.makeLookAt(p, v, osg::Y_AXIS);
 	return matrix;
+}
+
+osg::Vec3f CubicBezier::getPositiveExtension(float t)
+{
+	auto dir = (p3 - p2);
+	dir.normalize();
+	return dir * t + p3;
+}
+
+osg::Vec3f CubicBezier::getNegativeExtension(float t)
+{
+	auto dir = p0 - p1;
+	dir.normalize();
+	return dir * t + p0;
+}
+
+float CubicBezier::getTotalLength()
+{
+	return this->totalLength;
 }
 
 CubicBezier::CubicBezier(osg::Vec3f p0, osg::Vec3f p1, osg::Vec3f p2, osg::Vec3f p3) : arcLengths(101)

@@ -14,7 +14,10 @@ namespace osgCigi
 		osg::Quat getOrientation(float u) const;
 		osg::Quat getOrientationByArcLength(float t) const;
 		osg::Matrix getMOrientation(float u) const;
+		osg::Vec3f getPositiveExtension(float t);
+		osg::Vec3f getNegativeExtension(float t);
 		CubicBezier(osg::Vec3f p0, osg::Vec3f p1, osg::Vec3f p2, osg::Vec3f p3);
+		float getTotalLength();
 		virtual ~CubicBezier();
 	private:
 		osg::Vec3f p0, p1, p2, p3;
