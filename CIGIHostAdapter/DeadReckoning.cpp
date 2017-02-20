@@ -127,8 +127,8 @@ void DeadReckoning::setThreshold(float thresh)
 
 DeadReckoning::DeadReckoning(World* model, World* ghost) : model(model), ghost(ghost)
 {
-	rThreshold = 0.05;
-	smoothness = 10;
+	rThreshold = 0.01;
+	smoothness = 20;
 }
 
 
