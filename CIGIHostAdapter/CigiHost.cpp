@@ -20,7 +20,6 @@ CigiHost::CigiHost(World* data, World* ghost, Semaphore* sem, std::queue<DataPac
 	last = false;
 	usingDR = true;
 	quadratic = false;
-	latency = 300;
 	//compensationTime = 0;
 }
 
@@ -58,12 +57,6 @@ bool CigiHost::updateModelFromNetwork()
 void CigiHost::sendCigiPacket()
 {
 
-}
-
-void CigiHost::changeLatency(int latency)
-{
-	if (latency >= 0)
-		this->latency = latency;
 }
 
 bool CigiHost::toggleDR()

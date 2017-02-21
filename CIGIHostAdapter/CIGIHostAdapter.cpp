@@ -50,24 +50,6 @@ int _tmain(int argc, _TCHAR* argv[])
 				}
 			}
 		}
-		if (command.substr(0, 7) == "latency")
-		{
-			int latency = 0;
-			std::vector<std::string> fields;
-			boost::split(fields, command, boost::is_any_of("\t "), boost::token_compress_on);
-			if (fields.size() == 2)
-			{
-				try
-				{
-					latency = std::stoi(fields[1]);
-					server.changeLatency(latency);
-					std::cout << "Latency changed to " << latency << " milliseconds" << std::endl;
-				}
-				catch (...)
-				{
-				}
-			}
-		}
 		if (command == "dr")
 		{
 			bool value = server.toggleDR();
