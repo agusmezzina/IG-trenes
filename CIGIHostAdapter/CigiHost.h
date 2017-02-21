@@ -22,7 +22,6 @@ public:
 	void changeThreshold(float thresh);
 	bool toggleDR();
 	bool togglePredictionMethod();
-	void changeLatency(int latency);
 	void run(std::atomic_bool& quit);
 	virtual ~CigiHost();
 private:
@@ -48,7 +47,6 @@ private:
 	bool last;
 	bool usingDR;
 	bool quadratic;
-	int latency;
 	std::ofstream dataFile;
 	std::ofstream log;
 };

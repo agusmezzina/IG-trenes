@@ -53,14 +53,14 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(OSG_ROOT)\include;$(OSG_SOURCE)\include;$(BOOST_ROOT);$(CCL_SOURCE)\include;C:\Tesis\Proyectos\SimulacionFerroviaria\osgCigi;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OSG_ROOT)\include;$(OSG_SOURCE)\include;$(BOOST_ROOT);$(CCL_SOURCE)\include;$(SolutionDir)osgCigi;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
       <PrecompiledHeaderFile />
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(BOOST_ROOT)\stage\lib;$(OSG_ROOT)\lib;$(CCL_ROOT)\lib\debug;C:\Tesis\Proyectos\SimulacionFerroviaria\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(BOOST_ROOT)\stage\lib;$(OSG_ROOT)\lib;$(CCL_ROOT)\lib\debug;$(SolutionDir)$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>osgd.lib;osgDBd.lib;osgViewerd.lib;osgGAd.lib;osgUtild.lib;OpenThreadsd.lib;cigicl_debug.lib;osgCigi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
