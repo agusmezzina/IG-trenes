@@ -1,6 +1,9 @@
 #include "CubicBezier.h"
 #include <cmath>
 #include <algorithm>
+#include <iostream>
+#include <fstream>
+#include <boost\algorithm\string.hpp>
 //#include <osg/Matrix>
 
 using namespace osgCigi;
@@ -103,6 +106,31 @@ float CubicBezier::getTotalLength()
 	return this->totalLength;
 }
 
+CubicBezier::CubicBezier(std::string filename) : arcLengths(101)
+{
+	std::ifstream config;
+	config.open(filename);
+	if (config.is_open())
+	{
+		std::string line;
+		std::vector<std::string> fields;
+		std::getline(config, line);
+		boost::split(fields, line, boost::is_any_of(";"));
+		this->p0 = osg::Vec3f(std::stof(fields[0]), std::stof(fields[1]), std::stof(fields[2]));
+		std::getline(config, line);
+		boost::split(fields, line, boost::is_any_of(";"));
+		this->p1 = osg::Vec3f(std::stof(fields[0]), std::stof(fields[1]), std::stof(fields[2]));
+		std::getline(config, line);
+		boost::split(fields, line, boost::is_any_of(";"));
+		this->p2 = osg::Vec3f(std::stof(fields[0]), std::stof(fields[1]), std::stof(fields[2]));
+		std::getline(config, line);
+		boost::split(fields, line, boost::is_any_of(";"));
+		this->p3 = osg::Vec3f(std::stof(fields[0]), std::stof(fields[1]), std::stof(fields[2]));
+	}
+	config.close();
+	computeLengths();
+}
+
 CubicBezier::CubicBezier(osg::Vec3f p0, osg::Vec3f p1, osg::Vec3f p2, osg::Vec3f p3) : arcLengths(101)
 {
 	this->p0 = p0;
@@ -110,6 +138,11 @@ CubicBezier::CubicBezier(osg::Vec3f p0, osg::Vec3f p1, osg::Vec3f p2, osg::Vec3f
 	this->p2 = p2;
 	this->p3 = p3;
 
+	computeLengths();
+}
+
+void CubicBezier::computeLengths()
+{
 	int len = 100;
 	float clen = 0;
 	arcLengths[0] = 0;
@@ -124,7 +157,6 @@ CubicBezier::CubicBezier(osg::Vec3f p0, osg::Vec3f p1, osg::Vec3f p2, osg::Vec3f
 	}
 	this->totalLength = clen;
 }
-
 
 CubicBezier::~CubicBezier()
 {

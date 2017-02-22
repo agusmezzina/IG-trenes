@@ -12,11 +12,12 @@ CigiUpdateCallback::CigiUpdateCallback(World* data, World* ghost) : _data(data),
 	startTime = std::chrono::high_resolution_clock::now();
 	correctionStep = 0;
 	dr = std::make_unique<DeadReckoning>(data, ghost);
-	trajectory = std::make_unique<CubicBezier>(
+	/*trajectory = std::make_unique<CubicBezier>(
 		osg::Vec3f(0.0f, 0.0f, 0.0f),
 		osg::Vec3f(0.0f, 0.0f, 100.0f),
 		osg::Vec3f(50.0f, 0.0f, 100.0f),
-		osg::Vec3f(100.0f, 0.0f, 100.0f));
+		osg::Vec3f(100.0f, 0.0f, 100.0f));*/
+	trajectory = std::make_unique<osgCigi::CubicBezier>("C:\\ObjetosVarios\\curve.txt");
 	p_1 = _data->getEntity(1).getPosition();
 	v_1 = _data->getEntity(1).getVelocity();
 	a_1 = _data->getEntity(1).getAcceleration();

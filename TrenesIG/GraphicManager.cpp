@@ -19,11 +19,12 @@
 GraphicManager::GraphicManager()
 {
 	env = std::make_unique<osgCigi::CigiSimulationEnvironment>();
-	trackCurve = std::make_unique<osgCigi::CubicBezier>(
+	/*trackCurve = std::make_unique<osgCigi::CubicBezier>(
 		osg::Vec3f(0.0f, 0.0f, 0.0f),
 		osg::Vec3f(0.0f, 0.0f, 100.0f),
 		osg::Vec3f(50.0f, 0.0f, 100.0f),
-		osg::Vec3f(100.0f, 0.0f, 100.0f));
+		osg::Vec3f(100.0f, 0.0f, 100.0f));*/
+	trackCurve = std::make_unique<osgCigi::CubicBezier>("C:\\ObjetosVarios\\curve.txt");
 }
 
 //osg::Camera* GraphicManager::createHUDCamera(double left, double right, double bottom, double top)
