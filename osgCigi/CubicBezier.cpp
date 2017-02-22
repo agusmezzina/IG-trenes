@@ -1,6 +1,9 @@
 #include "CubicBezier.h"
 #include <cmath>
 #include <algorithm>
+#include <iostream>
+#include <fstream>
+#include <boost\algorithm\string.hpp>
 //#include <osg/Matrix>
 
 using namespace osgCigi;
@@ -8,12 +11,16 @@ using namespace osgCigi;
 osg::Vec3f CubicBezier::getPosition(float u) const
 {
 	//u = u - floorf(u);
+	if (u > 1)
+		u = 1;
 	return p0 * powf(1 - u, 3) + p1 * 3 * powf(1 - u, 2) * u + p2 * 3 * (1 - u) * powf(u, 2) + p3 * powf(u, 3);
 }
 
 osg::Vec3f CubicBezier::getPositionByArcLength(float t) const
 {
 	//t = t - floorf(t);
+	if (t > 1)
+		t = 1;
 	auto targetLength = t * this->totalLength;
 	
 	auto it = std::upper_bound(arcLengths.begin(), arcLengths.end(), targetLength);
@@ -38,6 +45,8 @@ osg::Vec3f CubicBezier::getPositionByArcLength(float t) const
 osg::Quat CubicBezier::getOrientation(float u) const
 {
 	//u = u - floorf(u);
+	if (u > 1)
+		u = 1;
 	osg::Vec3f p(1.0f, 0.0f, 0.0f); /*= p0 * powf(1 - u, 3) + p1 * 3 * powf(1 - u, 2) * u + p2 * 3 * (1 - u) * powf(u, 2) + p3 * powf(u, 3);*/
 	osg::Vec3f v = (p1 - p0) * 3 * powf(1 - u, 2) + (p2 - p1) * 6 * (1 - u) * u + (p3 - p2) * 3 * powf(u, 2);
 	
@@ -52,6 +61,8 @@ osg::Quat CubicBezier::getOrientation(float u) const
 
 osg::Quat CubicBezier::getOrientationByArcLength(float t) const
 {
+	if (t > 1)
+		t = 1;
 	auto targetLength = t * this->totalLength;
 
 	auto it = std::upper_bound(arcLengths.begin(), arcLengths.end(), targetLength);
@@ -75,6 +86,9 @@ osg::Quat CubicBezier::getOrientationByArcLength(float t) const
 
 osg::Matrix CubicBezier::getMOrientation(float u) const
 {
+	if (u > 1)
+		u = 1;
+
 	osg::Vec3f p = p0 * powf(1 - u, 3) + p1 * 3 * powf(1 - u, 2) * u + p2 * 3 * (1 - u) * powf(u, 2) + p3 * powf(u, 3);
 	osg::Vec3f v = (p1 - p0) * 3 * powf(1 - u, 2) + (p2 - p1) * 6 * (1 - u) * u + (p3 - p2) * 3 * powf(u, 2);
 	osg::Matrix matrix;
@@ -103,6 +117,31 @@ float CubicBezier::getTotalLength()
 	return this->totalLength;
 }
 
+CubicBezier::CubicBezier(std::string filename) : arcLengths(101)
+{
+	std::ifstream config;
+	config.open(filename);
+	if (config.is_open())
+	{
+		std::string line;
+		std::vector<std::string> fields;
+		std::getline(config, line);
+		boost::split(fields, line, boost::is_any_of(";"));
+		this->p0 = osg::Vec3f(std::stof(fields[0]), std::stof(fields[1]), std::stof(fields[2]));
+		std::getline(config, line);
+		boost::split(fields, line, boost::is_any_of(";"));
+		this->p1 = osg::Vec3f(std::stof(fields[0]), std::stof(fields[1]), std::stof(fields[2]));
+		std::getline(config, line);
+		boost::split(fields, line, boost::is_any_of(";"));
+		this->p2 = osg::Vec3f(std::stof(fields[0]), std::stof(fields[1]), std::stof(fields[2]));
+		std::getline(config, line);
+		boost::split(fields, line, boost::is_any_of(";"));
+		this->p3 = osg::Vec3f(std::stof(fields[0]), std::stof(fields[1]), std::stof(fields[2]));
+	}
+	config.close();
+	computeLengths();
+}
+
 CubicBezier::CubicBezier(osg::Vec3f p0, osg::Vec3f p1, osg::Vec3f p2, osg::Vec3f p3) : arcLengths(101)
 {
 	this->p0 = p0;
@@ -110,6 +149,11 @@ CubicBezier::CubicBezier(osg::Vec3f p0, osg::Vec3f p1, osg::Vec3f p2, osg::Vec3f
 	this->p2 = p2;
 	this->p3 = p3;
 
+	computeLengths();
+}
+
+void CubicBezier::computeLengths()
+{
 	int len = 100;
 	float clen = 0;
 	arcLengths[0] = 0;
@@ -124,7 +168,6 @@ CubicBezier::CubicBezier(osg::Vec3f p0, osg::Vec3f p1, osg::Vec3f p2, osg::Vec3f
 	}
 	this->totalLength = clen;
 }
-
 
 CubicBezier::~CubicBezier()
 {

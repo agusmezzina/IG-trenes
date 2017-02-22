@@ -7,6 +7,7 @@
 #include <osg\PositionAttitudeTransform>
 #include <osg\Switch>
 #include <osg\TexGen>
+#include <osg\Camera>
 #include <osgUtil/SmoothingVisitor>
 #include <osgDB\ReadFile>
 #include <osgGA\TrackballManipulator>
@@ -19,11 +20,12 @@
 GraphicManager::GraphicManager()
 {
 	env = std::make_unique<osgCigi::CigiSimulationEnvironment>();
-	trackCurve = std::make_unique<osgCigi::CubicBezier>(
+	/*trackCurve = std::make_unique<osgCigi::CubicBezier>(
 		osg::Vec3f(0.0f, 0.0f, 0.0f),
 		osg::Vec3f(0.0f, 0.0f, 100.0f),
 		osg::Vec3f(50.0f, 0.0f, 100.0f),
-		osg::Vec3f(100.0f, 0.0f, 100.0f));
+		osg::Vec3f(100.0f, 0.0f, 100.0f));*/
+	trackCurve = std::make_unique<osgCigi::CubicBezier>("C:\\ObjetosVarios\\curve.txt");
 }
 
 //osg::Camera* GraphicManager::createHUDCamera(double left, double right, double bottom, double top)
@@ -415,6 +417,31 @@ osg::Node* GraphicManager::createTrackNegativeExtension()
 	return track.release();
 }
 
+osg::Node* GraphicManager::createStation()
+{
+	osg::ref_ptr<osg::Group> root = new osg::Group;
+	osg::ref_ptr<osg::Node> anden = osgDB::readNodeFile("C:\\ObjetosVarios\\EstacionDemo\\anden_con_techo\\anden_con_techo.flt.90,-90,0.rot.[1,0.85,3.5].trans");
+	osg::ref_ptr<osg::PositionAttitudeTransform> transfStart = new osg::PositionAttitudeTransform;
+	osg::ref_ptr<osg::PositionAttitudeTransform> transfEnd = new osg::PositionAttitudeTransform;
+	double angle = 0, x = 0, y = 0, z = 0;
+
+	auto posStart = trackCurve->getPosition(0);
+	auto rotStart = trackCurve->getOrientation(0);
+	transfStart->setPosition(posStart);
+	transfStart->setAttitude(rotStart);
+	transfStart->addChild(anden);
+
+	auto posEnd = trackCurve->getPosition(1);
+	auto rotEnd = trackCurve->getOrientation(1);
+	transfEnd->setPosition(posEnd);
+	transfEnd->setAttitude(rotEnd);
+	transfEnd->addChild(anden);
+
+	root->addChild(transfStart);
+	root->addChild(transfEnd);
+	return root.release();
+}
+
 void GraphicManager::createScene(){
 	osg::ref_ptr<osg::Group> scene = new osg::Group;
 
@@ -424,6 +451,7 @@ void GraphicManager::createScene(){
 	osg::ref_ptr<osg::Node> light = createLightSource(0, osg::Vec3(10.0f, -10.0f, -20.0f), osg::Vec4(0.5f, 0.5f, 0.5f, 1.0f));
 	//osg::ref_ptr<osg::Node> rail = osgDB::readNodeFile("C:\\ObjetosVarios\\EstacionDemo\\tramo_vias2.flt.90,90,0.rot");
 	//osg::ref_ptr<osg::Node> anden = osgDB::readNodeFile("C:\\ObjetosVarios\\EstacionDemo\\anden_con_techo\\anden_con_techo.flt.90,90,0.rot.[6,0.85,-3.5].trans");	
+	osg::ref_ptr<osg::Node> station = createStation();
 	osg::ref_ptr<osg::Geode> floor = createFloor();
 	osg::ref_ptr<osg::Geode> path = createPath();
 	osg::ref_ptr<osg::Node> skydome = createSky();
@@ -433,6 +461,7 @@ void GraphicManager::createScene(){
 	osg::ref_ptr<osg::Geode> profile1 = createProfile1();
 	osg::ref_ptr<osg::Geode> profile2 = createProfile2();
 	
+	scene->addChild(station);
 	scene->addChild(profile1);
 	scene->addChild(profile2);
 	scene->addChild(trackExtPos);
@@ -452,7 +481,7 @@ int GraphicManager::runViewer(){
 	viewer.setSceneData(_sceneRoot.get());
 	viewer.addEventHandler(commCrtl.get());
 	viewer.addEventHandler(new osgViewer::StatsHandler);
-	viewer.apply(new osgViewer::SingleWindow(10, 10, 800, 600));
+	viewer.apply(new osgViewer::SingleWindow(10, 10, 1200, 900));
 	env->start();
 	return viewer.run();
 }

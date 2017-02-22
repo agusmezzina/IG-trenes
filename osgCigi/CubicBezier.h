@@ -3,6 +3,7 @@
 #include <osg/Quat>
 #include <osg/Matrix>
 #include <vector>
+#include <string>
 
 namespace osgCigi
 {
@@ -16,13 +17,17 @@ namespace osgCigi
 		osg::Matrix getMOrientation(float u) const;
 		osg::Vec3f getPositiveExtension(float t);
 		osg::Vec3f getNegativeExtension(float t);
+		/*Builds curve from control points*/
 		CubicBezier(osg::Vec3f p0, osg::Vec3f p1, osg::Vec3f p2, osg::Vec3f p3);
+		/*Reads control point from file*/
+		CubicBezier(std::string filename);
 		float getTotalLength();
 		virtual ~CubicBezier();
 	private:
 		osg::Vec3f p0, p1, p2, p3;
 		std::vector<float> arcLengths;
 		float totalLength;
+		void computeLengths();
 	};
 }
 

@@ -28,6 +28,7 @@ private:
 	osg::Node* createTrack();
 	osg::Node* createTrackPositiveExtension();
 	osg::Node* createTrackNegativeExtension();
+	osg::Node* createStation();
 	void createScene();
 	int runViewer();
 public:

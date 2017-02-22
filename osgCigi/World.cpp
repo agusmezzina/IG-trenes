@@ -56,8 +56,8 @@ long World::getTimestamp() const
 
 World::World()
 {
-	Entity ownship(1);
-	entities.push_back(ownship);
+	/*Entity ownship(1);
+	entities.push_back(ownship);*/
 }
 
 
