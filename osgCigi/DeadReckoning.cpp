@@ -23,6 +23,7 @@ void DeadReckoning::secondOrderUpdateGhost(int entityID, float deltaT)
 
 void DeadReckoning::setConvergencePoint(int entityID, float deltaT)
 {
+	/*Comnpensate latency*/
 	auto t = std::chrono::high_resolution_clock::now().time_since_epoch();
 	long t1 = std::chrono::duration_cast<std::chrono::milliseconds>(t).count();
 	auto t0 = model->getTimestamp();
@@ -38,6 +39,7 @@ void DeadReckoning::setConvergencePoint(int entityID, float deltaT)
 	auto compP = p + v * compTime + a * 0.5f * pow(compTime, 2);
 	auto compV = v + a * compTime;
 
+	/*Then calculate convergence point ahead starting from compensated point*/
 	startPoint = pg;
 	convergencePoint = compP + v * deltaT + a * 0.5f * pow(deltaT, 2);
 	convergenceVelocity = compV + a * deltaT;

@@ -453,7 +453,7 @@ int GraphicManager::runViewer(){
 	viewer.setSceneData(_sceneRoot.get());
 	viewer.addEventHandler(commCrtl.get());
 	viewer.addEventHandler(new osgViewer::StatsHandler);
-	viewer.apply(new osgViewer::SingleWindow(10, 10, 800, 600));
+	viewer.apply(new osgViewer::SingleWindow(10, 10, 1200, 900));
 	env->start();
 	return viewer.run();
 }
