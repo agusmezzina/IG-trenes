@@ -488,9 +488,9 @@ int GraphicManager::runViewer(){
 		osg::Vec3d(),
 		osg::X_AXIS));*/
 
-	osg::Vec3d eye(0.0f, -300.0f, 0.0f);
+	osg::Vec3d eye(200.0f, -200.0f, 0.0f);
 	osg::Vec3d center;
-	osg::Vec3d up = -osg::X_AXIS;
+	osg::Vec3d up(-1.0f, 0.0f, .0f);// = -osg::X_AXIS;
 
 	osg::ref_ptr<CommandController> commCrtl = new CommandController(env.get());
 	//viewer.setCamera(camera.get());
