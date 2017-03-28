@@ -61,10 +61,10 @@ osg::Camera* GraphicManager::createCamera(const osg::Vec3& eye, const osg::Vec3&
 osg::Geode* GraphicManager::createFloor()
 {
 	osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array;
-	vertices->push_back(osg::Vec3(-1000.0f, 0.3f, -1000.0f));
-	vertices->push_back(osg::Vec3(1000.0f, 0.3f, -1000.0f));
-	vertices->push_back(osg::Vec3(1000.0f, 0.3f, 1000.0f));
-	vertices->push_back(osg::Vec3(-1000.0f, 0.3f, 1000.0f));
+	vertices->push_back(osg::Vec3(-2000.0f, 0.3f, -2000.0f));
+	vertices->push_back(osg::Vec3(2000.0f, 0.3f, -2000.0f));
+	vertices->push_back(osg::Vec3(2000.0f, 0.3f, 2000.0f));
+	vertices->push_back(osg::Vec3(-2000.0f, 0.3f, 2000.0f));
 
 	osg::ref_ptr<osg::Vec3Array> normals = new osg::Vec3Array;
 	normals->push_back(osg::Vec3(0.0f, 0.0f, 1.0f));
@@ -477,12 +477,33 @@ void GraphicManager::createScene(){
 
 int GraphicManager::runViewer(){
 	osgViewer::Viewer viewer;
+	osg::ref_ptr<osg::Camera> camera = new osg::Camera;
+	/*camera->setViewMatrixAsLookAt(
+		osg::Vec3f(0.0f, 5.0f, 0.0f),
+		osg::Vec3f(0.0f, 0.0f, 0.0f),
+		osg::X_AXIS);*/
+
+	/*camera->setViewMatrix(osg::Matrixd::lookAt(
+		osg::Vec3d(0.0f, 25.0f, 0.0f),
+		osg::Vec3d(),
+		osg::X_AXIS));*/
+
+	osg::Vec3d eye(200.0f, -200.0f, 0.0f);
+	osg::Vec3d center;
+	osg::Vec3d up(-1.0f, 0.0f, .0f);// = -osg::X_AXIS;
+
 	osg::ref_ptr<CommandController> commCrtl = new CommandController(env.get());
+	//viewer.setCamera(camera.get());
 	viewer.setSceneData(_sceneRoot.get());
 	viewer.addEventHandler(commCrtl.get());
 	viewer.addEventHandler(new osgViewer::StatsHandler);
 	viewer.apply(new osgViewer::SingleWindow(10, 10, 1200, 900));
 	env->start();
+
+	//viewer.getCamera()->setViewMatrixAsLookAt(eye, center, osg::X_AXIS);
+	viewer.setCameraManipulator(new osgGA::TrackballManipulator);
+	viewer.getCameraManipulator()->setHomePosition(eye, center, up);
+	viewer.home();
 	return viewer.run();
 }
 
