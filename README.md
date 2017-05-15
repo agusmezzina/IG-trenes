@@ -8,3 +8,5 @@ Proyectos:
 - VirtualSimulationEnvironment (desactivado): modelo de datos para la representación de entornos virtuales.
 
 Tesis de Grado de Ingeniería en Informática - Facultad de Ingeniería UBA.
+
+![tren-preview](tren3.png)
